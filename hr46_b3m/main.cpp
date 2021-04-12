@@ -28,7 +28,7 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <HCIPC.h>
-#ifdef VREP_SIMULATOR
+#ifdef WEBOTS_GANKEN_SIMULATOR
 #include <SimulatorIPC.h>
 #endif
 
@@ -39,6 +39,8 @@
 #include <RTIMUSettings.h>
 
 #include <webots/Motor.hpp>
+#include <cmath>
+#include <unordered_map>
 
 extern "C"
 {
@@ -108,7 +110,7 @@ string recvHajimeCommand(const string &str, void *context)
 	}
 	while (!response_ready && cnt++ < CMD_TIMEOUT_MS)
 	{
-#ifdef VREP_SIMULATOR
+#ifdef WEBOTS_GANKEN_SIMULATOR
 		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 #else
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
@@ -297,12 +299,13 @@ class webots_motor_control
 
 private:
 	std::vector<std::pair<int32_t, std::string>> motors_info;
-	webots::Robot *robot = new Robot();
+	webots::Robot *robot;
 	std::unordered_map<int32_t,webots::Motor *>	robot_motors;
 
 public:
 	webots_motor_control()
 	{
+		robot = new Robot();
 		motors_info.emplace_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.emplace_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
 		motors_info.emplace_back({KNEE_R1, "right_knee_pitch_joint"});
@@ -325,9 +328,15 @@ public:
 		motors_info.emplace_back({HEAD_YAW, "head_yaw_joint"});
 
 		for(auto &mp:motors_info){
-			robot_motors.emplace(mp.first,robot->get);
+			robot_motors.emplace(mp.first,robot->getMotor(mp.second));
 		}
-		
+	}
+
+	int send_target_degrees(){
+		for(auto &mp:robot_motors){
+			(mp.second)->setPosition(-xv_ref.d[mp.first] * (std::numbers::pi_v<float>/180.0));
+		}
+		return 0;
 	}
 
 }
@@ -341,8 +350,10 @@ main(int argc, char *argv[])
 	int id = 0;
 	short j;
 	int shutdown_flag = 0;
-#ifdef VREP_SIMULATOR
+#ifdef WEBOTS_GANKEN_SIMULATOR
 	OrientationEstimator orientationEst((double)FRAME_RATE / 1000.0, 0.1);
+
+	webots_motor_control wb_motors;
 
 #endif
 	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
@@ -373,7 +384,7 @@ main(int argc, char *argv[])
 				cmd = "";
 			}
 		}
-#if !defined VREP_SIMULATOR
+#if !defined WEBOTS_GANKEN_SIMULATOR
 		{
 			///// MPU9250 reading sensor data, calc quaternion and settings
 			static int continueous_error_count = 0;
@@ -431,13 +442,10 @@ main(int argc, char *argv[])
 					shutdown_flag = 1;
 			}
 		}
-#endif //!defined VREP_SIMULATOR
+#endif //!defined WEBOTS_GANKEN_SIMULATOR
 		if (!shutdown_flag)
 			cntr();
 
-		//ここで指令を出す
-		{
-		}
 
 		static unsigned long last_pan_update = 0;
 		if ((fabs(xv_gyro.gyro_roll) > 30) || (fabs(xv_gyro.gyro_pitch) > 30))
@@ -455,9 +463,15 @@ main(int argc, char *argv[])
 			if (xv_sv[j].deg_sv > xp_sv[j].deg_lim_h * 100 || xv_sv[j].deg_sv < xp_sv[j].deg_lim_l * 100)
 				printf("*******ERROR**** xv_sv[%d].deg_sv=%f\n", j, xv_sv[j].deg_sv / 100.0f);
 		}
-#ifdef VREP_SIMULATOR
+#ifdef WEBOTS_GANKEN_SIMULATOR
 		{
 			static int cnt = 0;
+
+					//ここで指令を出す
+		{
+			wb_motors.send_target_degrees();
+		}
+
 			std::vector<int> angles(24, 0);
 			for (int i = 0; i < 24; i++)
 				angles[i] = xv_sv[i].pls_out + servo_offset[i];
@@ -502,7 +516,7 @@ main(int argc, char *argv[])
 			}
 			cnt++;
 		}
-#endif // VREP_SIMULATOR
+#endif // WEBOTS_GANKEN_SIMULATOR
 
 		//		printf("cnt:%05d mode:%d%d%d%d%d\n", count_time_l, sq_flag.start, sq_flag.straight, sq_flag.ready, sq_flag.walk, sq_flag.motion);
 	}
