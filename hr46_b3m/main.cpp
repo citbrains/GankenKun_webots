@@ -300,7 +300,9 @@ class webots_motor_control
 private:
 	std::vector<std::pair<int32_t, std::string>> motors_info;
 	webots::Robot *robot;
-	std::unordered_map<int32_t,webots::Motor *>	robot_motors;
+	std::unordered_map<int32_t, webots::Motor *> robot_motors;
+	webots::Gyro *robot_gyro;
+	webots::Accelerometer *robot_accelerometer;
 
 public:
 	webots_motor_control()
@@ -327,16 +329,38 @@ public:
 		motors_info.emplace_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
 		motors_info.emplace_back({HEAD_YAW, "head_yaw_joint"});
 
-		for(auto &mp:motors_info){
-			robot_motors.emplace(mp.first,robot->getMotor(mp.second));
+		for (auto &mp : motors_info)
+		{
+			robot_motors.emplace(mp.first, robot->getMotor(mp.second));
 		}
+		robot_accelerometer = robot.getAccelerometer("imu/data accelerometer");
+		robot_Gyro = robot.getGyro("imu/data gyro");
 	}
 
-	int send_target_degrees(){
-		for(auto &mp:robot_motors){
-			(mp.second)->setPosition(-xv_ref.d[mp.first] * (std::numbers::pi_v<float>/180.0));
+	int send_target_degrees()
+	{
+		for (auto &mp : robot_motors)
+		{
+			(mp.second)->setPosition(-xv_ref.d[mp.first] * (std::numbers::pi_v<float> / 180.0));
 		}
 		return 0;
+	}
+
+	int get_acc_values()
+	{
+		double *val = robot_gyro.getValues();
+		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x	/9.8�ŒP�ʂ�G����m/ss�ɂ���
+		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y	1.08/3.6 = 0.3 �ŃX�P�[�������킹��	�Z���T�̍ő�d���i�I�t�Z�b�g�ς݁j:1.08[V], �ő匟�o:3.6[G]
+		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z	�Ō��xp_acc.acc_k(3.1)��������
+		return 0;
+	}
+
+	int get_gyro_values()
+	{
+		double *val = robot_accelerometer.getValues();
+		xv_gyro.gyro_data1 = -val[0] * 1; // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
+		xv_gyro.gyro_data2 = -val[1] * 1; // pitch	�������I�I
+		xv_gyro.gyro_data3 = val[2] * 1;  // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
 	}
 
 }
@@ -353,7 +377,7 @@ main(int argc, char *argv[])
 #ifdef WEBOTS_GANKEN_SIMULATOR
 	OrientationEstimator orientationEst((double)FRAME_RATE / 1000.0, 0.1);
 
-	webots_motor_control wb_motors;
+	webots_motor_control wb_ganken;
 
 #endif
 	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
@@ -446,7 +470,6 @@ main(int argc, char *argv[])
 		if (!shutdown_flag)
 			cntr();
 
-
 		static unsigned long last_pan_update = 0;
 		if ((fabs(xv_gyro.gyro_roll) > 30) || (fabs(xv_gyro.gyro_pitch) > 30))
 		{
@@ -467,10 +490,10 @@ main(int argc, char *argv[])
 		{
 			static int cnt = 0;
 
-					//ここで指令を出す
-		{
-			wb_motors.send_target_degrees();
-		}
+			//ここで指令を出す
+			{
+				wb_ganken.send_target_degrees();
+			}
 
 			std::vector<int> angles(24, 0);
 			for (int i = 0; i < 24; i++)
@@ -490,14 +513,11 @@ main(int argc, char *argv[])
 			}
 			if (cnt > 5)
 			{
-				xv_gyro.gyro_data1 = -sd.gyro[0] * 1;				 // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
-				xv_gyro.gyro_data2 = -sd.gyro[1] * 1;				 // pitch	�������I�I
-				xv_gyro.gyro_data3 = sd.gyro[2] * 1;				 // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
-				xv_acc.acc_data1 = sd.accel[0] / 9.8f * 0.3f * 3.1f; // x	/9.8�ŒP�ʂ�G����m/ss�ɂ���
-				xv_acc.acc_data2 = sd.accel[1] / 9.8f * 0.3f * 3.1f; // y	1.08/3.6 = 0.3 �ŃX�P�[�������킹��	�Z���T�̍ő�d���i�I�t�Z�b�g�ς݁j:1.08[V], �ő匟�o:3.6[G]
-				xv_acc.acc_data3 = sd.accel[2] / 9.8f * 0.3f * 3.1f; // z	�Ō��xp_acc.acc_k(3.1)��������
-																	 //				printf("R:%lf\tP:%lf\tY:%lf\n",xv_gyro.gyro_data1, xv_gyro.gyro_data2, xv_gyro.gyro_data3);
-																	 //				printf("X:%f\tY:%f\tZ:%f\n",xv_acc.acc_data1, xv_acc.acc_data2, xv_acc.acc_data3);
+
+				wb_ganken.get_gyro_values();
+				wb_ganken.get_acc_values();
+				//				printf("R:%lf\tP:%lf\tY:%lf\n",xv_gyro.gyro_data1, xv_gyro.gyro_data2, xv_gyro.gyro_data3);
+				//				printf("X:%f\tY:%f\tZ:%f\n",xv_acc.acc_data1, xv_acc.acc_data2, xv_acc.acc_data3);
 
 				if ((xv_acc.acc_data1 != 0.0) || (xv_acc.acc_data2 != 0.0) || (xv_acc.acc_data3 != 0.0))
 				{
