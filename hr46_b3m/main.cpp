@@ -22,25 +22,29 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdio.h>
-#include <math.h>
-#include <KSerialPort.h>
+//#include <math.h>
+//#include <KSerialPort.h>
 
 #include <boost/thread.hpp>
 #include <string>
-#include <HCIPC.h>
+//#include <HCIPC.h>
+
+#define WEBOTS_GANKEN_SIMULATOR
+
 #ifdef WEBOTS_GANKEN_SIMULATOR
-#include <SimulatorIPC.h>
+#include <webots/Motor.hpp>
+#include <webots/Robot.hpp>
+#include <webots/Accelerometer.hpp>
+#include <webots/Gyro.hpp>
+#include <cmath>
+#include <unordered_map>
 #endif
 
 #include "pc_motion.h"
-#include "ADIS16375.h"
+//#include "ADIS16375.h"
 #include "OrientationEstimator.h"
-#include <RTIMULib.h>
-#include <RTIMUSettings.h>
-
-#include <webots/Motor.hpp>
-#include <cmath>
-#include <unordered_map>
+//#include <RTIMULib.h>
+//#include <RTIMUSettings.h>
 
 extern "C"
 {
@@ -69,7 +73,7 @@ extern "C"
 
 #pragma comment(lib, "winmm.lib")
 
-#define FRAME_RATE 10
+constexpr int32_t FRAME_RATE = 10;
 
 using namespace std;
 using namespace boost;
@@ -81,8 +85,7 @@ static string res;
 
 extern "C"
 
-	int
-	scif1_tx_fun()
+int scif1_tx_fun()
 {
 	mutex::scoped_lock look(lock_obj);
 
@@ -98,7 +101,7 @@ extern "C"
 	return 1;
 }
 
-string recvHajimeCommand(const string &str, void *context)
+/* string recvHajimeCommand(const string &str, void *context)
 {
 	static const int CMD_TIMEOUT_MS = 100;
 	int cnt = 0;
@@ -132,7 +135,7 @@ void ipcthread(int argc, char *argv[], int id)
 	hcipc->setCallback(recvHajimeCommand, NULL);
 	hcipc->wait();
 }
-
+ */
 extern "C" int servo_offset[SERV_NUM]; // �I�t�Z�b�g�ۑ��p
 
 //========================
@@ -307,48 +310,49 @@ private:
 public:
 	webots_motor_control()
 	{
-		robot = new Robot();
-		motors_info.emplace_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
-		motors_info.emplace_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
-		motors_info.emplace_back({KNEE_R1, "right_knee_pitch_joint"});
-		motors_info.emplace_back({KNEE_R2, "right_waist_pitch_joint"});
-		motors_info.emplace_back({LEG_ROLL_R, "right_waist_roll_joint"});
-		motors_info.emplace_back({LEG_YAW_R, "right_waist_yaw_joint"});
-		motors_info.emplace_back({ARM_ROLL_R, "right_shoulder_roll_joint"});
-		motors_info.emplace_back({ARM_PITCH_R, "right_shoulder_pitch_joint"});
-		motors_info.emplace_back({ELBOW_PITCH_R, "right_elbow_pitch_joint"});
+		robot = new webots::Robot();
+		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
+		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
+		motors_info.push_back({KNEE_R1, "right_knee_pitch_joint"});
+		motors_info.push_back({KNEE_R2, "right_waist_pitch_joint"});
+		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_joint"});
+		motors_info.push_back({LEG_YAW_R, "right_waist_yaw_joint"});
+		motors_info.push_back({ARM_ROLL_R, "right_shoulder_roll_joint"});
+		motors_info.push_back({ARM_PITCH_R, "right_shoulder_pitch_joint"});
+		motors_info.push_back({ELBOW_PITCH_R, "right_elbow_pitch_joint"});
 
-		motors_info.emplace_back({FOOT_ROLL_L, "left_ankle_roll_joint"});
-		motors_info.emplace_back({LEG_PITCH_L, "left_ankle_pitch_joint"});
-		motors_info.emplace_back({KNEE_L1, "left_knee_pitch_joint"});
-		motors_info.emplace_back({KNEE_L2, "left_waist_pitch_joint"});
-		motors_info.emplace_back({LEG_ROLL_L, "left_waist_roll_joint"});
-		motors_info.emplace_back({LEG_YAW_L, "left_waist_yaw_joint"});
-		motors_info.emplace_back({ARM_PITCH_L, "left_shoulder_pitch_joint"});
-		motors_info.emplace_back({ARM_ROLL_L, "left_shoulder_roll_joint"});
-		motors_info.emplace_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
-		motors_info.emplace_back({HEAD_YAW, "head_yaw_joint"});
+		motors_info.push_back({FOOT_ROLL_L, "left_ankle_roll_joint"});
+		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_joint"});
+		motors_info.push_back({KNEE_L1, "left_knee_pitch_joint"});
+		motors_info.push_back({KNEE_L2, "left_waist_pitch_joint"});
+		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_joint"});
+		motors_info.push_back({LEG_YAW_L, "left_waist_yaw_joint"});
+		motors_info.push_back({ARM_PITCH_L, "left_shoulder_pitch_joint"});
+		motors_info.push_back({ARM_ROLL_L, "left_shoulder_roll_joint"});
+		motors_info.push_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
+		motors_info.push_back({HEAD_YAW, "head_yaw_joint"});
 
 		for (auto &mp : motors_info)
 		{
 			robot_motors.emplace(mp.first, robot->getMotor(mp.second));
 		}
-		robot_accelerometer = robot.getAccelerometer("imu/data accelerometer");
-		robot_Gyro = robot.getGyro("imu/data gyro");
+		robot_accelerometer = robot->getAccelerometer("imu/data accelerometer");
+		robot_gyro = robot->getGyro("imu/data gyro");
 	}
 
 	int send_target_degrees()
 	{
 		for (auto &mp : robot_motors)
 		{
-			(mp.second)->setPosition(-xv_ref.d[mp.first] * (std::numbers::pi_v<float> / 180.0));
+			//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
+			(mp.second)->setPosition(-xv_ref.d[mp.first] * (M_PI / 180.0));
 		}
 		return 0;
 	}
 
 	int get_acc_values()
 	{
-		double *val = robot_gyro.getValues();
+		const double *val = robot_gyro->getValues();
 		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x	/9.8�ŒP�ʂ�G����m/ss�ɂ���
 		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y	1.08/3.6 = 0.3 �ŃX�P�[�������킹��	�Z���T�̍ő�d���i�I�t�Z�b�g�ς݁j:1.08[V], �ő匟�o:3.6[G]
 		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z	�Ō��xp_acc.acc_k(3.1)��������
@@ -357,13 +361,13 @@ public:
 
 	int get_gyro_values()
 	{
-		double *val = robot_accelerometer.getValues();
+		const double *val = robot_accelerometer->getValues();
 		xv_gyro.gyro_data1 = -val[0] * 1; // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
 		xv_gyro.gyro_data2 = -val[1] * 1; // pitch	�������I�I
 		xv_gyro.gyro_data3 = val[2] * 1;  // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
 	}
 
-}
+};
 
 /*--------------------------------------*/
 /*	PC simulation main					*/
@@ -408,6 +412,7 @@ main(int argc, char *argv[])
 				cmd = "";
 			}
 		}
+/* 
 #if !defined WEBOTS_GANKEN_SIMULATOR
 		{
 			///// MPU9250 reading sensor data, calc quaternion and settings
@@ -466,7 +471,7 @@ main(int argc, char *argv[])
 					shutdown_flag = 1;
 			}
 		}
-#endif //!defined WEBOTS_GANKEN_SIMULATOR
+#endif //!defined WEBOTS_GANKEN_SIMULATOR */
 		if (!shutdown_flag)
 			cntr();
 
@@ -495,22 +500,16 @@ main(int argc, char *argv[])
 				wb_ganken.send_target_degrees();
 			}
 
-			std::vector<int> angles(24, 0);
+/* 			std::vector<int> angles(24, 0);
 			for (int i = 0; i < 24; i++)
-				angles[i] = xv_sv[i].pls_out + servo_offset[i];
-			float ptime = client.getSimulationTime();
-			hc::SensorData sd;
-			do
-			{
-				sd = client.setJointAngles(id, angles, 10);
-				boost::this_thread::sleep(boost::posix_time::microseconds(1000));
-				// empty sensor data indicate that simulation didn't progress
-			} while (sd.accel.size() == 0);
+				angles[i] = xv_sv[i].pls_out + servo_offset[i];  */
 
+/* 			float ptime = client.getSimulationTime();
 			while (ptime == client.getSimulationTime())
 			{
 				boost::this_thread::sleep(boost::posix_time::microseconds(5000));
-			}
+			} 
+			これなんですか.......*/
 			if (cnt > 5)
 			{
 
