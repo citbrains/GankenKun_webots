@@ -352,6 +352,7 @@ public:
 		robot_accelerometer->enable(10);
 		robot_gyro->enable(10);
 		mTimeStep = (int)robot->getBasicTimeStep();
+		cout << mTimeStep << endl;
 	}
 
 	int send_target_degrees()
@@ -379,9 +380,15 @@ public:
 		xv_gyro.gyro_data1 = -val[0] * 1; // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
 		xv_gyro.gyro_data2 = -val[1] * 1; // pitch	�������I�I
 		xv_gyro.gyro_data3 = val[2] * 1;  // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
+        return 0;
 	}
+
 	bool step(){
 		return robot->step(mTimeStep) != -1 ;
+	}
+
+	int32_t getmTimeStep(){
+		return mTimeStep;
 	}
 };
 
@@ -394,9 +401,10 @@ int main(int argc, char *argv[])
 	short j;
 	int shutdown_flag = 0;
 #ifdef WEBOTS_GANKEN_SIMULATOR
-	OrientationEstimator orientationEst((double)FRAME_RATE / 1000.0, 0.1);
 
 	webots_motor_control wb_ganken;
+
+	OrientationEstimator orientationEst((double)(wb_ganken->getmTimeStep()) / 1000.0, 0.1);
 
 #endif
 	const char *servo_port = "/dev/kondoservo";
@@ -415,7 +423,7 @@ int main(int argc, char *argv[])
 	// loop start
 	for (count_time_l = 0;wb_ganken.step() ; count_time_l++)
 	{
-		bool cmd_accept = false;
+		/*bool cmd_accept = false;
 		{
 			// accept command
 			mutex::scoped_lock look(lock_obj);
@@ -426,7 +434,7 @@ int main(int argc, char *argv[])
 				cmd_accept = true;
 				cmd = "";
 			}
-		}
+		}*/
 		/* 
 #if !defined WEBOTS_GANKEN_SIMULATOR
 		{
@@ -551,6 +559,7 @@ int main(int argc, char *argv[])
 			}
 			cnt++;
 			//あとでちゃんと調整するやつを作る
+			/*
 			boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
 			while(diff.total_milliseconds() < ( 1000 / FRAME_RATE )){
@@ -558,14 +567,14 @@ int main(int argc, char *argv[])
 				boost::this_thread::sleep(boost::posix_time::milliseconds((1000 / FRAME_RATE) - diff.total_milliseconds()));
 				now = boost::posix_time::microsec_clock::local_time();
 				diff = now - ptime;
-			}
+			}*/
 			if (cnt % 200 == 0)
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(5 + 26)];
 				unsigned char stride_y = ParamTable[(int)(0 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
