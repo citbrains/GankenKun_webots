@@ -316,6 +316,7 @@ private:
 	std::unordered_map<int32_t, webots::Motor *> robot_motors;
 	webots::Gyro *robot_gyro;
 	webots::Accelerometer *robot_accelerometer;
+	int32_t mTimeStep;
 
 public:
 	webots_motor_control()
@@ -350,6 +351,7 @@ public:
 		robot_gyro = robot->getGyro("imu/data gyro");
 		robot_accelerometer->enable(10);
 		robot_gyro->enable(10);
+		mTimeStep = (int)robot->getBasicTimeStep();
 	}
 
 	int send_target_degrees()
@@ -364,7 +366,7 @@ public:
 
 	int get_acc_values()
 	{
-		const double *val = robot_gyro->getValues();
+		const double *val = robot_accelerometer->getValues();
 		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x	/9.8�ŒP�ʂ�G����m/ss�ɂ���
 		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y	1.08/3.6 = 0.3 �ŃX�P�[�������킹��	�Z���T�̍ő�d���i�I�t�Z�b�g�ς݁j:1.08[V], �ő匟�o:3.6[G]
 		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z	�Ō��xp_acc.acc_k(3.1)��������
@@ -373,10 +375,13 @@ public:
 
 	int get_gyro_values()
 	{
-		const double *val = robot_accelerometer->getValues();
+		const double *val = robot_gyro->getValues();
 		xv_gyro.gyro_data1 = -val[0] * 1; // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
 		xv_gyro.gyro_data2 = -val[1] * 1; // pitch	�������I�I
 		xv_gyro.gyro_data3 = val[2] * 1;  // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
+	}
+	bool step(){
+		return robot->step(mTimeStep) != -1 ;
 	}
 };
 
@@ -408,7 +413,7 @@ int main(int argc, char *argv[])
 
 	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	// loop start
-	for (count_time_l = 0;; count_time_l++)
+	for (count_time_l = 0;wb_ganken.step() ; count_time_l++)
 	{
 		bool cmd_accept = false;
 		{
