@@ -392,7 +392,6 @@ int main(int argc, char *argv[])
 	webots_motor_control wb_ganken;
 
 #endif
-	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	const char *servo_port = "/dev/kondoservo";
 	if (argc > 1)
 		servo_port = argv[1];
@@ -405,6 +404,7 @@ int main(int argc, char *argv[])
 	eeprom_load((char *)"eeprom_list.txt");
 	flag_gyro.zero = ON;
 
+	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	// loop start
 	for (count_time_l = 0;; count_time_l++)
 	{
@@ -544,7 +544,14 @@ int main(int argc, char *argv[])
 			}
 			cnt++;
 			//あとでちゃんと調整するやつを作る
-			boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+			boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
+			boost::posix_time::time_duration diff = now - ptime;
+			while(diff.total_milliseconds() < ( 1000 / FRAME_RATE )){
+			
+				boost::this_thread::sleep(boost::posix_time::milliseconds((1000 / FRAME_RATE) - diff.total_milliseconds()));
+				now = boost::posix_time::microsec_clock::local_time();
+				diff = now - ptime;
+			}
 			if (cnt % 200 == 0)
 			{
 				//motion_flag = false;
