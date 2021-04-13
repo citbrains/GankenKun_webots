@@ -83,9 +83,19 @@ static string cmd;
 static bool response_ready = false;
 static string res;
 
+char ParamTable[53] =
+{
+	'z','y','x','w','v','u','t','s','r','q','p','o','n','m','l','k','j','i','h','g','f','e','d','c','b','a', // -26 - -1
+	'0',                                                                                                     // 0
+	'1','2','3','4','5','6','7','8','9','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'  // 1 - 26
+};
+
+
+
 extern "C"
 
-int scif1_tx_fun()
+	int
+	scif1_tx_fun()
 {
 	mutex::scoped_lock look(lock_obj);
 
@@ -366,14 +376,12 @@ public:
 		xv_gyro.gyro_data2 = -val[1] * 1; // pitch	�������I�I
 		xv_gyro.gyro_data3 = val[2] * 1;  // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
 	}
-
 };
 
 /*--------------------------------------*/
 /*	PC simulation main					*/
 /*--------------------------------------*/
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int id = 0;
 	short j;
@@ -412,7 +420,7 @@ main(int argc, char *argv[])
 				cmd = "";
 			}
 		}
-/* 
+		/* 
 #if !defined WEBOTS_GANKEN_SIMULATOR
 		{
 			///// MPU9250 reading sensor data, calc quaternion and settings
@@ -500,16 +508,17 @@ main(int argc, char *argv[])
 				wb_ganken.send_target_degrees();
 			}
 
-/* 			std::vector<int> angles(24, 0);
+			/* 			std::vector<int> angles(24, 0);
 			for (int i = 0; i < 24; i++)
 				angles[i] = xv_sv[i].pls_out + servo_offset[i];  */
 
-/* 			float ptime = client.getSimulationTime();
+			/* 			float ptime = client.getSimulationTime();
 			while (ptime == client.getSimulationTime())
 			{
 				boost::this_thread::sleep(boost::posix_time::microseconds(5000));
 			} 
 			これなんですか.......*/
+
 			if (cnt > 5)
 			{
 
@@ -534,6 +543,20 @@ main(int argc, char *argv[])
 				}
 			}
 			cnt++;
+			//あとでちゃんと調整するやつを作る
+			boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+			if (cnt % 200 == 0)
+			{
+				//motion_flag = false;
+				unsigned char walk_cmd = 'A';
+				unsigned char num_step = ParamTable[(int)(0 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(0 + 26)];
+				unsigned char stride_y = ParamTable[(int)(0 + 26)];
+				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
+				convert_bin(&xv_comm_bin, &xv_comm);
+			}
 		}
 #endif // WEBOTS_GANKEN_SIMULATOR
 
