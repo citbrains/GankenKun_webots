@@ -27,7 +27,7 @@ set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 FIND_PACKAGE(Boost COMPONENTS system thread filesystem)
 add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
-add_subdirectory(RTIMULib)
+#add_subdirectory(RTIMULib)
 
 #set(ICE_DIR $ENV{ICE_HOME} CACHE PATH "ZeroC ICE installation dir(Default: $ICE_HOME)")
 
@@ -68,7 +68,7 @@ include_directories(
 	${WEBOTS_HOME}/include/controller/cpp
 	#../SimDriver
 	#../HCServer
-	RTIMULib
+	#RTIMULib
 )
 
 link_directories(
@@ -76,7 +76,7 @@ link_directories(
 	${Boost_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIR}
 	${WEBOTS_HOME}/lib/controller
-	RTIMULib
+	#RTIMULib
 )
 
 set(HR46_B3M_SRCS
@@ -125,18 +125,18 @@ target_link_libraries(hr46_b3m
 	${Boost_LIBRARIES}
 	#${hr46_b3m_LIBRARIES}
 	${WEBOTS_LIBRARIES}
-	RTIMULib
+	#RTIMULib
 )
 
 
 SET(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 INSTALL(TARGETS hr46_b3m 
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION bin
-  ARCHIVE DESTINATION bin
+  RUNTIME DESTINATION ../bin
+  LIBRARY DESTINATION ../bin
+  ARCHIVE DESTINATION ../bin
 )
 
-install(FILES servo_para.txt DESTINATION bin)
-install(FILES RTIMULib.ini DESTINATION bin)
+install(FILES servo_para.txt DESTINATION ../bin)
+#install(FILES RTIMULib.ini DESTINATION ../bin)
 
