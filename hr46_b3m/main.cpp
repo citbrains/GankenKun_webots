@@ -348,6 +348,8 @@ public:
 		}
 		robot_accelerometer = robot->getAccelerometer("imu/data accelerometer");
 		robot_gyro = robot->getGyro("imu/data gyro");
+		robot_accelerometer->enable(10);
+		robot_gyro->enable(10);
 	}
 
 	int send_target_degrees()
