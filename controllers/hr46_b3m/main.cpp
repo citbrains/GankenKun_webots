@@ -84,13 +84,11 @@ static bool response_ready = false;
 static string res;
 
 char ParamTable[53] =
-{
-	'z','y','x','w','v','u','t','s','r','q','p','o','n','m','l','k','j','i','h','g','f','e','d','c','b','a', // -26 - -1
-	'0',                                                                                                     // 0
-	'1','2','3','4','5','6','7','8','9','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'  // 1 - 26
+	{
+		'z', 'y', 'x', 'w', 'v', 'u', 't', 's', 'r', 'q', 'p', 'o', 'n', 'm', 'l', 'k', 'j', 'i', 'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a', // -26 - -1
+		'0',																															  // 0
+		'1', '2', '3', '4', '5', '6', '7', '8', '9', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'  // 1 - 26
 };
-
-
 
 extern "C"
 
@@ -359,8 +357,14 @@ public:
 	{
 		for (auto &mp : robot_motors)
 		{
-			//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
-			(mp.second)->setPosition(-xv_ref.d[mp.first] * (M_PI / 180.0));
+			if ((mp.first == KNEE_R1) || (mp.first == KNEE_R2) || (mp.first == KNEE_L1)|| (mp.first == KNEE_L2)|| (mp.first == ELBOW_PITCH_L)|| (mp.first == ELBOW_PITCH_R))
+			{
+				//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
+				(mp.second)->setPosition(xv_ref.d[mp.first] * (M_PI / 180.0));
+			}
+			else{
+				(mp.second)->setPosition(-xv_ref.d[mp.first] * (M_PI / 180.0));
+			}
 		}
 		return 0;
 	}
@@ -380,14 +384,16 @@ public:
 		xv_gyro.gyro_data1 = -val[0] * 1; // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
 		xv_gyro.gyro_data2 = -val[1] * 1; // pitch	�������I�I
 		xv_gyro.gyro_data3 = val[2] * 1;  // yaw	�ő�d��(�I�t�Z�b�g�ς�):2[V], �ő匟�o:200[deg/sec] 2/200=0.01 ��xp_gyro.gyro_k3(100)�������� 0.01*100=1
-        return 0;
+		return 0;
 	}
 
-	bool step(){
-		return robot->step(mTimeStep) != -1 ;
+	bool step()
+	{
+		return robot->step(mTimeStep) != -1;
 	}
 
-	int32_t getmTimeStep(){
+	int32_t getmTimeStep()
+	{
 		return mTimeStep;
 	}
 };
@@ -421,7 +427,7 @@ int main(int argc, char *argv[])
 
 	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	// loop start
-	for (count_time_l = 0;wb_ganken.step() ; count_time_l++)
+	for (count_time_l = 0; wb_ganken.step(); count_time_l++)
 	{
 		/*bool cmd_accept = false;
 		{
