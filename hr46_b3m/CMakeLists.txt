@@ -83,7 +83,7 @@ set(HR46_B3M_SRCS
 acc.c                 calc_deg.c            calc_mv.c             
 cntr.c                func.c                gyro.c
 joy.c                 kine.c                main.cpp
-motion.c              mvtbl.c               b3m.cpp
+motion.c              mvtbl.c               
 serv.c                servo_rs.c            serv_init.c
 sq_motion.c           sq_ready.c            sq_start.c
 sq_straight.c         sq_walk.c             var_init.c
@@ -92,11 +92,11 @@ pc_motion.cpp         OrientationEstimator.cpp
 acc.h                 calc_deg.h            calc_mv.h
 cntr.h                func.h                gyro.h
 joy.h                 kine.h                motion.h
-mvtbl.h               b3m.h                  serv.h
+mvtbl.h                                     serv.h
 servo_rs.h            serv_init.h           sq_motion.h
 sq_ready.h            sq_start.h            sq_straight.h
 sq_walk.h             var.h                 pc_motion.h
-OrientationEstimator.h						ADIS16375.h
+OrientationEstimator.h						
 )
 
 

@@ -13,26 +13,26 @@
 #include "b3m.h"
 #include "motion.h"
 
-// short flag_sq_start;					// sq_start‚ğÀs‚·‚é‚©‚Ìƒtƒ‰ƒOi‡”Ô‘Ò‚¿‚ ‚èj
-short flag_md_start_end;				// mode‚ÌI—¹ƒtƒ‰ƒO
+// short flag_sq_start;					// sq_startï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½é‚©ï¿½Ìƒtï¿½ï¿½ï¿½Oï¿½iï¿½ï¿½ï¿½Ô‘Ò‚ï¿½ï¿½ï¿½ï¿½ï¿½j
+short flag_md_start_end;				// modeï¿½ÌIï¿½ï¿½ï¿½tï¿½ï¿½ï¿½O
 short mode_sq_start, mode_sq_start_prev;
 
-// ‹N“®ƒV[ƒPƒ“ƒX‚Ì‰Šú‰»
+// ï¿½Nï¿½ï¿½ï¿½Vï¿½[ï¿½Pï¿½ï¿½ï¿½Xï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½
 void sq_start_init()
 {
 //	sq_flag.start       =   ON;
-	flag_md_start_end	= 	OFF;		// mode‚ÌI—¹ƒtƒ‰ƒO
+	flag_md_start_end	= 	OFF;		// modeï¿½ÌIï¿½ï¿½ï¿½tï¿½ï¿½ï¿½O
 	mode_sq_start_prev	=   -1;
 	mode_sq_start		=	0;
 	servo_period		=	0;
 }
 
-int	servo_offset[SERV_NUM];	// ƒIƒtƒZƒbƒg•Û‘¶—p
+int	servo_offset[SERV_NUM];	// ï¿½Iï¿½tï¿½Zï¿½bï¿½gï¿½Û‘ï¿½ï¿½p
 
 /*--------------------------------------*/
 /*	sq_start_mode						*/
 /*--------------------------------------*/
-// ‹N“®‚ÌƒV[ƒPƒ“ƒX
+// ï¿½Nï¿½ï¿½ï¿½ï¿½ï¿½ÌƒVï¿½[ï¿½Pï¿½ï¿½ï¿½X
 int sq_start()
 {
 	static float mode_sq_time;
@@ -43,7 +43,7 @@ int sq_start()
 		{
 			case 0:
 				/***	servo_reset		***/
-				B3MAllReset( B3M_RESET_AFTER_TIME );
+				//B3MAllReset( B3M_RESET_AFTER_TIME );
 				mode_sq_time	=	0.06f;
 				break;
 
@@ -165,7 +165,7 @@ int sq_start()
 					for(i = 0; i < SERV_NUM; i ++){
 						position[i] = xv_servo_rs.goal_position[i] + servo_offset[i];
 					}
-					Write_All_B3M_Position_or_Time( (unsigned short *)&position[0], &xp_servo_rs.goal_time_slow[0], 2 );
+					//Write_All_B3M_Position_or_Time( (unsigned short *)&position[0], &xp_servo_rs.goal_time_slow[0], 2 );
 				}
 				mode_sq_time	=	3.0f;
 				break;
@@ -193,5 +193,5 @@ int sq_start()
 		mode_sq_time -= RTC_TIME_SEC;
 	}
 
-	return flag_md_start_end;		// I—¹‚©‚Ç‚¤‚©‚Ìƒtƒ‰ƒO
+	return flag_md_start_end;		// ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½Ìƒtï¿½ï¿½ï¿½O
 }

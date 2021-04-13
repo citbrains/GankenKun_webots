@@ -106,7 +106,7 @@ void	write_servo_rs_all( unsigned char addr, unsigned short *pdata, short len )
 {
 	int ret;
 
-	ret = Write_Servo_B3M_All_2Kport(addr, pdata, len );
+	//ret = Write_Servo_B3M_All_2Kport(addr, pdata, len );
 }
 
 /*--------------------------------------*/

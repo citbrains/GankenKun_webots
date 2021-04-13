@@ -372,7 +372,7 @@ void	joy( void )
 			tmpCharPtr = sfmt + 5;
 
 			// write battery voltage * 100
-			if(mode_motion == MOTION_NONE){
+			/*if(mode_motion == MOTION_NONE){
 				struct ServoStatus s;
 				ad_volt[3] = B3MGetServoStatus(18, &s) == 0 ? s.voltage * 100 : 0;
 				printf("voltage 1: %f\n", s.voltage);
@@ -381,7 +381,7 @@ void	joy( void )
 				}
 			}else{
 				ad_volt[3] = 9999;
-			}
+			}*/
 			writeHexNumber(tmpCharPtr,(int)(ad_volt[3]), 4);
 			tmpCharPtr += 4;
 			writeHexNumber(tmpCharPtr,(int)(ad_volt[3]), 4);
