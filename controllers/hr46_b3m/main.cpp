@@ -357,7 +357,8 @@ public:
 	{
 		for (auto &mp : robot_motors)
 		{
-			if ((mp.first == KNEE_R1) || (mp.first == KNEE_R2) || (mp.first == KNEE_L1)|| (mp.first == KNEE_L2)|| (mp.first == ELBOW_PITCH_L)|| (mp.first == ELBOW_PITCH_R))
+			//if ((mp.first == KNEE_R1) || (mp.first == KNEE_R2) || (mp.first == KNEE_L1)|| (mp.first == KNEE_L2)|| (mp.first == ELBOW_PITCH_L)|| (mp.first == ELBOW_PITCH_R))
+			if(false)//リバースモードが必要かと思ってやった痕跡
 			{
 				//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
 				(mp.second)->setPosition(xv_ref.d[mp.first] * (M_PI / 180.0));
@@ -410,7 +411,7 @@ int main(int argc, char *argv[])
 
 	webots_motor_control wb_ganken;
 
-	OrientationEstimator orientationEst((double)(wb_ganken->getmTimeStep()) / 1000.0, 0.1);
+	OrientationEstimator orientationEst((double)(wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
 #endif
 	const char *servo_port = "/dev/kondoservo";
