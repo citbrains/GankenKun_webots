@@ -37,9 +37,10 @@
 #include <webots/Accelerometer.hpp>
 #include <webots/Gyro.hpp>
 #include <cmath>
-#include <map>
+#include <set>
 #include <exception>
 #include <cstdint>
+#include <tuple>
 #endif
 
 #include "pc_motion.h"
@@ -313,10 +314,11 @@ class webots_motor_control
 private:
 	std::vector<std::pair<int32_t, std::string>> motors_info;
 	webots::Robot *robot;
-	std::map<int32_t, webots::Motor *> robot_motors;
+	std::vector<std::tuple<int32_t, webots::Motor *,std::string>> robot_motors;
 	webots::Gyro *robot_gyro;
 	webots::Accelerometer *robot_accelerometer;
 	int32_t mTimeStep;
+	std::set<std::string> reverse_motors;
 
 public:
 	webots_motor_control()
@@ -324,13 +326,13 @@ public:
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
-		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_mimic_joint"});
+		//motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R1, "right_knee_pitch_joint"});
-		motors_info.push_back({KNEE_R1, "right_knee_pitch_mimic_joint"});
+		//motors_info.push_back({KNEE_R1, "right_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R2, "right_waist_pitch_joint"});
-		motors_info.push_back({KNEE_R2, "right_waist_pitch_mimic_joint"});
+		//motors_info.push_back({KNEE_R2, "right_waist_pitch_mimic_joint"});
 		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_joint"});
-		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_mimic_joint"});
+		//motors_info.push_back({LEG_ROLL_R, "right_waist_roll_mimic_joint"});
 		motors_info.push_back({LEG_YAW_R, "right_waist_yaw_joint"});
 		motors_info.push_back({ARM_ROLL_R, "right_shoulder_roll_joint"});
 		motors_info.push_back({ARM_PITCH_R, "right_shoulder_pitch_joint"});
@@ -338,25 +340,32 @@ public:
 
 		motors_info.push_back({FOOT_ROLL_L, "left_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_joint"});
-		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_mimic_joint"});
+		//motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L1, "left_knee_pitch_joint"});
-		motors_info.push_back({KNEE_L1, "left_knee_pitch_mimic_joint"});
+		//motors_info.push_back({KNEE_L1, "left_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L2, "left_waist_pitch_joint"});
-		motors_info.push_back({KNEE_L2, "left_waist_pitch_mimic_joint"});
+		//motors_info.push_back({KNEE_L2, "left_waist_pitch_mimic_joint"});
 		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_joint"});
-		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_mimic_joint"});
+	//	motors_info.push_back({LEG_ROLL_L, "left_waist_roll_mimic_joint"});
 		motors_info.push_back({LEG_YAW_L, "left_waist_yaw_joint"});
 		motors_info.push_back({ARM_PITCH_L, "left_shoulder_pitch_joint"});
 		motors_info.push_back({ARM_ROLL_L, "left_shoulder_roll_joint"});
 		motors_info.push_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
 		motors_info.push_back({HEAD_YAW, "head_yaw_joint"});
 
+		//reverse_motors.emplace("left_waist_pitch_joint");
+		reverse_motors.emplace("left_ankle_pitch_mimic_joint");
+		reverse_motors.emplace("left_waist_pitch_mimic_joint");
+		//reverse_motors.emplace("right_waist_pitch_joint");
+		reverse_motors.emplace("right_ankle_pitch_mimic_joint");
+		reverse_motors.emplace("right_waist_pitch_mimic_joint");
+
 		for (auto &mp : motors_info)
 		{
 			auto motor_ptr = robot->getMotor(mp.second);
 			if (motor_ptr != nullptr)
 			{
-				robot_motors.emplace(mp.first, motor_ptr);
+				robot_motors.emplace_back(mp.first, motor_ptr,mp.second);
 			}
 			else
 			{
@@ -387,17 +396,19 @@ public:
 
 	int32_t send_target_degrees()
 	{
+		int32_t servo_number = 0;
+		webots::Motor *target_motor;
+		std::string name_of_motor;
 		for (auto &mp : robot_motors)
 		{
-			//if ((mp.first == KNEE_R1) || (mp.first == KNEE_R2) || (mp.first == KNEE_L1)|| (mp.first == KNEE_L2)|| (mp.first == ELBOW_PITCH_L)|| (mp.first == ELBOW_PITCH_R))
-			/*if (false) //リバースモードが必要かと思ってやった痕跡
+			std::tie(servo_number,target_motor,name_of_motor) = mp;
+			if(reverse_motors.find(name_of_motor) != reverse_motors.end())
 			{
-				//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
-				(mp.second)->setPosition(xv_ref.d[mp.first] * (M_PI / 180.0));
+				(target_motor)->setPosition(xv_ref.d[servo_number] * (M_PI / 180.0));
 			}
-			else*/
+			else
 			{
-				(mp.second)->setPosition(-xv_ref.d[mp.first] * (M_PI / 180.0));
+				(target_motor)->setPosition(-xv_ref.d[servo_number] * (M_PI / 180.0));
 			}
 		}
 		return 0;
@@ -408,16 +419,18 @@ public:
 		const double *val = robot_accelerometer->getValues();
 		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x	
 		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y	
-		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z	
+		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z
+		//std::cout << "acc--x: " << xv_acc.acc_data1 << " y: " << xv_acc.acc_data2 << " z: " << xv_acc.acc_data3 << "\n";
 		return 0;
 	}
 
 	int32_t get_gyro_values()
 	{
 		const double *val = robot_gyro->getValues();
-		xv_gyro.gyro_data1 = -val[0] * 180.0f  / M_PI; // roll	返却値が[rad/sec]らしい.
-		xv_gyro.gyro_data2 = val[1] * 180.0f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.pitchはvrep用では-がついていたがこちらは+で良さそう。ｗ
+		xv_gyro.gyro_data1 = val[0] * 180.0f  / M_PI; // roll	返却値が[rad/sec]らしい.
+		xv_gyro.gyro_data2 = val[1] * 180.0f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.
 		xv_gyro.gyro_data3 = val[2] * 180.0f / M_PI;  // yaw 
+		//std::cout << "gyro--roll: " << xv_gyro.gyro_data1 << " pitch: " << xv_gyro.gyro_data2 << " yaw: " << xv_gyro.gyro_data3 << "\n"; 
 		return 0;
 	}
 
@@ -444,7 +457,7 @@ int main(int argc, char *argv[])
 
 	webots_motor_control wb_ganken;
 
-	OrientationEstimator orientationEst((double)(wb_ganken.getmTimeStep()) / 1000.0, 0.1);
+	OrientationEstimator orientationEst((double)(1000.0/wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
 #endif
 	const char *servo_port = "/dev/kondoservo";
@@ -463,7 +476,7 @@ int main(int argc, char *argv[])
 	// loop start
 	for (count_time_l = 0; wb_ganken.step(); count_time_l++)
 	{
-		/*bool cmd_accept = false;
+		bool cmd_accept = false;
 		{
 			// accept command
 			mutex::scoped_lock look(lock_obj);
@@ -474,7 +487,7 @@ int main(int argc, char *argv[])
 				cmd_accept = true;
 				cmd = "";
 			}
-		}*/
+		}	
 		/* 
 #if !defined WEBOTS_GANKEN_SIMULATOR
 		{
@@ -595,7 +608,7 @@ int main(int argc, char *argv[])
 				diff = now - ptime;
 			}*/
 
-			if (count_time_l % 200 == 0)
+			if (count_time_l == 200)
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
