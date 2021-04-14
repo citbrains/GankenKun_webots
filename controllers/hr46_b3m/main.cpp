@@ -37,7 +37,9 @@
 #include <webots/Accelerometer.hpp>
 #include <webots/Gyro.hpp>
 #include <cmath>
-#include <unordered_map>
+#include <map>
+#include <exception>
+#include <cstdint>
 #endif
 
 #include "pc_motion.h"
@@ -311,7 +313,7 @@ class webots_motor_control
 private:
 	std::vector<std::pair<int32_t, std::string>> motors_info;
 	webots::Robot *robot;
-	std::unordered_map<int32_t, webots::Motor *> robot_motors;
+	std::map<int32_t, webots::Motor *> robot_motors;
 	webots::Gyro *robot_gyro;
 	webots::Accelerometer *robot_accelerometer;
 	int32_t mTimeStep;
@@ -343,34 +345,57 @@ public:
 
 		for (auto &mp : motors_info)
 		{
-			robot_motors.emplace(mp.first, robot->getMotor(mp.second));
+			auto motor_ptr = robot->getMotor(mp.second);
+			if (motor_ptr != nullptr)
+			{
+				robot_motors.emplace(mp.first, motor_ptr);
+			}
+			else
+			{
+				std::cerr << " getMotor allocation error !!" << std::endl;
+				std::terminate();
+			}
 		}
+
 		robot_accelerometer = robot->getAccelerometer("imu/data accelerometer");
+		if (robot_accelerometer == nullptr)
+		{
+			std::cerr << " getAccelerometer memory allocation error !!" << std::endl;
+			std::terminate();
+		}
+
 		robot_gyro = robot->getGyro("imu/data gyro");
+		if (robot_gyro == nullptr)
+		{
+			std::cerr << " getGyro memory allocation error !!" << std::endl;
+			std::terminate();
+		}
+
 		robot_accelerometer->enable(10);
 		robot_gyro->enable(10);
 		mTimeStep = (int)robot->getBasicTimeStep();
-		cout << mTimeStep << endl;
+		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 	}
 
-	int send_target_degrees()
+	int32_t send_target_degrees()
 	{
 		for (auto &mp : robot_motors)
 		{
 			//if ((mp.first == KNEE_R1) || (mp.first == KNEE_R2) || (mp.first == KNEE_L1)|| (mp.first == KNEE_L2)|| (mp.first == ELBOW_PITCH_L)|| (mp.first == ELBOW_PITCH_R))
-			if(false)//リバースモードが必要かと思ってやった痕跡
+			if (false) //リバースモードが必要かと思ってやった痕跡
 			{
 				//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
 				(mp.second)->setPosition(xv_ref.d[mp.first] * (M_PI / 180.0));
 			}
-			else{
+			else
+			{
 				(mp.second)->setPosition(-xv_ref.d[mp.first] * (M_PI / 180.0));
 			}
 		}
 		return 0;
 	}
 
-	int get_acc_values()
+	int32_t get_acc_values()
 	{
 		const double *val = robot_accelerometer->getValues();
 		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x	/9.8�ŒP�ʂ�G����m/ss�ɂ���
@@ -379,7 +404,7 @@ public:
 		return 0;
 	}
 
-	int get_gyro_values()
+	int32_t get_gyro_values()
 	{
 		const double *val = robot_gyro->getValues();
 		xv_gyro.gyro_data1 = -val[0] * 1; // roll		�������I�I	�\�z�ł�	�ő�d��(�I�t�Z�b�g�ς�):1[V], �ő匟�o:500[deg/sec] 1/500=0.002 ��xp_gyro.gyro_k1,2(1000)�������� 0.002*1000=2
@@ -523,25 +548,13 @@ int main(int argc, char *argv[])
 		}
 #ifdef WEBOTS_GANKEN_SIMULATOR
 		{
-			static int cnt = 0;
 
 			//ここで指令を出す
 			{
 				wb_ganken.send_target_degrees();
 			}
 
-			/* 			std::vector<int> angles(24, 0);
-			for (int i = 0; i < 24; i++)
-				angles[i] = xv_sv[i].pls_out + servo_offset[i];  */
-
-			/* 			float ptime = client.getSimulationTime();
-			while (ptime == client.getSimulationTime())
-			{
-				boost::this_thread::sleep(boost::posix_time::microseconds(5000));
-			} 
-			これなんですか.......*/
-
-			if (cnt > 5)
+			if (count_time_l > 5)
 			{
 
 				wb_ganken.get_gyro_values();
@@ -564,24 +577,23 @@ int main(int argc, char *argv[])
 					//					printf("Roll:%f\tPitch:%f\tYaw:%f\n",xv_gyro.gyro_roll, xv_gyro.gyro_pitch, xv_gyro.gyro_yaw);
 				}
 			}
-			cnt++;
-			//あとでちゃんと調整するやつを作る
-			/*
+
 			boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
-			while(diff.total_milliseconds() < ( 1000 / FRAME_RATE )){
+			while(diff.total_milliseconds() < wb_ganken.getmTimeStep()){
 			
-				boost::this_thread::sleep(boost::posix_time::milliseconds((1000 / FRAME_RATE) - diff.total_milliseconds()));
+				boost::this_thread::sleep(boost::posix_time::milliseconds((wb_ganken.getmTimeStep()) - diff.total_milliseconds()));
 				now = boost::posix_time::microsec_clock::local_time();
 				diff = now - ptime;
-			}*/
+			}
+
 			if (cnt % 200 == 0)
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(5 + 26)];
+				unsigned char stride_x = ParamTable[(int)(30 + 26)];
 				unsigned char stride_y = ParamTable[(int)(0 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
