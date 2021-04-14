@@ -407,9 +407,9 @@ public:
 	int32_t get_gyro_values()
 	{
 		const double *val = robot_gyro->getValues();
-		xv_gyro.gyro_data1 = -val[0] * 180f  / M_PI; // roll	返却値が[rad/sec]らしい.
-		xv_gyro.gyro_data2 = -val[1] * 180f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.
-		xv_gyro.gyro_data3 = val[2] * 180f / M_PI;  // yaw 
+		xv_gyro.gyro_data1 = -val[0] * 180.0f  / M_PI; // roll	返却値が[rad/sec]らしい.
+		xv_gyro.gyro_data2 = -val[1] * 180.0f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.
+		xv_gyro.gyro_data3 = val[2] * 180.0f / M_PI;  // yaw 
 		return 0;
 	}
 
@@ -587,7 +587,7 @@ int main(int argc, char *argv[])
 				diff = now - ptime;
 			}
 
-			if (cnt % 200 == 0)
+			if (count_time_l % 200 == 0)
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
