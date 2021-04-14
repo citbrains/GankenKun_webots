@@ -324,9 +324,13 @@ public:
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
+		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R1, "right_knee_pitch_joint"});
+		motors_info.push_back({KNEE_R1, "right_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R2, "right_waist_pitch_joint"});
+		motors_info.push_back({KNEE_R2, "right_waist_pitch_mimic_joint"});
 		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_joint"});
+		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_mimic_joint"});
 		motors_info.push_back({LEG_YAW_R, "right_waist_yaw_joint"});
 		motors_info.push_back({ARM_ROLL_R, "right_shoulder_roll_joint"});
 		motors_info.push_back({ARM_PITCH_R, "right_shoulder_pitch_joint"});
@@ -334,9 +338,13 @@ public:
 
 		motors_info.push_back({FOOT_ROLL_L, "left_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_joint"});
+		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L1, "left_knee_pitch_joint"});
+		motors_info.push_back({KNEE_L1, "left_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L2, "left_waist_pitch_joint"});
+		motors_info.push_back({KNEE_L2, "left_waist_pitch_mimic_joint"});
 		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_joint"});
+		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_mimic_joint"});
 		motors_info.push_back({LEG_YAW_L, "left_waist_yaw_joint"});
 		motors_info.push_back({ARM_PITCH_L, "left_shoulder_pitch_joint"});
 		motors_info.push_back({ARM_ROLL_L, "left_shoulder_roll_joint"});
@@ -382,12 +390,12 @@ public:
 		for (auto &mp : robot_motors)
 		{
 			//if ((mp.first == KNEE_R1) || (mp.first == KNEE_R2) || (mp.first == KNEE_L1)|| (mp.first == KNEE_L2)|| (mp.first == ELBOW_PITCH_L)|| (mp.first == ELBOW_PITCH_R))
-			if (false) //リバースモードが必要かと思ってやった痕跡
+			/*if (false) //リバースモードが必要かと思ってやった痕跡
 			{
 				//xv_servo_rs.goal_positionの方が良い気もするがよく分からない。
 				(mp.second)->setPosition(xv_ref.d[mp.first] * (M_PI / 180.0));
 			}
-			else
+			else*/
 			{
 				(mp.second)->setPosition(-xv_ref.d[mp.first] * (M_PI / 180.0));
 			}
@@ -408,7 +416,7 @@ public:
 	{
 		const double *val = robot_gyro->getValues();
 		xv_gyro.gyro_data1 = -val[0] * 180.0f  / M_PI; // roll	返却値が[rad/sec]らしい.
-		xv_gyro.gyro_data2 = -val[1] * 180.0f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.
+		xv_gyro.gyro_data2 = val[1] * 180.0f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.pitchはvrep用では-がついていたがこちらは+で良さそう。ｗ
 		xv_gyro.gyro_data3 = val[2] * 180.0f / M_PI;  // yaw 
 		return 0;
 	}
@@ -554,7 +562,7 @@ int main(int argc, char *argv[])
 				wb_ganken.send_target_degrees();
 			}
 
-			if (count_time_l > 5)
+			if (count_time_l > 100)
 			{
 
 				wb_ganken.get_gyro_values();
@@ -578,14 +586,14 @@ int main(int argc, char *argv[])
 				}
 			}
 
-			boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
+			/*boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
 			while(diff.total_milliseconds() < wb_ganken.getmTimeStep()){
 			
 				boost::this_thread::sleep(boost::posix_time::milliseconds((wb_ganken.getmTimeStep()) - diff.total_milliseconds()));
 				now = boost::posix_time::microsec_clock::local_time();
 				diff = now - ptime;
-			}
+			}*/
 
 			if (count_time_l % 200 == 0)
 			{
@@ -593,7 +601,7 @@ int main(int argc, char *argv[])
 				unsigned char walk_cmd = 'A';
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(30 + 26)];
+				unsigned char stride_x = ParamTable[(int)(10 + 26)];
 				unsigned char stride_y = ParamTable[(int)(0 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
