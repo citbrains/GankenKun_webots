@@ -10,6 +10,12 @@
 #include <webots/Robot.hpp>
 #include <webots/Camera.hpp>
 #include <string>
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <sstream>
+#include <cstdlib>
+#include <iomanip>
 
 // All the webots classes are defined in the "webots" namespace
 using namespace webots;
@@ -39,10 +45,17 @@ int main() {
 
   // Main loop:
   // - perform simulation steps until Webots is stopping the controller
-  std::string filename("image.jpeg");
+
+  std::string filename("image");
+  int image_count=0;
   while (robot->step(timeStep) != -1) {
     camera->getImage();
-    camera->saveImage(filename, 100);
+    std::stringstream ss;
+    ss << filename << "/" << std::setw(6) << std::setfill('0') << image_count << ".jpg";
+    image_count++;
+    std::string save_image_name(ss.str());
+    std::cout << save_image_name << std::endl;
+    camera->saveImage(save_image_name, 100);
     // Read the sensors:
     // Enter here functions to read sensor data, like:
     //  double val = ds->getValue();
@@ -54,7 +67,7 @@ int main() {
   };
 
   // Enter here exit cleanup code.
-
+  delete camera;
   delete robot;
   return 0;
 }
