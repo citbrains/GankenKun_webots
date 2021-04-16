@@ -31,5 +31,5 @@ DEF BALL Ball {
 }
 GankenKun {
   translation -0.3 0 0.43
-  controller "GankenKun_controller"
+  controller "hr46_b3m"
 }
