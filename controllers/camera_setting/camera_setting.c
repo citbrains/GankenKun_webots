@@ -18,7 +18,7 @@ enum BLOB_TYPE { RED, GREEN, BLUE, NONE };
 int main(int argc, char **argv) {
     WbDeviceTag camera;
     int width, height;
-    int pause_counter = 0;
+//    int pause_counter = 0;
     int i, j;
     int red, blue, green;
     const char *color_names[3] = {"red", "green", "blue"};
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
                 green += wb_camera_image_get_green(image, width, i, j);
             }
         }
-        printf("red:%d,green:%d,blue:%d",red,green,blue);
+        printf("red:%d,green:%d,blue:%d\n",red,green,blue);
         printf("for文から出た\n");
         if ((red > 3 * green) && (red > 3 * blue))
             current_blob = RED;
@@ -79,16 +79,18 @@ int main(int argc, char **argv) {
             strcpy(filepath, user_directory);
             strcat(filepath, "\\");
 #else
-            const char *user_directory = wbu_system_getenv("HOME");
-            filepath = (char *)malloc(strlen(user_directory) + 16);
-            strcpy(filepath, user_directory);
+//            const char *user_directory = wbu_system_getenv("HOME");
+            filepath = (char *)malloc(32);
+            strcpy(filepath, "image");
             strcat(filepath, "/");
+            printf("pass%s\n",filepath);
 #endif
+            printf("uuuuuuuuuuuu\n");
             strcat(filepath, filenames[current_blob]);
             wb_camera_save_image(camera, filepath, 100);
             printf("できてる????\n");
             free(filepath);
-            pause_counter = 1280 / time_step;
+//            pause_counter = 1280 / time_step;
         }
         /* } */
         printf("ループしてくれ\n");
