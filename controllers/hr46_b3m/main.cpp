@@ -449,9 +449,11 @@ public:
 		grabbed_key = pc_keyboard->getKey();
 		if ((grabbed_key == webots::Keyboard::UP) || (grabbed_key == webots::Keyboard::DOWN) || (grabbed_key == webots::Keyboard::RIGHT) || (grabbed_key == webots::Keyboard::LEFT))
 		{
+                    	std::cout << "getkey" << std::endl;
 			if (grabbed_key != current_key)
 			{
 				get_new_command = true;
+				current_key = grabbed_key;
 			}
 		}
 		if (get_new_command)
@@ -491,7 +493,7 @@ public:
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
 				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(10 + 26)];
+				unsigned char stride_y = ParamTable[(int)(-10 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
@@ -504,7 +506,7 @@ public:
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
 				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(-10 + 26)];
+				unsigned char stride_y = ParamTable[(int)(10 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
