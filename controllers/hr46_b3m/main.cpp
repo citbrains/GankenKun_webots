@@ -36,6 +36,7 @@
 #include <webots/Robot.hpp>
 #include <webots/Accelerometer.hpp>
 #include <webots/Gyro.hpp>
+#include <webots/Keyboard.hpp>
 #include <cmath>
 #include <set>
 #include <exception>
@@ -314,14 +315,16 @@ class webots_motor_control
 private:
 	std::vector<std::pair<int32_t, std::string>> motors_info;
 	webots::Robot *robot;
-	std::vector<std::tuple<int32_t, webots::Motor *,std::string>> robot_motors;
+	std::vector<std::tuple<int32_t, webots::Motor *, std::string>> robot_motors;
 	webots::Gyro *robot_gyro;
 	webots::Accelerometer *robot_accelerometer;
+	webots::Keyboard *pc_keyboard;
 	int32_t mTimeStep;
 	std::set<std::string> reverse_motors;
+	int32_t current_key;
 
 public:
-	webots_motor_control()
+	webots_motor_control() : mTimeStep(0), current_key(0)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -352,17 +355,17 @@ public:
 		motors_info.push_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
 		motors_info.push_back({HEAD_YAW, "head_yaw_joint"});
 
-                reverse_motors.emplace("right_knee_pitch_mimic_joint");
-                reverse_motors.emplace("right_ankle_pitch_mimic_joint");
-                reverse_motors.emplace("left_knee_pitch_mimic_joint");
-                reverse_motors.emplace("left_ankle_pitch_mimic_joint");
+		reverse_motors.emplace("right_knee_pitch_mimic_joint");
+		reverse_motors.emplace("right_ankle_pitch_mimic_joint");
+		reverse_motors.emplace("left_knee_pitch_mimic_joint");
+		reverse_motors.emplace("left_ankle_pitch_mimic_joint");
 
 		for (auto &mp : motors_info)
 		{
 			auto motor_ptr = robot->getMotor(mp.second);
 			if (motor_ptr != nullptr)
 			{
-				robot_motors.emplace_back(mp.first, motor_ptr,mp.second);
+				robot_motors.emplace_back(mp.first, motor_ptr, mp.second);
 			}
 			else
 			{
@@ -385,10 +388,18 @@ public:
 			std::terminate();
 		}
 
+		pc_keyboard = robot->getKeyboard();
+		if (pc_keyboard == nullptr)
+		{
+			std::cerr << " getKeyboard memory allocation error !!" << std::endl;
+			std::terminate();
+		}
+
 		mTimeStep = (int)robot->getBasicTimeStep();
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
+		pc_keyboard->enable(mTimeStep);
 	}
 
 	int32_t send_target_degrees()
@@ -398,8 +409,8 @@ public:
 		std::string name_of_motor;
 		for (auto &mp : robot_motors)
 		{
-			std::tie(servo_number,target_motor,name_of_motor) = mp;
-			if(reverse_motors.find(name_of_motor) != reverse_motors.end())
+			std::tie(servo_number, target_motor, name_of_motor) = mp;
+			if (reverse_motors.find(name_of_motor) != reverse_motors.end())
 			{
 				(target_motor)->setPosition(xv_ref.d[servo_number] * (M_PI / 180.0));
 			}
@@ -414,8 +425,8 @@ public:
 	int32_t get_acc_values()
 	{
 		const double *val = robot_accelerometer->getValues();
-		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x	
-		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y	
+		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x
+		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y
 		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z
 		//std::cout << "acc--x: " << xv_acc.acc_data1 << " y: " << xv_acc.acc_data2 << " z: " << xv_acc.acc_data3 << "\n";
 		return 0;
@@ -424,11 +435,87 @@ public:
 	int32_t get_gyro_values()
 	{
 		const double *val = robot_gyro->getValues();
-		xv_gyro.gyro_data1 = val[0] * 180.0f  / M_PI; // roll	返却値が[rad/sec]らしい.
-		xv_gyro.gyro_data2 = val[1] * 180.0f  / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.
-		xv_gyro.gyro_data3 = val[2] * 180.0f / M_PI;  // yaw 
-		//std::cout << "gyro--roll: " << xv_gyro.gyro_data1 << " pitch: " << xv_gyro.gyro_data2 << " yaw: " << xv_gyro.gyro_data3 << "\n"; 
+		xv_gyro.gyro_data1 = val[0] * 180.0f / M_PI; // roll	返却値が[rad/sec]らしい.
+		xv_gyro.gyro_data2 = val[1] * 180.0f / M_PI; // pitch	gyro_dataは[deg/sec]なので割る.
+		xv_gyro.gyro_data3 = val[2] * 180.0f / M_PI; // yaw
+		//std::cout << "gyro--roll: " << xv_gyro.gyro_data1 << " pitch: " << xv_gyro.gyro_data2 << " yaw: " << xv_gyro.gyro_data3 << "\n";
 		return 0;
+	}
+
+	bool get_key_and_send_command()
+	{
+		int32_t grabbed_key = 0;
+		bool get_new_command = false;
+		grabbed_key = pc_keyboard->getKey();
+		if ((grabbed_key == webots::Keyboard::UP) || (grabbed_key == webots::Keyboard::DOWN) || (grabbed_key == webots::Keyboard::RIGHT) || (grabbed_key == webots::Keyboard::LEFT))
+		{
+			if (grabbed_key != current_key)
+			{
+				get_new_command = true;
+			}
+		}
+		if (get_new_command)
+		{ 
+			switch (grabbed_key)
+			{
+			case webots::Keyboard::UP:
+			{
+				//motion_flag = false;
+				unsigned char walk_cmd = 'A';
+				unsigned char num_step = ParamTable[(int)(0 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(10 + 26)];
+				unsigned char stride_y = ParamTable[(int)(0 + 26)];
+				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
+				convert_bin(&xv_comm_bin, &xv_comm);
+			}
+			break;
+			case webots::Keyboard::DOWN:
+			{
+				//motion_flag = false;
+				unsigned char walk_cmd = 'A';
+				unsigned char num_step = ParamTable[(int)(0 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(-10 + 26)];
+				unsigned char stride_y = ParamTable[(int)(0 + 26)];
+				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
+				convert_bin(&xv_comm_bin, &xv_comm);
+			}
+			break;
+			case webots::Keyboard::RIGHT:
+			{
+				//motion_flag = false;
+				unsigned char walk_cmd = 'A';
+				unsigned char num_step = ParamTable[(int)(0 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(0 + 26)];
+				unsigned char stride_y = ParamTable[(int)(10 + 26)];
+				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
+				convert_bin(&xv_comm_bin, &xv_comm);
+			}
+			break;
+			case webots::Keyboard::LEFT:
+			{
+				//motion_flag = false;
+				unsigned char walk_cmd = 'A';
+				unsigned char num_step = ParamTable[(int)(0 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(0 + 26)];
+				unsigned char stride_y = ParamTable[(int)(-10 + 26)];
+				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
+				convert_bin(&xv_comm_bin, &xv_comm);
+			}
+			break;
+
+			default:
+				break;
+			}
+		}
+		return get_new_command;
 	}
 
 	bool step()
@@ -454,7 +541,9 @@ int main(int argc, char *argv[])
 
 	webots_motor_control wb_ganken;
 
-	OrientationEstimator orientationEst((double)(1000.0/wb_ganken.getmTimeStep()) / 1000.0, 0.1);
+	int64_t keyboard_loop = 0;
+
+	OrientationEstimator orientationEst((double)(1000.0 / wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
 #endif
 	const char *servo_port = "/dev/kondoservo";
@@ -484,7 +573,7 @@ int main(int argc, char *argv[])
 				cmd_accept = true;
 				cmd = "";
 			}
-		}	
+		}
 		/* 
 #if !defined WEBOTS_GANKEN_SIMULATOR
 		{
@@ -596,6 +685,13 @@ int main(int argc, char *argv[])
 				}
 			}
 
+			if (count_time_l > (keyboard_loop + 30))
+			{
+
+				if(wb_ganken.get_key_and_send_command()){
+					keyboard_loop = count_time_l;
+				}
+			}
 			/*boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
 			while(diff.total_milliseconds() < wb_ganken.getmTimeStep()){
@@ -604,19 +700,6 @@ int main(int argc, char *argv[])
 				now = boost::posix_time::microsec_clock::local_time();
 				diff = now - ptime;
 			}*/
-
-			if (count_time_l == 200)
-			{
-				//motion_flag = false;
-				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(10 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
-				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
-				convert_bin(&xv_comm_bin, &xv_comm);
-			}
 		}
 #endif // WEBOTS_GANKEN_SIMULATOR
 
