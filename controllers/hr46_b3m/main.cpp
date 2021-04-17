@@ -323,46 +323,39 @@ private:
 public:
 	webots_motor_control()
 	{
-		//shinピッチは消した方がよさそう
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
-		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_mimic_joint"});
+		motors_info.push_back({KNEE_R1, "right_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R1, "right_knee_pitch_joint"});
-		//motors_info.push_back({KNEE_R1, "right_shin_pitch_mimic_joint"});
-		motors_info.push_back({KNEE_R1, "right_knee_pitch_mimic_joint"});
+		motors_info.push_back({KNEE_R1, "right_shin_pitch_mimic_joint"});
+		motors_info.push_back({KNEE_R2, "right_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R2, "right_waist_pitch_joint"});
 		motors_info.push_back({KNEE_R2, "right_waist_pitch_mimic_joint"});
 		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_joint"});
-		//motors_info.push_back({LEG_ROLL_R, "right_waist_roll_mimic_joint"});
 		motors_info.push_back({LEG_YAW_R, "right_waist_yaw_joint"});
 		motors_info.push_back({ARM_ROLL_R, "right_shoulder_roll_joint"});
 		motors_info.push_back({ARM_PITCH_R, "right_shoulder_pitch_joint"});
 		motors_info.push_back({ELBOW_PITCH_R, "right_elbow_pitch_joint"});
-
-
 		motors_info.push_back({FOOT_ROLL_L, "left_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_joint"});
-		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_mimic_joint"});
+		motors_info.push_back({KNEE_L1, "left_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L1, "left_knee_pitch_joint"});
-		//motors_info.push_back({KNEE_L1, "left_shin_pitch_mimic_joint"});
-		motors_info.push_back({KNEE_L1, "left_knee_pitch_mimic_joint"});
+		motors_info.push_back({KNEE_L1, "left_shin_pitch_mimic_joint"});
+		motors_info.push_back({KNEE_L2, "left_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L2, "left_waist_pitch_joint"});
 		motors_info.push_back({KNEE_L2, "left_waist_pitch_mimic_joint"});
 		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_joint"});
-	//	motors_info.push_back({LEG_ROLL_L, "left_waist_roll_mimic_joint"});
 		motors_info.push_back({LEG_YAW_L, "left_waist_yaw_joint"});
 		motors_info.push_back({ARM_PITCH_L, "left_shoulder_pitch_joint"});
 		motors_info.push_back({ARM_ROLL_L, "left_shoulder_roll_joint"});
 		motors_info.push_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
 		motors_info.push_back({HEAD_YAW, "head_yaw_joint"});
 
-		//reverse_motors.emplace("left_waist_pitch_joint");
-	//reverse_motors.emplace("left_ankle_pitch_mimic_joint");
-		//reverse_motors.emplace("left_waist_pitch_mimic_joint");
-		//reverse_motors.emplace("right_waist_pitch_joint");
-	//reverse_motors.emplace("right_ankle_pitch_mimic_joint");
-		//reverse_motors.emplace("right_waist_pitch_mimic_joint");
+                reverse_motors.emplace("right_knee_pitch_mimic_joint");
+                reverse_motors.emplace("right_ankle_pitch_mimic_joint");
+                reverse_motors.emplace("left_knee_pitch_mimic_joint");
+                reverse_motors.emplace("left_ankle_pitch_mimic_joint");
 
 		for (auto &mp : motors_info)
 		{
