@@ -442,6 +442,10 @@ public:
 		return 0;
 	}
 
+	/*
+	キーボードの上下左右キーで上下左右に歩行。Jキーで右旋回、Fキーで左旋回を行う。Cキーでキャンセル。Mキーでキックモーション再生が出来るが、
+	その前にキャンセルをしておかないと再生出来ない。Tキーでその場足踏み。歩行速度が遅いときは適当にstrideを変更して下さい。
+	*/
 	bool get_key_and_send_command()
 	{
 		int32_t grabbed_key = 0;
@@ -464,7 +468,7 @@ public:
 				unsigned char walk_cmd = 'A';
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(10 + 26)];
+				unsigned char stride_x = ParamTable[(int)(15 + 26)];
 				unsigned char stride_y = ParamTable[(int)(0 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
@@ -477,7 +481,7 @@ public:
 				unsigned char walk_cmd = 'A';
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(-10 + 26)];
+				unsigned char stride_x = ParamTable[(int)(-15 + 26)];
 				unsigned char stride_y = ParamTable[(int)(0 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
@@ -491,7 +495,7 @@ public:
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
 				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(-10 + 26)];
+				unsigned char stride_y = ParamTable[(int)(-15 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
@@ -504,13 +508,13 @@ public:
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
 				unsigned char period = ParamTable[(int)(0 + 26)];
 				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(10 + 26)];
+				unsigned char stride_y = ParamTable[(int)(15 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
 			break;
-			case webots::Keyboard::SHIFT:
+			case webots::Keyboard::T:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
@@ -549,20 +553,33 @@ public:
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
 			break;
-			/*case 'M':
+			case 'M':
 			{
 				//motion_flag = false;
 				std::cout << "get M key" << std::endl;
 				unsigned char walk_cmd = 'M';
 				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(3 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
+				unsigned char stride_x = ParamTable[(int)(0 + 26)];
+				unsigned char stride_y = ParamTable[(int)(0 + 26)];
+				unsigned char stride_th = ParamTable[(int)(3 + 26)];
+				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
+				convert_bin(&xv_comm_bin, &xv_comm);
+			}
+			break;
+			case 'C':
+			{
+				//motion_flag = false;
+				unsigned char walk_cmd = 'C';
+				unsigned char num_step = ParamTable[(int)(0 + 26)];
+				unsigned char period = ParamTable[(int)(0 + 26)];
 				unsigned char stride_x = ParamTable[(int)(0 + 26)];
 				unsigned char stride_y = ParamTable[(int)(0 + 26)];
 				unsigned char stride_th = ParamTable[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
-			break;*/
+			break;
 			default:
 				break;
 			}
