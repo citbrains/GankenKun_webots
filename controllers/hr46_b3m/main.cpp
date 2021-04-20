@@ -514,7 +514,7 @@ public:
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
 			break;
-			case webots::Keyboard::'T':
+			case 'T':
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
