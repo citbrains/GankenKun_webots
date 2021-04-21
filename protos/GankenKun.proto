@@ -13,9 +13,24 @@ PROTO GankenKun [
   field  SFString    customData      ""           # Is `Robot.customData`.
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
-  field  SFBool      selfCollision   FALSE        # Is `Robot.selfCollision`.
+  field  SFBool      selfCollision   TRUE        # Is `Robot.selfCollision`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
+
+  field  SFFloat     backlash        0.01
+
+  field  SFFloat     positionresolution 0.0015
+
+  field  SFFloat     b3msc1040-torque 4.6
+  field  SFFloat     b3msc1040-maxVero 54
+  field  SFFloat     b3msc1040-staticFric 0.05888
+  field  SFFloat     b3msc1040-damping 1.2452588169
+
+  field  SFFloat     b3msc1170-torque 7.6
+  field  SFFloat     b3msc1170-maxVero 46
+  field  SFFloat     b3msc1170-staticFric 0.07296
+  field  SFFloat     b3msc1170-damping 0.639974
+
 ]
 {
   Robot {
@@ -88,7 +103,7 @@ PROTO GankenKun [
           }
         ]
       }
-      HingeJoint {
+      HingeJointWithBacklash {
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.000000 0.000000 0.094750
@@ -105,6 +120,7 @@ PROTO GankenKun [
           }
           PositionSensor {
             name "head_yaw_joint_sensor"
+            resolution IS positionresolution
           }
         ]
         endPoint DEF head_yaw_link Solid {
@@ -175,7 +191,7 @@ PROTO GankenKun [
           }
         }
       }
-      HingeJoint {
+      HingeJointWithBacklash {
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 0.060000 0.072000
@@ -192,6 +208,7 @@ PROTO GankenKun [
           }
           PositionSensor {
             name "left_shoulder_pitch_joint_sensor"
+            resolution IS positionresolution
           }
         ]
         endPoint DEF left_shoulder_link Solid {
@@ -224,7 +241,7 @@ PROTO GankenKun [
                 }
               ]
             }
-            HingeJoint {
+            HingeJointWithBacklash {
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 0.031500
@@ -240,6 +257,7 @@ PROTO GankenKun [
                 }
                 PositionSensor {
                   name "left_shoulder_roll_joint_sensor"
+                  resolution IS positionresolution
                 }
               ]
               endPoint DEF left_upper_arm_link Solid {
@@ -266,7 +284,7 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
@@ -283,6 +301,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "left_elbow_pitch_joint_sensor"
+                         resolution IS positionresolution
                       }
                     ]
                     endPoint DEF left_lower_arm_link Solid {
@@ -363,7 +382,7 @@ PROTO GankenKun [
           }
         }
       }
-      HingeJoint {
+      HingeJointWithBacklash {
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 -0.060000 0.072000
@@ -380,7 +399,8 @@ PROTO GankenKun [
           }
           PositionSensor {
             name "right_shoulder_pitch_joint_sensor"
-          }
+            resolution IS positionresolution
+          } 
         ]
         endPoint DEF right_shoulder_link Solid {
           translation 0.000000 -0.060000 0.072000
@@ -396,7 +416,7 @@ PROTO GankenKun [
                 }
               ]
             }
-            HingeJoint {
+            HingeJointWithBacklash {
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 -0.031500
@@ -412,6 +432,7 @@ PROTO GankenKun [
                 }
                 PositionSensor {
                   name "right_shoulder_roll_joint_sensor"
+                  resolution IS positionresolution
                 }
               ]
               endPoint DEF right_upper_arm_link Solid {
@@ -428,7 +449,7 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
@@ -445,6 +466,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "right_elbow_pitch_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF right_lower_arm_link Solid {
@@ -515,7 +537,7 @@ PROTO GankenKun [
           }
         }
       }
-      HingeJoint {
+      HingeJointWithBacklash {
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 0.044000 -0.072500
@@ -532,7 +554,8 @@ PROTO GankenKun [
           }
           PositionSensor {
             name "left_waist_yaw_joint_sensor"
-          }
+            resolution IS positionresolution
+          } 
         ]
         endPoint DEF left_waist_yaw_link Solid {
           translation 0.005000 0.044000 -0.072500
@@ -558,7 +581,7 @@ PROTO GankenKun [
                 }
               ]
             }
-            HingeJoint {
+            HingeJointWithBacklash {
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
@@ -575,7 +598,8 @@ PROTO GankenKun [
                 }
                 PositionSensor {
                   name "left_waist_roll_joint_sensor"
-                }
+                  resolution IS positionresolution
+                } 
               ]
               endPoint DEF left_waist_roll_link Solid {
                 translation 0.024975 0.000000 -0.055000
@@ -601,7 +625,7 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
@@ -618,6 +642,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "left_waist_roll_mimic_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF left_slider_crank_link Solid {
@@ -662,7 +687,7 @@ PROTO GankenKun [
                       }
                     }
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
@@ -679,6 +704,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "left_waist_pitch_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF left_waist_pitch_link Solid {
@@ -705,7 +731,7 @@ PROTO GankenKun [
                             }
                           ]
                         }
-                        HingeJoint {
+                        HingeJointWithBacklash {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
@@ -722,6 +748,7 @@ PROTO GankenKun [
                             }
                             PositionSensor {
                               name "left_knee_pitch_mimic_joint_sensor"
+                              resolution IS positionresolution
                             }
                           ]
                           endPoint DEF left_knee_pitch_link Solid {
@@ -748,7 +775,7 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
-                              HingeJoint {
+                              HingeJointWithBacklash {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
@@ -765,6 +792,7 @@ PROTO GankenKun [
                                   }
                                   PositionSensor {
                                     name "left_knee_pitch_joint_sensor"
+                                    resolution IS positionresolution
                                   }
                                 ]
                                 endPoint DEF left_shin_pitch_link Solid {
@@ -791,7 +819,7 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
-                                    HingeJoint {
+                                    HingeJointWithBacklash {
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
@@ -808,6 +836,7 @@ PROTO GankenKun [
                                         }
                                         PositionSensor {
                                           name "left_ankle_pitch_mimic_joint_sensor"
+                                          resolution IS positionresolution
                                         }
                                       ]
                                       endPoint DEF left_independent_pitch_link Solid {
@@ -834,7 +863,7 @@ PROTO GankenKun [
                                               }
                                             ]
                                           }
-                                          HingeJoint {
+                                          HingeJointWithBacklash {
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
@@ -851,6 +880,7 @@ PROTO GankenKun [
                                               }
                                               PositionSensor {
                                                 name "left_ankle_pitch_joint_sensor"
+                                                resolution IS positionresolution
                                               }
                                             ]
                                             endPoint DEF left_ankle_pitch_link Solid {
@@ -877,7 +907,7 @@ PROTO GankenKun [
                                                     }
                                                   ]
                                                 }
-                                                HingeJoint {
+                                                HingeJointWithBacklash {
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
@@ -894,6 +924,7 @@ PROTO GankenKun [
                                                     }
                                                     PositionSensor {
                                                       name "left_ankle_roll_joint_sensor"
+                                                      resolution IS positionresolution
                                                     }
                                                   ]
                                                   endPoint DEF left_ankle_roll_link Solid {
@@ -1002,7 +1033,7 @@ PROTO GankenKun [
                                   }
                                 }
                               }
-                              HingeJoint {
+                              HingeJointWithBacklash {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
@@ -1019,6 +1050,7 @@ PROTO GankenKun [
                                   }
                                   PositionSensor {
                                     name "left_shin_pitch_mimic_joint_sensor"
+                                    resolution IS positionresolution
                                   }
                                 ]
                                 endPoint DEF left_shin_pitch_mimic_link Solid {
@@ -1099,7 +1131,7 @@ PROTO GankenKun [
                       }
                     }
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
@@ -1116,6 +1148,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "left_waist_pitch_mimic_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF left_waist_pitch_mimic_link Solid {
@@ -1196,7 +1229,7 @@ PROTO GankenKun [
           }
         }
       }
-      HingeJoint {
+      HingeJointWithBacklash {
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 -0.044000 -0.072500
@@ -1213,6 +1246,7 @@ PROTO GankenKun [
           }
           PositionSensor {
             name "right_waist_yaw_joint_sensor"
+            resolution IS positionresolution
           }
         ]
         endPoint DEF right_waist_yaw_link Solid {
@@ -1229,7 +1263,7 @@ PROTO GankenKun [
                 }
               ]
             }
-            HingeJoint {
+            HingeJointWithBacklash {
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
@@ -1246,6 +1280,7 @@ PROTO GankenKun [
                 }
                 PositionSensor {
                   name "right_waist_roll_joint_sensor"
+                  resolution IS positionresolution
                 }
               ]
               endPoint DEF right_waist_roll_link Solid {
@@ -1272,7 +1307,7 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
@@ -1289,6 +1324,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "right_waist_roll_mimic_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF right_slider_crank_link Solid {
@@ -1323,7 +1359,7 @@ PROTO GankenKun [
                       }
                     }
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
@@ -1340,6 +1376,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "right_waist_pitch_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF right_waist_pitch_link Solid {
@@ -1356,7 +1393,7 @@ PROTO GankenKun [
                             }
                           ]
                         }
-                        HingeJoint {
+                        HingeJointWithBacklash {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
@@ -1373,6 +1410,7 @@ PROTO GankenKun [
                             }
                             PositionSensor {
                               name "right_knee_pitch_mimic_joint_sensor"
+                              resolution IS positionresolution
                             }
                           ]
                           endPoint DEF right_knee_pitch_link Solid {
@@ -1399,7 +1437,7 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
-                              HingeJoint {
+                              HingeJointWithBacklash {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
@@ -1416,6 +1454,7 @@ PROTO GankenKun [
                                   }
                                   PositionSensor {
                                     name "right_knee_pitch_joint_sensor"
+                                    resolution IS positionresolution
                                   }
                                 ]
                                 endPoint DEF right_shin_pitch_link Solid {
@@ -1432,7 +1471,7 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
-                                    HingeJoint {
+                                    HingeJointWithBacklash {
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
@@ -1449,6 +1488,7 @@ PROTO GankenKun [
                                         }
                                         PositionSensor {
                                           name "right_ankle_pitch_mimic_joint_sensor"
+                                          resolution IS positionresolution
                                         }
                                       ]
                                       endPoint DEF right_independent_pitch_link Solid {
@@ -1465,7 +1505,7 @@ PROTO GankenKun [
                                               }
                                             ]
                                           }
-                                          HingeJoint {
+                                          HingeJointWithBacklash {
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
@@ -1482,6 +1522,7 @@ PROTO GankenKun [
                                               }
                                               PositionSensor {
                                                 name "right_ankle_pitch_joint_sensor"
+                                                resolution IS positionresolution
                                               }
                                             ]
                                             endPoint DEF right_ankle_pitch_link Solid {
@@ -1508,7 +1549,7 @@ PROTO GankenKun [
                                                     }
                                                   ]
                                                 }
-                                                HingeJoint {
+                                                HingeJointWithBacklash {
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
@@ -1525,6 +1566,7 @@ PROTO GankenKun [
                                                     }
                                                     PositionSensor {
                                                       name "right_ankle_roll_joint_sensor"
+                                                      resolution IS positionresolution
                                                     }
                                                   ]
                                                   endPoint DEF right_ankle_roll_link Solid {
@@ -1633,7 +1675,7 @@ PROTO GankenKun [
                                   }
                                 }
                               }
-                              HingeJoint {
+                              HingeJointWithBacklash {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
@@ -1650,6 +1692,7 @@ PROTO GankenKun [
                                   }
                                   PositionSensor {
                                     name "right_shin_pitch_mimic_joint_sensor"
+                                    resolution IS positionresolution
                                   }
                                 ]
                                 endPoint DEF right_shin_pitch_mimic_link Solid {
@@ -1720,7 +1763,7 @@ PROTO GankenKun [
                       }
                     }
                   }
-                  HingeJoint {
+                  HingeJointWithBacklash {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
@@ -1737,6 +1780,7 @@ PROTO GankenKun [
                       }
                       PositionSensor {
                         name "right_waist_pitch_mimic_joint_sensor"
+                        resolution IS positionresolution
                       }
                     ]
                     endPoint DEF right_waist_pitch_mimic_link Solid {
@@ -1813,9 +1857,13 @@ PROTO GankenKun [
         children [
           Accelerometer {
             name "imu/data accelerometer"
+            lookupTable [-78.455 0 0,
+                         78.455 65536 0 ]
           }
           Gyro {
             name "imu/data gyro"
+            lookupTable [-17.455 0 0,
+                         17.455 65536 0 ]
           }
           Compass {
             name "imu/data compass"
