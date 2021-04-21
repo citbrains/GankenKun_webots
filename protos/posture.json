@@ -1,0 +1,13 @@
+{
+    "robot_name": "MyRobotName",
+    "upright": {
+        "motor_1_name": 0,
+        "motor_2_name": 0,
+        "": 0
+    },
+    "extension": {
+        "motor_1_name": 0,
+        "motor_2_name": 0,
+        "": 0
+    }
+}
