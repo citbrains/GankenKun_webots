@@ -1001,11 +1001,11 @@ PROTO GankenKun [
                                                     boundingObject Group {
                                                       children [ 
                                                         Transform {
-                                                          translation 0.043500 0.021000 0.022500
+                                                          translation 0.048500 0.021000 0.022500
                                                           rotation 0.000000 -1.000000 -0.000000 3.141593
                                                           children [
                                                             Box {
-                                                               size 0.005000 0.092500 0.176500
+                                                               size 0.013000 0.092500 0.176500
                                                             }
                                                           ]
                                                         }
@@ -1669,11 +1669,11 @@ PROTO GankenKun [
                                                     boundingObject Group {
                                                       children [ 
                                                         Transform {
-                                                          translation 0.043500 -0.021000 0.022500
+                                                          translation 0.048500 -0.021000 0.022500
                                                           rotation 0.000000 -1.000000 -0.000000 3.141593
                                                           children [
                                                             Box {
-                                                               size 0.00500 0.092500 0.176500
+                                                               size 0.01300 0.092500 0.176500
                                                             }
                                                           ]
                                                         }
