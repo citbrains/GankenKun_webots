@@ -108,16 +108,17 @@ backlash IS backlash
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.000000 0.000000 0.094750
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant IS b3msc1040-damping
+          staticFriction IS b3msc1040-staticFric
         }
         device [
           RotationalMotor {
             name "head_yaw_joint"
-            maxVelocity 1.0
+            maxVelocity IS b3msc1040-maxVero
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque IS b3msc1040-torque
+
           }
           PositionSensor {
             name "head_yaw_joint_sensor"
@@ -197,16 +198,16 @@ backlash IS backlash
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 0.060000 0.072000
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant IS b3msc1040-damping
+          staticFriction IS b3msc1040-staticFric
         }
         device [
           RotationalMotor {
             name "left_shoulder_pitch_joint"
-            maxVelocity 1.0
+            maxVelocity IS b3msc1040-maxVero
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque IS b3msc1040-torque
           }
           PositionSensor {
             name "left_shoulder_pitch_joint_sensor"
@@ -248,15 +249,15 @@ backlash IS backlash
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 0.031500
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant IS b3msc1040-damping
+                staticFriction IS b3msc1040-staticFric
               }
               device [
                 RotationalMotor {
                   name "left_shoulder_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity IS b3msc1040-maxVero
                   maxPosition 3.14159265359
-                  maxTorque 1000.0
+                  maxTorque IS b3msc1040-torque
                 }
                 PositionSensor {
                   name "left_shoulder_roll_joint_sensor"
@@ -292,16 +293,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1040-damping
+                      staticFriction IS b3msc1040-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "left_elbow_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity IS b3msc1040-maxVero
                         minPosition -2.35619449019
                         maxPosition 2.35619449019
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1040-torque
                       }
                       PositionSensor {
                         name "left_elbow_pitch_joint_sensor"
@@ -391,16 +392,16 @@ backlash IS backlash
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 -0.060000 0.072000
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant IS b3msc1040-damping
+          staticFriction IS b3msc1040-staticFric
         }
         device [
           RotationalMotor {
             name "right_shoulder_pitch_joint"
-            maxVelocity 1.0
+            maxVelocity IS b3msc1040-maxVero
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque IS b3msc1040-torque
           }
           PositionSensor {
             name "right_shoulder_pitch_joint_sensor"
@@ -426,15 +427,15 @@ backlash IS backlash
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 -0.031500
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant IS b3msc1040-damping
+                staticFriction IS b3msc1040-staticFric
               }
               device [
                 RotationalMotor {
                   name "right_shoulder_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity IS b3msc1040-maxVero
                   minPosition -3.14159265359
-                  maxTorque 1000.0
+                  maxTorque IS b3msc1040-torque
                 }
                 PositionSensor {
                   name "right_shoulder_roll_joint_sensor"
@@ -460,16 +461,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1040-damping
+                      staticFriction IS b3msc1040-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "right_elbow_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity IS b3msc1040-maxVero
                         minPosition -2.35619449019
                         maxPosition 2.35619449019
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1040-torque
                       }
                       PositionSensor {
                         name "right_elbow_pitch_joint_sensor"
@@ -549,16 +550,16 @@ backlash IS backlash
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 0.044000 -0.072500
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant IS b3msc1170-damping
+          staticFriction IS b3msc1170-staticFric
         }
         device [
           RotationalMotor {
             name "left_waist_yaw_joint"
-            maxVelocity 1.0
+            maxVelocity IS b3msc1170-maxVero
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque IS b3msc1170-torque
           }
           PositionSensor {
             name "left_waist_yaw_joint_sensor"
@@ -594,16 +595,16 @@ backlash IS backlash
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant IS b3msc1170-damping
+                staticFriction IS b3msc1170-staticFric
               }
               device [
                 RotationalMotor {
                   name "left_waist_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity IS b3msc1170-maxVero
                   minPosition -0.785398163397
                   maxPosition 0.785398163397
-                  maxTorque 1000.0
+                  maxTorque IS b3msc1170-torque
                 }
                 PositionSensor {
                   name "left_waist_roll_joint_sensor"
@@ -639,16 +640,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1170-damping
+                      staticFriction IS b3msc1170-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_roll_mimic_joint"
-                        maxVelocity 2.0
+                        maxVelocity IS b3msc1170-maxVero
                         minPosition -1.57079632679
                         maxPosition 1.57079632679
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1170-torque
                       }
                       PositionSensor {
                         name "left_waist_roll_mimic_joint_sensor"
@@ -702,16 +703,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1170-damping
+                      staticFriction IS b3msc1170-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity IS b3msc1170-maxVero
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1170-torque
                       }
                       PositionSensor {
                         name "left_waist_pitch_joint_sensor"
@@ -747,16 +748,16 @@ backlash IS backlash
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
-                            dampingConstant 0.0
-                            staticFriction 0.0
+                            dampingConstant IS b3msc1170-damping
+                            staticFriction IS b3msc1170-staticFric
                           }
                           device [
                             RotationalMotor {
                               name "left_knee_pitch_mimic_joint"
-                              maxVelocity 1.0
+                              maxVelocity IS b3msc1170-maxVero
                               minPosition -0.523598775598
                               maxPosition 1.57079632679
-                              maxTorque 1000.0
+                              maxTorque IS b3msc1170-torque
                             }
                             PositionSensor {
                               name "left_knee_pitch_mimic_joint_sensor"
@@ -792,16 +793,16 @@ backlash IS backlash
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant IS b3msc1170-damping
+                                  staticFriction IS b3msc1170-staticFric
                                 }
                                 device [
                                   RotationalMotor {
                                     name "left_knee_pitch_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity IS b3msc1170-maxVero
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque IS b3msc1170-torque
                                   }
                                   PositionSensor {
                                     name "left_knee_pitch_joint_sensor"
@@ -837,16 +838,16 @@ backlash IS backlash
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
-                                        dampingConstant 0.0
-                                        staticFriction 0.0
+                                        dampingConstant IS b3msc1170-damping
+                                        staticFriction IS b3msc1170-staticFric
                                       }
                                       device [
                                         RotationalMotor {
                                           name "left_ankle_pitch_mimic_joint"
-                                          maxVelocity 1.0
+                                          maxVelocity IS b3msc1170-maxVero
                                           minPosition -1.57079632679
                                           maxPosition 1.57079632679
-                                          maxTorque 1000.0
+                                          maxTorque IS b3msc1170-torque
                                         }
                                         PositionSensor {
                                           name "left_ankle_pitch_mimic_joint_sensor"
@@ -882,16 +883,16 @@ backlash IS backlash
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
-                                              dampingConstant 0.0
-                                              staticFriction 0.0
+                                              dampingConstant IS b3msc1170-damping
+                                              staticFriction IS b3msc1170-staticFric
                                             }
                                             device [
                                               RotationalMotor {
                                                 name "left_ankle_pitch_joint"
-                                                maxVelocity 1.0
+                                                maxVelocity IS b3msc1170-maxVero
                                                 minPosition -2.35619449019
                                                 maxPosition 2.35619449019
-                                                maxTorque 1000.0
+                                                maxTorque IS b3msc1170-torque
                                               }
                                               PositionSensor {
                                                 name "left_ankle_pitch_joint_sensor"
@@ -927,16 +928,16 @@ backlash IS backlash
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
-                                                    dampingConstant 0.0
-                                                    staticFriction 0.0
+                                                    dampingConstant IS b3msc1040-damping
+                                                    staticFriction IS b3msc1040-staticFric
                                                   }
                                                   device [
                                                     RotationalMotor {
                                                       name "left_ankle_roll_joint"
-                                                      maxVelocity 1.0
+                                                      maxVelocity IS b3msc1040-maxVero
                                                       minPosition -1.57079632679
                                                       maxPosition 1.57079632679
-                                                      maxTorque 1000.0
+                                                      maxTorque IS b3msc1040-torque
                                                     }
                                                     PositionSensor {
                                                       name "left_ankle_roll_joint_sensor"
@@ -1054,16 +1055,16 @@ backlash IS backlash
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant IS b3msc1170-damping
+                                  staticFriction IS b3msc1170-staticFric
                                 }
                                 device [
                                   RotationalMotor {
                                     name "left_shin_pitch_mimic_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity IS b3msc1170-maxVero
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque IS b3msc1170-torque
                                   }
                                   PositionSensor {
                                     name "left_shin_pitch_mimic_joint_sensor"
@@ -1153,16 +1154,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1170-damping
+                      staticFriction IS b3msc1170-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_pitch_mimic_joint"
-                        maxVelocity 1.0
+                        maxVelocity IS b3msc1170-maxVero
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1170-torque
                       }
                       PositionSensor {
                         name "left_waist_pitch_mimic_joint_sensor"
@@ -1252,16 +1253,16 @@ backlash IS backlash
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 -0.044000 -0.072500
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant IS b3msc1170-damping
+          staticFriction IS b3msc1170-staticFric
         }
         device [
           RotationalMotor {
             name "right_waist_yaw_joint"
-            maxVelocity 1.0
+            maxVelocity IS b3msc1170-maxVero
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque IS b3msc1170-torque
           }
           PositionSensor {
             name "right_waist_yaw_joint_sensor"
@@ -1287,16 +1288,16 @@ backlash IS backlash
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant IS b3msc1170-damping
+                staticFriction IS b3msc1170-staticFric
               }
               device [
                 RotationalMotor {
                   name "right_waist_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity IS b3msc1170-maxVero
                   minPosition -0.785398163397
                   maxPosition 0.785398163397
-                  maxTorque 1000.0
+                  maxTorque IS b3msc1170-torque
                 }
                 PositionSensor {
                   name "right_waist_roll_joint_sensor"
@@ -1332,16 +1333,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1170-damping
+                      staticFriction IS b3msc1170-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_roll_mimic_joint"
-                        maxVelocity 2.0
+                        maxVelocity IS b3msc1170-maxVero
                         minPosition -1.57079632679
                         maxPosition 1.57079632679
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1170-torque
                       }
                       PositionSensor {
                         name "right_waist_roll_mimic_joint_sensor"
@@ -1385,16 +1386,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1170-damping
+                      staticFriction IS b3msc1170-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity IS b3msc1170-maxVero
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1170-torque
                       }
                       PositionSensor {
                         name "right_waist_pitch_joint_sensor"
@@ -1420,16 +1421,16 @@ backlash IS backlash
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
-                            dampingConstant 0.0
-                            staticFriction 0.0
+                            dampingConstant IS b3msc1170-damping
+                            staticFriction IS b3msc1170-staticFric
                           }
                           device [
                             RotationalMotor {
                               name "right_knee_pitch_mimic_joint"
-                              maxVelocity 1.0
+                              maxVelocity IS b3msc1170-maxVero
                               minPosition -0.523598775598
                               maxPosition 1.57079632679
-                              maxTorque 1000.0
+                              maxTorque IS b3msc1170-torque
                             }
                             PositionSensor {
                               name "right_knee_pitch_mimic_joint_sensor"
@@ -1465,16 +1466,16 @@ backlash IS backlash
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant IS b3msc1170-damping
+                                  staticFriction IS b3msc1170-staticFric
                                 }
                                 device [
                                   RotationalMotor {
                                     name "right_knee_pitch_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity IS b3msc1170-maxVero
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque IS b3msc1170-torque
                                   }
                                   PositionSensor {
                                     name "right_knee_pitch_joint_sensor"
@@ -1500,16 +1501,16 @@ backlash IS backlash
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
-                                        dampingConstant 0.0
-                                        staticFriction 0.0
+                                        dampingConstant IS b3msc1170-damping
+                                        staticFriction IS b3msc1170-staticFric
                                       }
                                       device [
                                         RotationalMotor {
                                           name "right_ankle_pitch_mimic_joint"
-                                          maxVelocity 1.0
+                                          maxVelocity IS b3msc1170-maxVero
                                           minPosition -1.57079632679
                                           maxPosition 1.57079632679
-                                          maxTorque 1000.0
+                                          maxTorque IS b3msc1170-torque
                                         }
                                         PositionSensor {
                                           name "right_ankle_pitch_mimic_joint_sensor"
@@ -1535,16 +1536,16 @@ backlash IS backlash
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
-                                              dampingConstant 0.0
-                                              staticFriction 0.0
+                                              dampingConstant IS b3msc1170-damping
+                                              staticFriction IS b3msc1170-staticFric
                                             }
                                             device [
                                               RotationalMotor {
                                                 name "right_ankle_pitch_joint"
-                                                maxVelocity 1.0
+                                                maxVelocity IS b3msc1170-maxVero
                                                 minPosition -2.35619449019
                                                 maxPosition 2.35619449019
-                                                maxTorque 1000.0
+                                                maxTorque IS b3msc1170-torque
                                               }
                                               PositionSensor {
                                                 name "right_ankle_pitch_joint_sensor"
@@ -1580,16 +1581,16 @@ backlash IS backlash
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
-                                                    dampingConstant 0.0
-                                                    staticFriction 0.0
+                                                    dampingConstant IS b3msc1040-damping
+                                                    staticFriction IS b3msc1040-staticFric
                                                   }
                                                   device [
                                                     RotationalMotor {
                                                       name "right_ankle_roll_joint"
-                                                      maxVelocity 1.0
+                                                      maxVelocity IS b3msc1040-maxVero
                                                       minPosition -1.57079632679
                                                       maxPosition 1.57079632679
-                                                      maxTorque 1000.0
+                                                      maxTorque IS b3msc1040-torque
                                                     }
                                                     PositionSensor {
                                                       name "right_ankle_roll_joint_sensor"
@@ -1707,16 +1708,16 @@ backlash IS backlash
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant IS b3msc1170-damping
+                                  staticFriction IS b3msc1170-staticFric
                                 }
                                 device [
                                   RotationalMotor {
                                     name "right_shin_pitch_mimic_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity IS b3msc1170-maxVero
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque IS b3msc1170-torque
                                   }
                                   PositionSensor {
                                     name "right_shin_pitch_mimic_joint_sensor"
@@ -1796,16 +1797,16 @@ backlash IS backlash
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant IS b3msc1170-damping
+                      staticFriction IS b3msc1170-staticFric
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_pitch_mimic_joint"
-                        maxVelocity 1.0
+                        maxVelocity IS b3msc1170-maxVero
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque IS b3msc1170-torque
                       }
                       PositionSensor {
                         name "right_waist_pitch_mimic_joint_sensor"
