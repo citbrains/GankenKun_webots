@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
   // Main loop:
   // - perform simulation steps until Webots is stopping the controller
   double angle = 0.0, delta_angle = 0.01;
-  const double lower_angle = 0.0, upper_angle = 1.0;
+  const double lower_angle = 0.0, upper_angle = 1.57;
   while (robot->step(mTimeStep) != -1) {
     // Read the sensors:
     // Enter here functions to read sensor data, like:
@@ -97,6 +97,10 @@ int main(int argc, char **argv) {
     angle += delta_angle;
     if (angle >= upper_angle) delta_angle *= -1.0;
     if (angle <= lower_angle) delta_angle *= -1.0;
+    mMotors[2]->setPosition(0.75);
+    mMotors[3]->setPosition(-1.0);
+    mMotors[5]->setPosition(-0.75);
+    mMotors[6]->setPosition(-1.0);
     mMotors[10]->setPosition(-angle);
     mMotors[11]->setPosition( angle);
     mMotors[12]->setPosition( angle);
