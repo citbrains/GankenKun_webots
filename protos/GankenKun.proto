@@ -160,11 +160,11 @@ PROTO GankenKun [
           ]
           name "head_yaw_link"
           boundingObject Transform {
-            translation 0.002923 -0.000000 0.054996
+            translation 0.015000 -0.000000 0.085000
             rotation -0.969980 0.000000 0.243186 3.141593
             children [
               Box {
-                 size 0.068779 0.072919 0.111536
+                 size 0.068779 0.072919 0.050000
               }
             ]
           }
@@ -330,11 +330,11 @@ PROTO GankenKun [
                 ]
                 name "left_upper_arm_link"
                 boundingObject Transform {
-                  translation 0.000500 0.054500 -0.000500
+                  translation 0.000500 0.035000 0.000000
                   rotation 0.577350 0.577350 -0.577350 2.094395
                   children [
                     Box {
-                       size 0.044500 0.044500 0.133000
+                       size 0.034500 0.034500 0.070000
                     }
                   ]
                 }
@@ -347,15 +347,6 @@ PROTO GankenKun [
             }
           ]
           name "left_shoulder_link"
-          boundingObject Transform {
-            translation 0.000000 -0.000000 0.021455
-            rotation 0.577350 0.577350 0.577350 2.094395
-            children [
-              Box {
-                 size 0.042000 0.042911 0.046300
-              }
-            ]
-          }
           physics Physics {
             density -1
             mass 0.090380
@@ -482,11 +473,11 @@ PROTO GankenKun [
                 ]
                 name "right_upper_arm_link"
                 boundingObject Transform {
-                  translation 0.000500 0.054500 -0.000500
+                  translation 0.000500 0.035000 0.000000
                   rotation 0.577350 0.577350 -0.577350 2.094395
                   children [
                     Box {
-                       size 0.044500 0.044500 0.133000
+                       size 0.034500 0.034500 0.070000
                     }
                   ]
                 }
@@ -499,15 +490,6 @@ PROTO GankenKun [
             }
           ]
           name "right_shoulder_link"
-          boundingObject Transform {
-            translation 0.000000 -0.000000 -0.021455
-            rotation -0.577350 0.577350 -0.577350 2.094395
-            children [
-              Box {
-                 size 0.042000 0.042911 0.046300
-              }
-            ]
-          }
           physics Physics {
             density -1
             mass 0.090380
@@ -646,15 +628,6 @@ PROTO GankenKun [
                         }
                       ]
                       name "left_slider_crank_link"
-                      boundingObject Transform {
-                        translation -0.004086 0.001886 -0.001000
-                        rotation -0.698714 0.153619 0.698714 2.836738
-                        children [
-                          Box {
-                             size 0.002000 0.021997 0.030516
-                          }
-                        ]
-                      }
                       physics Physics {
                         density -1
                         mass 0.002638
@@ -932,12 +905,25 @@ PROTO GankenKun [
                                                       }
                                                     ]
                                                     name "left_ankle_roll_link"
-                                                    boundingObject Transform {
-                                                      translation 0.016500 0.021000 0.022500
-                                                      rotation 0.000000 -1.000000 -0.000000 3.141593
-                                                      children [
-                                                        Box {
-                                                           size 0.055000 0.092500 0.176500
+                                                    boundingObject Group {
+                                                      children [ 
+                                                        Transform {
+                                                          translation 0.043500 0.021000 0.022500
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.005000 0.092500 0.176500
+                                                            }
+                                                          ]
+                                                        }
+                                                        Transform {
+                                                          translation 0.020000 0.000000 0.000000
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.05000 0.040000 0.110000
+                                                            }
+                                                          ]
                                                         }
                                                       ]
                                                     }
@@ -950,15 +936,6 @@ PROTO GankenKun [
                                                 }
                                               ]
                                               name "left_ankle_pitch_link"
-                                              boundingObject Transform {
-                                                translation -0.011092 0.030446 0.000500
-                                                rotation -0.593169 0.544335 0.593169 2.144626
-                                                children [
-                                                  Box {
-                                                     size 0.051500 0.054079 0.115158
-                                                  }
-                                                ]
-                                              }
                                               physics Physics {
                                                 density -1
                                                 mass 0.229672
@@ -968,15 +945,6 @@ PROTO GankenKun [
                                           }
                                         ]
                                         name "left_independent_pitch_link"
-                                        boundingObject Transform {
-                                          translation -0.010014 0.010350 0.000000
-                                          rotation 0.376588 -0.926381 -0.000000 3.141593
-                                          children [
-                                            Box {
-                                               size 0.025904 0.054727 0.063500
-                                            }
-                                          ]
-                                        }
                                         physics Physics {
                                           density -1
                                           mass 0.012450
@@ -987,11 +955,11 @@ PROTO GankenKun [
                                   ]
                                   name "left_shin_pitch_link"
                                   boundingObject Transform {
-                                    translation 0.049438 -0.002825 -0.000000
+                                    translation 0.029438 -0.002825 -0.000000
                                     rotation 0.577350 0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.028350 0.063700 0.121507
+                                         size 0.028350 0.063700 0.060000
                                       }
                                     ]
                                   }
@@ -1048,11 +1016,11 @@ PROTO GankenKun [
                                   ]
                                   name "left_shin_pitch_mimic_link"
                                   boundingObject Transform {
-                                    translation 0.050049 -0.002250 -0.000000
+                                    translation 0.050049 0.002750 -0.000000
                                     rotation -0.577350 -0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.021500 0.063700 0.116875
+                                         size 0.011500 0.063700 0.060000
                                       }
                                     ]
                                   }
@@ -1065,15 +1033,6 @@ PROTO GankenKun [
                               }
                             ]
                             name "left_knee_pitch_link"
-                            boundingObject Transform {
-                              translation 0.029530 0.011250 -0.000000
-                              rotation -0.577350 0.577350 -0.577350 2.094395
-                              children [
-                                Box {
-                                   size 0.054500 0.063500 0.078939
-                                }
-                              ]
-                            }
                             physics Physics {
                               density -1
                               mass 0.161201
@@ -1084,11 +1043,11 @@ PROTO GankenKun [
                       ]
                       name "left_waist_pitch_link"
                       boundingObject Transform {
-                        translation 0.048457 -0.003587 -0.000000
+                        translation 0.068457 -0.003587 -0.000000
                         rotation 0.566380 -0.582758 -0.582758 2.110929
                         children [
                           Box {
-                             size 0.027109 0.063700 0.119777
+                             size 0.027109 0.063700 0.060000
                           }
                         ]
                       }
@@ -1145,15 +1104,14 @@ PROTO GankenKun [
                       ]
                       name "left_waist_pitch_mimic_link"
                       boundingObject Transform {
-                        translation 0.049927 -0.002250 0.000000
+                        translation 0.049927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
                         children [
                           Box {
-                             size 0.021500 0.063700 0.116855
+                             size 0.011500 0.063700 0.060000
                           }
                         ]
-                      }
-                      physics Physics {
+                      }                      physics Physics {
                         density -1
                         mass 0.026735
                         centerOfMass [ 0.059775 0.001384 0.000000 ]
@@ -1162,15 +1120,6 @@ PROTO GankenKun [
                   }
                 ]
                 name "left_waist_roll_link"
-                boundingObject Transform {
-                  translation 0.003755 0.000000 -0.048259
-                  rotation -0.092137 0.092137 -0.991475 1.579358
-                  children [
-                    Box {
-                       size 0.056500 0.067002 0.096798
-                    }
-                  ]
-                }
                 physics Physics {
                   density -1
                   mass 0.227844
@@ -1307,15 +1256,6 @@ PROTO GankenKun [
                         }
                       ]
                       name "right_slider_crank_link"
-                      boundingObject Transform {
-                        translation -0.004086 0.001886 -0.001000
-                        rotation -0.698714 0.153619 0.698714 2.836738
-                        children [
-                          Box {
-                             size 0.002000 0.021997 0.030516
-                          }
-                        ]
-                      }
                       physics Physics {
                         density -1
                         mass 0.002638
@@ -1563,12 +1503,25 @@ PROTO GankenKun [
                                                       }
                                                     ]
                                                     name "right_ankle_roll_link"
-                                                    boundingObject Transform {
-                                                      translation 0.016500 -0.021000 0.022500
-                                                      rotation 0.000000 -1.000000 -0.000000 3.141593
-                                                      children [
-                                                        Box {
-                                                           size 0.055000 0.092500 0.176500
+                                                    boundingObject Group {
+                                                      children [ 
+                                                        Transform {
+                                                          translation 0.043500 -0.021000 0.022500
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.00500 0.092500 0.176500
+                                                            }
+                                                          ]
+                                                        }
+                                                        Transform {
+                                                          translation 0.020000 0.000000 0.000000
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.05000 0.040000 0.110000
+                                                            }
+                                                          ]
                                                         }
                                                       ]
                                                     }
@@ -1581,15 +1534,6 @@ PROTO GankenKun [
                                                 }
                                               ]
                                               name "right_ankle_pitch_link"
-                                              boundingObject Transform {
-                                                translation -0.011203 0.030466 -0.000500
-                                                rotation -0.560850 -0.609010 -0.560850 2.047556
-                                                children [
-                                                  Box {
-                                                     size 0.051500 0.053981 0.115041
-                                                  }
-                                                ]
-                                              }
                                               physics Physics {
                                                 density -1
                                                 mass 0.229672
@@ -1599,15 +1543,6 @@ PROTO GankenKun [
                                           }
                                         ]
                                         name "right_independent_pitch_link"
-                                        boundingObject Transform {
-                                          translation -0.010014 0.010350 0.000000
-                                          rotation 0.376588 -0.926381 -0.000000 3.141593
-                                          children [
-                                            Box {
-                                               size 0.025904 0.054727 0.063500
-                                            }
-                                          ]
-                                        }
                                         physics Physics {
                                           density -1
                                           mass 0.012450
@@ -1618,11 +1553,20 @@ PROTO GankenKun [
                                   ]
                                   name "right_shin_pitch_link"
                                   boundingObject Transform {
-                                    translation 0.049438 -0.002825 -0.000000
+                                    translation 0.029438 -0.002825 -0.000000
                                     rotation 0.577350 0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.028350 0.063700 0.121507
+                                         size 0.028350 0.063700 0.060000
+                                      }
+                                    ]
+                                  }
+                                  boundingObject Transform {
+                                    translation 0.029438 -0.002825 -0.000000
+                                    rotation 0.577350 0.577350 0.577350 2.094395
+                                    children [
+                                      Box {
+                                         size 0.028350 0.063700 0.060000
                                       }
                                     ]
                                   }
@@ -1669,11 +1613,11 @@ PROTO GankenKun [
                                   ]
                                   name "right_shin_pitch_mimic_link"
                                   boundingObject Transform {
-                                    translation 0.050049 -0.002250 -0.000000
+                                    translation 0.050049 0.002750 -0.000000
                                     rotation -0.577350 -0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.021500 0.063700 0.116875
+                                         size 0.011500 0.063700 0.060000
                                       }
                                     ]
                                   }
@@ -1686,15 +1630,6 @@ PROTO GankenKun [
                               }
                             ]
                             name "right_knee_pitch_link"
-                            boundingObject Transform {
-                              translation 0.029530 0.011250 -0.000000
-                              rotation 0.577350 0.577350 0.577350 2.094395
-                              children [
-                                Box {
-                                   size 0.054500 0.063500 0.078939
-                                }
-                              ]
-                            }
                             physics Physics {
                               density -1
                               mass 0.161201
@@ -1705,11 +1640,11 @@ PROTO GankenKun [
                       ]
                       name "right_waist_pitch_link"
                       boundingObject Transform {
-                        translation 0.048457 -0.003587 -0.000000
+                        translation 0.068457 -0.003587 -0.000000
                         rotation 0.566380 -0.582758 -0.582758 2.110929
                         children [
                           Box {
-                             size 0.027109 0.063700 0.119777
+                             size 0.027109 0.063700 0.060000
                           }
                         ]
                       }
@@ -1756,11 +1691,11 @@ PROTO GankenKun [
                       ]
                       name "right_waist_pitch_mimic_link"
                       boundingObject Transform {
-                        translation 0.049927 -0.002250 0.000000
+                        translation 0.049927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
                         children [
                           Box {
-                             size 0.021500 0.063700 0.116855
+                             size 0.011500 0.063700 0.060000
                           }
                         ]
                       }
@@ -1773,15 +1708,6 @@ PROTO GankenKun [
                   }
                 ]
                 name "right_waist_roll_link"
-                boundingObject Transform {
-                  translation 0.003749 0.000000 -0.048261
-                  rotation -0.092572 0.092572 -0.991393 1.579440
-                  children [
-                    Box {
-                       size 0.056500 0.066984 0.096825
-                    }
-                  ]
-                }
                 physics Physics {
                   density -1
                   mass 0.227844
@@ -1831,11 +1757,11 @@ PROTO GankenKun [
     ]
     name IS name 
     boundingObject Transform {
-      translation -0.049913 0.000000 0.026411
-      rotation 0.706002 -0.706002 -0.055879 3.029951
+      translation -0.049913 0.000000 0.040000
+      rotation 0.0 0.0 1 1.57
       children [
         Box {
-           size 0.142800 0.194748 0.196812
+           size 0.142800 0.160000 0.196812
         }
       ]
     }
