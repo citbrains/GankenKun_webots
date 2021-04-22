@@ -1026,7 +1026,7 @@ PROTO GankenKun [
                                                     ]
                                                     name "left_ankle_roll_link"
                                                     boundingObject Transform {
-                                                      translation 0.016500 0.021000 0.022500
+                                                      translation 0.026500 0.021000 0.022500
                                                       rotation 0.000000 -1.000000 -0.000000 3.141593
                                                       children [
                                                         Box {
@@ -1727,7 +1727,7 @@ PROTO GankenKun [
                                                     ]
                                                     name "right_ankle_roll_link"
                                                     boundingObject Transform {
-                                                      translation 0.016500 -0.021000 0.022500
+                                                      translation 0.026500 -0.021000 0.022500
                                                       rotation 0.000000 -1.000000 -0.000000 3.141593
                                                       children [
                                                         Box {
