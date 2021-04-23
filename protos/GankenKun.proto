@@ -13,7 +13,7 @@ PROTO GankenKun [
   field  SFString    customData      ""           # Is `Robot.customData`.
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
-  field  SFBool      selfCollision   TRUE        # Is `Robot.selfCollision`.
+  field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
 
@@ -23,15 +23,14 @@ PROTO GankenKun [
   field  SFFloat     positionresolution 0.0015
 
   field  SFFloat     b3msc1040-torque 4.6
-  field  SFFloat     b3msc1040-maxVero 54
+  field  SFFloat     b3msc1040-maxVero 5.65
   field  SFFloat     b3msc1040-staticFric 0.05888
   field  SFFloat     b3msc1040-damping 1.2452588169
 
   field  SFFloat     b3msc1170-torque 7.6
-  field  SFFloat     b3msc1170-maxVero 46
+  field  SFFloat     b3msc1170-maxVero 4.817
   field  SFFloat     b3msc1170-staticFric 0.07296
   field  SFFloat     b3msc1170-damping 0.639974
-
 ]
 {
   Robot {
@@ -171,11 +170,6 @@ PROTO GankenKun [
                 }
               ]
               name "camera_link"
-              physics Physics {
-                density -1
-                mass 0.000000
-                centerOfMass [ 0.000000 0.000000 0.000000 ]
-              }
             }
           ]
           name "head_yaw_link"
@@ -192,10 +186,10 @@ PROTO GankenKun [
             density -1
             mass 0.111692
             centerOfMass [ 0.017325 0.000000 0.065059 ]
-             inertiaMatrix [
-                1.148365390e-04 8.968346100e-05 7.895650100e-05
-                9.572310000e-07 -7.715580000e-07 2.138747600e-05
-             ]
+            inertiaMatrix [
+              1.148365390e-04 8.968346100e-05 7.895650100e-05
+              9.572310000e-07 -7.715580000e-07 2.138747600e-05
+            ]
           }
         }
       }
@@ -703,11 +697,6 @@ PROTO GankenKun [
                         }
                       ]
                       name "left_slider_crank_link"
-                      physics Physics {
-                        density -1
-                        mass 0.002638
-                        centerOfMass [ -0.010842 0.000000 -0.001000 ]
-                      }
                     }
                   }
                   HingeJointWithBacklash {
@@ -986,16 +975,6 @@ PROTO GankenKun [
                                                           }
                                                         ]
                                                       }
-                                                      DEF left_foot_link Solid {
-                                                        translation 0.044000 0.000000 0.000000
-                                                        rotation 0.000000 -1.000000 0.000000 1.570796
-                                                        name "left_foot_link"
-                                                        physics Physics {
-                                                          density -1
-                                                          mass 0.000000
-                                                          centerOfMass [ 0.000000 0.000000 0.000000 ]
-                                                        }
-                                                      }
                                                     ]
                                                     name "left_ankle_roll_link"
                                                     boundingObject Group {
@@ -1050,6 +1029,10 @@ PROTO GankenKun [
                                           density -1
                                           mass 0.012450
                                           centerOfMass [ -0.007630 0.000000 0.000000 ]
+                                          inertiaMatrix [
+                                            1.000000000e-06 1.000000000e-06 1.000000000e-06
+                                            0.000000000 0.000000000 0.000000000
+                                          ]
                                         }
                                       }
                                     }
@@ -1401,11 +1384,6 @@ PROTO GankenKun [
                         }
                       ]
                       name "right_slider_crank_link"
-                      physics Physics {
-                        density -1
-                        mass 0.002638
-                        centerOfMass [ -0.010842 0.000000 -0.001000 ]
-                      }
                     }
                   }
                   HingeJointWithBacklash {
@@ -1654,16 +1632,6 @@ PROTO GankenKun [
                                                           }
                                                         ]
                                                       }
-                                                      DEF right_foot_link Solid {
-                                                        translation 0.044000 0.000000 0.000000
-                                                        rotation 0.000000 -1.000000 0.000000 1.570796
-                                                        name "right_foot_link"
-                                                        physics Physics {
-                                                          density -1
-                                                          mass 0.000000
-                                                          centerOfMass [ 0.000000 0.000000 0.000000 ]
-                                                        }
-                                                      }
                                                     ]
                                                     name "right_ankle_roll_link"
                                                     boundingObject Group {
@@ -1718,20 +1686,15 @@ PROTO GankenKun [
                                           density -1
                                           mass 0.012450
                                           centerOfMass [ -0.007630 0.000000 0.000000 ]
+                                          inertiaMatrix [
+                                            1.000000000e-06 1.000000000e-06 1.000000000e-06
+                                            0.000000000 0.000000000 0.000000000
+                                          ]
                                         }
                                       }
                                     }
                                   ]
                                   name "right_shin_pitch_link"
-                                  boundingObject Transform {
-                                    translation 0.029438 -0.002825 -0.000000
-                                    rotation 0.577350 0.577350 0.577350 2.094395
-                                    children [
-                                      Box {
-                                         size 0.028350 0.063700 0.060000
-                                      }
-                                    ]
-                                  }
                                   boundingObject Transform {
                                     translation 0.029438 -0.002825 -0.000000
                                     rotation 0.577350 0.577350 0.577350 2.094395
@@ -1959,8 +1922,12 @@ PROTO GankenKun [
         name "imu_link"
         physics Physics {
           density -1
-          mass 0.000000
+          mass 0.010000
           centerOfMass [ 0.000000 0.000000 0.000000 ]
+          inertiaMatrix [
+            1.000000e-06 1.000000e-06 1.000000e-06
+            0.000000e+00 0.000000e+00 0.000000e+00
+          ]
         }
       }
     ]
