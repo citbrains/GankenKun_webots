@@ -163,10 +163,11 @@ PROTO GankenKun [
                 Camera {
                   rotation 1.0 0.0 0.0 0.0
                   name "camera_sensor"
-                  fieldOfView 1.396263
-                  width 160
-                  height 120
-                  noise 0.007000
+                  fieldOfView 2.05
+                  width 640
+                  height 480
+                  noise 0.0
+                  spherical TRUE
                 }
               ]
               name "camera_link"
