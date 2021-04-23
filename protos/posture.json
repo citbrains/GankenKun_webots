@@ -1,5 +1,5 @@
 {
-    "robot_name": "MyRobotName",
+    "robot_name": "GankenKun",
     "upright": {
         "head_yaw_joint": 0,
         "left_shoulder_pitch_joint": 0,
