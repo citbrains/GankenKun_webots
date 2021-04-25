@@ -1,0 +1,74 @@
+{
+  "name": "CIT Brains",
+  "players": {
+    "1": {
+      "proto": "RoboCup_GankenKun",
+      "dockerImg": "CITBrains_GankenKun",
+      "dockerCmd": "launchRobot.sh --goalie",
+      "halfTimeStartingPose": {
+        "translation": [-3.5, -3.1, 0.439],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "reentryStartingPose": {
+        "translation": [-3.0, -3.11, 0.439],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "shootoutStartingPose": {
+        "translation": [2.0, 0.0, 0.439],
+        "rotation": [0, 0, 1, 0.0]
+      }
+    },
+    "2": {
+      "proto": "RoboCup_GankenKun",
+      "dockerImg": "CITBrains_GankenKun",
+      "dockerCmd": "launchRobot.sh --fieldPlayer",
+      "halfTimeStartingPose": {
+        "translation": [-3.5, 3.1, 0.439],
+        "rotation": [0, 0, 1, -1.57]
+      },
+      "reentryStartingPose": {
+        "translation": [-3.0, -3.11, 0.439],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "shootoutStartingPose": {
+        "translation": [2.0, 0.0, 0.439],
+        "rotation": [0, 0, 1, 0.0]
+      }
+    },
+    "3": {
+      "proto": "RoboCup_GankenKun",
+      "dockerImg": "CITBrains_GankenKun",
+      "dockerCmd": "launchRobot.sh --fieldPlayer",
+      "halfTimeStartingPose": {
+        "translation": [-0.75, -3.1, 0.439],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "reentryStartingPose": {
+        "translation": [-3.0, -3.11, 0.439],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "shootoutStartingPose": {
+        "translation": [2.0, 0.0, 0.439],
+        "rotation": [0, 0, 1, 0.0]
+      }
+    },
+    "4": {
+      "proto": "RoboCup_GankenKun",
+      "dockerImg": "CITBrains_GankenKun",
+      "dockerCmd": "launchRobot.sh --fieldPlayer",
+      "halfTimeStartingPose": {
+        "translation": [-0.75, 3.1, 0.439],
+        "rotation": [0, 0, 1, -1.57]
+      },
+      "reentryStartingPose": {
+        "translation": [-3.0, -3.11, 0.439],
+        "rotation": [0, 0, 1, 1.57]
+      },
+      "shootoutStartingPose": {
+        "translation": [2.0, 0.0, 0.439],
+        "rotation": [0, 0, 1, 0.0]
+      }
+    }
+  }
+}
+

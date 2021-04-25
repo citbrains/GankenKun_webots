@@ -14,8 +14,11 @@ PROTO GankenKun [
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
   field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
+  field  SFInt32     cameraWidth     640          # Is `Camera.width`.
+  field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
+  field  SFBool      enable_backlash FALSE        # Enables backlash on all joints.
 
   field  SFFloat     backlash        0.01
   field  SFFloat     gearmass        0.01
@@ -33,6 +36,9 @@ PROTO GankenKun [
   field  SFFloat     b3msc1170-damping 0.639974
 ]
 {
+  %{
+    local enable_backlash = fields.enable_backlash.value
+  }%
   Robot {
     translation IS translation
     rotation IS rotation
@@ -164,8 +170,8 @@ PROTO GankenKun [
                   rotation 1.0 0.0 0.0 0.0
                   name "camera_sensor"
                   fieldOfView 2.05
-                  width 640
-                  height 480
+                  width IS cameraWidth
+                  height IS cameraHeight
                   noise 0.0
                   spherical TRUE
                 }
