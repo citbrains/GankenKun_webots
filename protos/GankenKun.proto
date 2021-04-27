@@ -14,34 +14,33 @@ PROTO GankenKun [
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
   field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
+  field  SFInt32     cameraWidth     640          # Is `Camera.width`.
+  field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
-
-  field  SFFloat     backlash        0.01
-  field  SFFloat     gearmass        0.01
-
-  field  SFFloat     positionresolution 0.0015
-
-  field  SFFloat     b3msc1040-torque 4.6
-  field  SFFloat     b3msc1040-maxVero 5.65
-  field  SFFloat     b3msc1040-staticFric 0.05888
-  field  SFFloat     b3msc1040-damping 1.2452588169
-
-  field  SFFloat     b3msc1170-torque 7.6
-  field  SFFloat     b3msc1170-maxVero 4.817
-  field  SFFloat     b3msc1170-staticFric 0.07296
-  field  SFFloat     b3msc1170-damping 0.639974
+  field  SFBool      enable_backlash FALSE        # Enables backlash on all joints.
 ]
 {
+  %{
+    local enable_backlash = fields.enable_backlash.value
+    local backlash = 0.01
+    local gearmass = 0.001
+
+    local b3msc1040_torque = 4.6
+    local b3msc1040_maxVelo = 5.65
+    local b3msc1040_staticFric = 0.05888
+    local b3msc1040_damping = 0.803738053
+
+    local b3msc1170_torque = 7.6
+    local b3msc1170_maxVelo = 4.817
+    local b3msc1170_staticFric = 0.07296
+    local b3msc1170_damping = 1.562599128
+
+    local positionresolution = 0.0015
+  }%
   Robot {
     translation IS translation
     rotation IS rotation
-    controller IS controller
-    controllerArgs IS controllerArgs
-    customData IS customData
-    supervisor IS supervisor
-    synchronization IS synchronization
-    selfCollision IS selfCollision
     children [
       Transform {
         translation 0.000000 0.000000 0.000000
@@ -104,26 +103,26 @@ PROTO GankenKun [
         ]
       }
       HingeJointWithBacklash {
-        backlash IS backlash
-        gearMass IS gearmass
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.000000 0.000000 0.094750
-          dampingConstant IS b3msc1040-damping
-          staticFriction IS b3msc1040-staticFric
+          dampingConstant %{= b3msc1040_damping }%
+          staticFriction %{= b3msc1040_staticFric }%
         }
         device [
           RotationalMotor {
             name "head_yaw_joint"
-            maxVelocity IS b3msc1040-maxVero
+            maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque IS b3msc1040-torque
+            maxTorque %{= b3msc1040_torque }%
 
           }
           PositionSensor {
             name "head_yaw_joint_sensor"
-            resolution IS positionresolution
+            resolution %{= positionresolution }%
           }
         ]
         endPoint DEF head_yaw_link Solid {
@@ -164,8 +163,8 @@ PROTO GankenKun [
                   rotation 1.0 0.0 0.0 0.0
                   name "camera_sensor"
                   fieldOfView 2.05
-                  width 640
-                  height 480
+                  width IS cameraWidth
+                  height IS cameraHeight
                   noise 0.0
                   spherical TRUE
                 }
@@ -195,25 +194,25 @@ PROTO GankenKun [
         }
       }
       HingeJointWithBacklash {
-        backlash IS backlash
-        gearMass IS gearmass
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 0.060000 0.072000
-          dampingConstant IS b3msc1040-damping
-          staticFriction IS b3msc1040-staticFric
+          dampingConstant %{= b3msc1040_damping }%
+          staticFriction %{= b3msc1040_staticFric }%
         }
         device [
           RotationalMotor {
             name "left_shoulder_pitch_joint"
-            maxVelocity IS b3msc1040-maxVero
+            maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque IS b3msc1040-torque
+            maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
             name "left_shoulder_pitch_joint_sensor"
-            resolution IS positionresolution
+            resolution %{= positionresolution }%
           }
         ]
         endPoint DEF left_shoulder_link Solid {
@@ -247,24 +246,24 @@ PROTO GankenKun [
               ]
             }
             HingeJointWithBacklash {
-              backlash IS backlash
-              gearMass IS gearmass
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 0.031500
-                dampingConstant IS b3msc1040-damping
-                staticFriction IS b3msc1040-staticFric
+                dampingConstant %{= b3msc1040_damping }%
+                staticFriction %{= b3msc1040_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "left_shoulder_roll_joint"
-                  maxVelocity IS b3msc1040-maxVero
+                  maxVelocity %{= b3msc1040_maxVelo }%
                   maxPosition 3.14159265359
-                  maxTorque IS b3msc1040-torque
+                  maxTorque %{= b3msc1040_torque }%
                 }
                 PositionSensor {
                   name "left_shoulder_roll_joint_sensor"
-                  resolution IS positionresolution
+                  resolution %{= positionresolution }%
                 }
               ]
               endPoint DEF left_upper_arm_link Solid {
@@ -292,25 +291,25 @@ PROTO GankenKun [
                     ]
                   }
                   HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
-                      dampingConstant IS b3msc1040-damping
-                      staticFriction IS b3msc1040-staticFric
+                      dampingConstant %{= b3msc1040_damping }%
+                      staticFriction %{= b3msc1040_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_elbow_pitch_joint"
-                        maxVelocity IS b3msc1040-maxVero
+                        maxVelocity %{= b3msc1040_maxVelo }%
                         minPosition -2.35619449019
                         maxPosition 2.35619449019
-                        maxTorque IS b3msc1040-torque
+                        maxTorque %{= b3msc1040_torque }%
                       }
                       PositionSensor {
                         name "left_elbow_pitch_joint_sensor"
-                         resolution IS positionresolution
+                         resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_lower_arm_link Solid {
@@ -395,25 +394,25 @@ PROTO GankenKun [
         }
       }
       HingeJointWithBacklash {
-        backlash IS backlash
-        gearMass IS gearmass
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 -0.060000 0.072000
-          dampingConstant IS b3msc1040-damping
-          staticFriction IS b3msc1040-staticFric
+          dampingConstant %{= b3msc1040_damping }%
+          staticFriction %{= b3msc1040_staticFric }%
         }
         device [
           RotationalMotor {
             name "right_shoulder_pitch_joint"
-            maxVelocity IS b3msc1040-maxVero
+            maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque IS b3msc1040-torque
+            maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
             name "right_shoulder_pitch_joint_sensor"
-            resolution IS positionresolution
+            resolution %{= positionresolution }%
           } 
         ]
         endPoint DEF right_shoulder_link Solid {
@@ -431,24 +430,24 @@ PROTO GankenKun [
               ]
             }
             HingeJointWithBacklash {
-              backlash IS backlash
-              gearMass IS gearmass
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 -0.031500
-                dampingConstant IS b3msc1040-damping
-                staticFriction IS b3msc1040-staticFric
+                dampingConstant %{= b3msc1040_damping }%
+                staticFriction %{= b3msc1040_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "right_shoulder_roll_joint"
-                  maxVelocity IS b3msc1040-maxVero
+                  maxVelocity %{= b3msc1040_maxVelo }%
                   minPosition -3.14159265359
-                  maxTorque IS b3msc1040-torque
+                  maxTorque %{= b3msc1040_torque }%
                 }
                 PositionSensor {
                   name "right_shoulder_roll_joint_sensor"
-                  resolution IS positionresolution
+                  resolution %{= positionresolution }%
                 }
               ]
               endPoint DEF right_upper_arm_link Solid {
@@ -466,25 +465,25 @@ PROTO GankenKun [
                     ]
                   }
                   HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
-                      dampingConstant IS b3msc1040-damping
-                      staticFriction IS b3msc1040-staticFric
+                      dampingConstant %{= b3msc1040_damping }%
+                      staticFriction %{= b3msc1040_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_elbow_pitch_joint"
-                        maxVelocity IS b3msc1040-maxVero
+                        maxVelocity %{= b3msc1040_maxVelo }%
                         minPosition -2.35619449019
                         maxPosition 2.35619449019
-                        maxTorque IS b3msc1040-torque
+                        maxTorque %{= b3msc1040_torque }%
                       }
                       PositionSensor {
                         name "right_elbow_pitch_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_lower_arm_link Solid {
@@ -559,25 +558,25 @@ PROTO GankenKun [
         }
       }
       HingeJointWithBacklash {
-        backlash IS backlash
-        gearMass IS gearmass
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 0.044000 -0.072500
-          dampingConstant IS b3msc1170-damping
-          staticFriction IS b3msc1170-staticFric
+          dampingConstant %{= b3msc1170_damping }%
+          staticFriction %{= b3msc1170_staticFric }%
         }
         device [
           RotationalMotor {
             name "left_waist_yaw_joint"
-            maxVelocity IS b3msc1170-maxVero
+            maxVelocity %{= b3msc1170_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque IS b3msc1170-torque
+            maxTorque %{= b3msc1170_torque }%
           }
           PositionSensor {
             name "left_waist_yaw_joint_sensor"
-            resolution IS positionresolution
+            resolution %{= positionresolution }%
           } 
         ]
         endPoint DEF left_waist_yaw_link Solid {
@@ -605,25 +604,25 @@ PROTO GankenKun [
               ]
             }
             HingeJointWithBacklash {
-              backlash IS backlash
-              gearMass IS gearmass
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
-                dampingConstant IS b3msc1170-damping
-                staticFriction IS b3msc1170-staticFric
+                dampingConstant %{= b3msc1170_damping }%
+                staticFriction %{= b3msc1170_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "left_waist_roll_joint"
-                  maxVelocity IS b3msc1170-maxVero
+                  maxVelocity %{= b3msc1170_maxVelo }%
                   minPosition -0.785398163397
                   maxPosition 0.785398163397
-                  maxTorque IS b3msc1170-torque
+                  maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
                   name "left_waist_roll_joint_sensor"
-                  resolution IS positionresolution
+                  resolution %{= positionresolution }%
                 } 
               ]
               endPoint DEF left_waist_roll_link Solid {
@@ -650,26 +649,27 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                  HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
+                  HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
-                      dampingConstant IS b3msc1170-damping
-                      staticFriction IS b3msc1170-staticFric
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_roll_mimic_joint"
-                        maxVelocity IS b3msc1170-maxVero
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 1.57079632679
-                        maxTorque IS b3msc1170-torque
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "left_waist_roll_mimic_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_slider_crank_link Solid {
@@ -701,25 +701,25 @@ PROTO GankenKun [
                     }
                   }
                   HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant IS b3msc1170-damping
-                      staticFriction IS b3msc1170-staticFric
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_pitch_joint"
-                        maxVelocity IS b3msc1170-maxVero
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque IS b3msc1170-torque
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "left_waist_pitch_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_waist_pitch_link Solid {
@@ -746,26 +746,27 @@ PROTO GankenKun [
                             }
                           ]
                         }
-                        HingeJointWithBacklash {
-                          backlash IS backlash
-                          gearMass IS gearmass
+#                        HingeJointWithBacklash {
+#                          backlash %{= backlash }%
+#                          gearMass %{= gearmass }%
+                        HingeJoint {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
-                            dampingConstant IS b3msc1170-damping
-                            staticFriction IS b3msc1170-staticFric
+                            dampingConstant %{= b3msc1170_damping }%
+                            staticFriction %{= b3msc1170_staticFric }%
                           }
                           device [
                             RotationalMotor {
                               name "left_knee_pitch_mimic_joint"
-                              maxVelocity IS b3msc1170-maxVero
+                              maxVelocity %{= b3msc1170_maxVelo }%
                               minPosition -0.523598775598
                               maxPosition 1.57079632679
-                              maxTorque IS b3msc1170-torque
+                              maxTorque %{= b3msc1170_torque }%
                             }
                             PositionSensor {
                               name "left_knee_pitch_mimic_joint_sensor"
-                              resolution IS positionresolution
+                              resolution %{= positionresolution }%
                             }
                           ]
                           endPoint DEF left_knee_pitch_link Solid {
@@ -793,25 +794,25 @@ PROTO GankenKun [
                                 ]
                               }
                               HingeJointWithBacklash {
-                                backlash IS backlash
-                                gearMass IS gearmass
+                                backlash %{= backlash }%
+                                gearMass %{= gearmass }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant IS b3msc1170-damping
-                                  staticFriction IS b3msc1170-staticFric
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "left_knee_pitch_joint"
-                                    maxVelocity IS b3msc1170-maxVero
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque IS b3msc1170-torque
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "left_knee_pitch_joint_sensor"
-                                    resolution IS positionresolution
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF left_shin_pitch_link Solid {
@@ -838,26 +839,27 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
-                                    HingeJointWithBacklash {
-                                      backlash IS backlash
-                                      gearMass IS gearmass
+#                                    HingeJointWithBacklash {
+#                                      backlash %{= backlash }%
+#                                      gearMass %{= gearmass }%
+                                    HingeJoint {
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
-                                        dampingConstant IS b3msc1170-damping
-                                        staticFriction IS b3msc1170-staticFric
+                                        dampingConstant %{= b3msc1170_damping }%
+                                        staticFriction %{= b3msc1170_staticFric }%
                                       }
                                       device [
                                         RotationalMotor {
                                           name "left_ankle_pitch_mimic_joint"
-                                          maxVelocity IS b3msc1170-maxVero
+                                          maxVelocity %{= b3msc1170_maxVelo }%
                                           minPosition -1.57079632679
                                           maxPosition 1.57079632679
-                                          maxTorque IS b3msc1170-torque
+                                          maxTorque %{= b3msc1170_torque }%
                                         }
                                         PositionSensor {
                                           name "left_ankle_pitch_mimic_joint_sensor"
-                                          resolution IS positionresolution
+                                          resolution %{= positionresolution }%
                                         }
                                       ]
                                       endPoint DEF left_independent_pitch_link Solid {
@@ -885,25 +887,25 @@ PROTO GankenKun [
                                             ]
                                           }
                                           HingeJointWithBacklash {
-                                            backlash IS backlash
-                                            gearMass IS gearmass
+                                            backlash %{= backlash }%
+                                            gearMass %{= gearmass }%
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
-                                              dampingConstant IS b3msc1170-damping
-                                              staticFriction IS b3msc1170-staticFric
+                                              dampingConstant %{= b3msc1170_damping }%
+                                              staticFriction %{= b3msc1170_staticFric }%
                                             }
                                             device [
                                               RotationalMotor {
                                                 name "left_ankle_pitch_joint"
-                                                maxVelocity IS b3msc1170-maxVero
+                                                maxVelocity %{= b3msc1170_maxVelo }%
                                                 minPosition -2.35619449019
                                                 maxPosition 2.35619449019
-                                                maxTorque IS b3msc1170-torque
+                                                maxTorque %{= b3msc1170_torque }%
                                               }
                                               PositionSensor {
                                                 name "left_ankle_pitch_joint_sensor"
-                                                resolution IS positionresolution
+                                                resolution %{= positionresolution }%
                                               }
                                             ]
                                             endPoint DEF left_ankle_pitch_link Solid {
@@ -931,25 +933,25 @@ PROTO GankenKun [
                                                   ]
                                                 }
                                                 HingeJointWithBacklash {
-                                                  backlash IS backlash
-                                                  gearMass IS gearmass
+                                                  backlash %{= backlash }%
+                                                  gearMass %{= gearmass }%
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
-                                                    dampingConstant IS b3msc1040-damping
-                                                    staticFriction IS b3msc1040-staticFric
+                                                    dampingConstant %{= b3msc1040_damping }%
+                                                    staticFriction %{= b3msc1040_staticFric }%
                                                   }
                                                   device [
                                                     RotationalMotor {
                                                       name "left_ankle_roll_joint"
-                                                      maxVelocity IS b3msc1040-maxVero
+                                                      maxVelocity %{= b3msc1040_maxVelo }%
                                                       minPosition -1.57079632679
                                                       maxPosition 1.57079632679
-                                                      maxTorque IS b3msc1040-torque
+                                                      maxTorque %{= b3msc1040_torque }%
                                                     }
                                                     PositionSensor {
                                                       name "left_ankle_roll_joint_sensor"
-                                                      resolution IS positionresolution
+                                                      resolution %{= positionresolution }%
                                                     }
                                                   ]
                                                   endPoint DEF left_ankle_roll_link Solid {
@@ -1060,26 +1062,27 @@ PROTO GankenKun [
                                   }
                                 }
                               }
-                              HingeJointWithBacklash {
-                                backlash IS backlash
-                                gearMass IS gearmass
+#                              HingeJointWithBacklash {
+#                                backlash %{= backlash }%
+#                                gearMass %{= gearmass }%
+                              HingeJoint {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
-                                  dampingConstant IS b3msc1170-damping
-                                  staticFriction IS b3msc1170-staticFric
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "left_shin_pitch_mimic_joint"
-                                    maxVelocity IS b3msc1170-maxVero
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque IS b3msc1170-torque
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "left_shin_pitch_mimic_joint_sensor"
-                                    resolution IS positionresolution
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF left_shin_pitch_mimic_link Solid {
@@ -1163,26 +1166,27 @@ PROTO GankenKun [
                       }
                     }
                   }
-                  HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
+                  HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
-                      dampingConstant IS b3msc1170-damping
-                      staticFriction IS b3msc1170-staticFric
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_pitch_mimic_joint"
-                        maxVelocity IS b3msc1170-maxVero
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque IS b3msc1170-torque
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "left_waist_pitch_mimic_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_waist_pitch_mimic_link Solid {
@@ -1266,25 +1270,25 @@ PROTO GankenKun [
         }
       }
       HingeJointWithBacklash {
-        backlash IS backlash
-        gearMass IS gearmass
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 -0.044000 -0.072500
-          dampingConstant IS b3msc1170-damping
-          staticFriction IS b3msc1170-staticFric
+          dampingConstant %{= b3msc1170_damping }%
+          staticFriction %{= b3msc1170_staticFric }%
         }
         device [
           RotationalMotor {
             name "right_waist_yaw_joint"
-            maxVelocity IS b3msc1170-maxVero
+            maxVelocity %{= b3msc1170_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque IS b3msc1170-torque
+            maxTorque %{= b3msc1170_torque }%
           }
           PositionSensor {
             name "right_waist_yaw_joint_sensor"
-            resolution IS positionresolution
+            resolution %{= positionresolution }%
           }
         ]
         endPoint DEF right_waist_yaw_link Solid {
@@ -1302,25 +1306,25 @@ PROTO GankenKun [
               ]
             }
             HingeJointWithBacklash {
-              backlash IS backlash
-              gearMass IS gearmass
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
-                dampingConstant IS b3msc1170-damping
-                staticFriction IS b3msc1170-staticFric
+                dampingConstant %{= b3msc1170_damping }%
+                staticFriction %{= b3msc1170_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "right_waist_roll_joint"
-                  maxVelocity IS b3msc1170-maxVero
+                  maxVelocity %{= b3msc1170_maxVelo }%
                   minPosition -0.785398163397
                   maxPosition 0.785398163397
-                  maxTorque IS b3msc1170-torque
+                  maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
                   name "right_waist_roll_joint_sensor"
-                  resolution IS positionresolution
+                  resolution %{= positionresolution }%
                 }
               ]
               endPoint DEF right_waist_roll_link Solid {
@@ -1347,26 +1351,27 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                  HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
+                  HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
-                      dampingConstant IS b3msc1170-damping
-                      staticFriction IS b3msc1170-staticFric
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_roll_mimic_joint"
-                        maxVelocity IS b3msc1170-maxVero
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 1.57079632679
-                        maxTorque IS b3msc1170-torque
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "right_waist_roll_mimic_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_slider_crank_link Solid {
@@ -1388,25 +1393,25 @@ PROTO GankenKun [
                     }
                   }
                   HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant IS b3msc1170-damping
-                      staticFriction IS b3msc1170-staticFric
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_pitch_joint"
-                        maxVelocity IS b3msc1170-maxVero
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque IS b3msc1170-torque
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "right_waist_pitch_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_waist_pitch_link Solid {
@@ -1423,26 +1428,27 @@ PROTO GankenKun [
                             }
                           ]
                         }
-                        HingeJointWithBacklash {
-                          backlash IS backlash
-                          gearMass IS gearmass
+#                        HingeJointWithBacklash {
+#                          backlash %{= backlash }%
+#                          gearMass %{= gearmass }%
+                        HingeJoint {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
-                            dampingConstant IS b3msc1170-damping
-                            staticFriction IS b3msc1170-staticFric
+                            dampingConstant %{= b3msc1170_damping }%
+                            staticFriction %{= b3msc1170_staticFric }%
                           }
                           device [
                             RotationalMotor {
                               name "right_knee_pitch_mimic_joint"
-                              maxVelocity IS b3msc1170-maxVero
+                              maxVelocity %{= b3msc1170_maxVelo }%
                               minPosition -0.523598775598
                               maxPosition 1.57079632679
-                              maxTorque IS b3msc1170-torque
+                              maxTorque %{= b3msc1170_torque }%
                             }
                             PositionSensor {
                               name "right_knee_pitch_mimic_joint_sensor"
-                              resolution IS positionresolution
+                              resolution %{= positionresolution }%
                             }
                           ]
                           endPoint DEF right_knee_pitch_link Solid {
@@ -1470,25 +1476,25 @@ PROTO GankenKun [
                                 ]
                               }
                               HingeJointWithBacklash {
-                                backlash IS backlash
-                                gearMass IS gearmass
+                                backlash %{= backlash }%
+                                gearMass %{= gearmass }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant IS b3msc1170-damping
-                                  staticFriction IS b3msc1170-staticFric
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "right_knee_pitch_joint"
-                                    maxVelocity IS b3msc1170-maxVero
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque IS b3msc1170-torque
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "right_knee_pitch_joint_sensor"
-                                    resolution IS positionresolution
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF right_shin_pitch_link Solid {
@@ -1505,26 +1511,27 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
-                                    HingeJointWithBacklash {
-                                      backlash IS backlash
-                                      gearMass IS gearmass
+#                                    HingeJointWithBacklash {
+#                                      backlash %{= backlash }%
+#                                      gearMass %{= gearmass }%
+                                    HingeJoint {
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
-                                        dampingConstant IS b3msc1170-damping
-                                        staticFriction IS b3msc1170-staticFric
+                                        dampingConstant %{= b3msc1170_damping }%
+                                        staticFriction %{= b3msc1170_staticFric }%
                                       }
                                       device [
                                         RotationalMotor {
                                           name "right_ankle_pitch_mimic_joint"
-                                          maxVelocity IS b3msc1170-maxVero
+                                          maxVelocity %{= b3msc1170_maxVelo }%
                                           minPosition -1.57079632679
                                           maxPosition 1.57079632679
-                                          maxTorque IS b3msc1170-torque
+                                          maxTorque %{= b3msc1170_torque }%
                                         }
                                         PositionSensor {
                                           name "right_ankle_pitch_mimic_joint_sensor"
-                                          resolution IS positionresolution
+                                          resolution %{= positionresolution }%
                                         }
                                       ]
                                       endPoint DEF right_independent_pitch_link Solid {
@@ -1542,25 +1549,25 @@ PROTO GankenKun [
                                             ]
                                           }
                                           HingeJointWithBacklash {
-                                            backlash IS backlash
-                                            gearMass IS gearmass
+                                            backlash %{= backlash }%
+                                            gearMass %{= gearmass }%
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
-                                              dampingConstant IS b3msc1170-damping
-                                              staticFriction IS b3msc1170-staticFric
+                                              dampingConstant %{= b3msc1170_damping }%
+                                              staticFriction %{= b3msc1170_staticFric }%
                                             }
                                             device [
                                               RotationalMotor {
                                                 name "right_ankle_pitch_joint"
-                                                maxVelocity IS b3msc1170-maxVero
+                                                maxVelocity %{= b3msc1170_maxVelo }%
                                                 minPosition -2.35619449019
                                                 maxPosition 2.35619449019
-                                                maxTorque IS b3msc1170-torque
+                                                maxTorque %{= b3msc1170_torque }%
                                               }
                                               PositionSensor {
                                                 name "right_ankle_pitch_joint_sensor"
-                                                resolution IS positionresolution
+                                                resolution %{= positionresolution }%
                                               }
                                             ]
                                             endPoint DEF right_ankle_pitch_link Solid {
@@ -1588,25 +1595,25 @@ PROTO GankenKun [
                                                   ]
                                                 }
                                                 HingeJointWithBacklash {
-                                                  backlash IS backlash
-                                                  gearMass IS gearmass
+                                                  backlash %{= backlash }%
+                                                  gearMass %{= gearmass }%
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
-                                                    dampingConstant IS b3msc1040-damping
-                                                    staticFriction IS b3msc1040-staticFric
+                                                    dampingConstant %{= b3msc1040_damping }%
+                                                    staticFriction %{= b3msc1040_staticFric }%
                                                   }
                                                   device [
                                                     RotationalMotor {
                                                       name "right_ankle_roll_joint"
-                                                      maxVelocity IS b3msc1040-maxVero
+                                                      maxVelocity %{= b3msc1040_maxVelo }%
                                                       minPosition -1.57079632679
                                                       maxPosition 1.57079632679
-                                                      maxTorque IS b3msc1040-torque
+                                                      maxTorque %{= b3msc1040_torque }%
                                                     }
                                                     PositionSensor {
                                                       name "right_ankle_roll_joint_sensor"
-                                                      resolution IS positionresolution
+                                                      resolution %{= positionresolution }%
                                                     }
                                                   ]
                                                   endPoint DEF right_ankle_roll_link Solid {
@@ -1716,26 +1723,27 @@ PROTO GankenKun [
                                   }
                                 }
                               }
-                              HingeJointWithBacklash {
-                                backlash IS backlash
-                                gearMass IS gearmass
+#                              HingeJointWithBacklash {
+#                                backlash %{= backlash }%
+#                                gearMass %{= gearmass }%
+                              HingeJoint {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
-                                  dampingConstant IS b3msc1170-damping
-                                  staticFriction IS b3msc1170-staticFric
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "right_shin_pitch_mimic_joint"
-                                    maxVelocity IS b3msc1170-maxVero
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque IS b3msc1170-torque
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "right_shin_pitch_mimic_joint_sensor"
-                                    resolution IS positionresolution
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF right_shin_pitch_mimic_link Solid {
@@ -1809,26 +1817,27 @@ PROTO GankenKun [
                       }
                     }
                   }
-                  HingeJointWithBacklash {
-                    backlash IS backlash
-                    gearMass IS gearmass
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
+                  HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
-                      dampingConstant IS b3msc1170-damping
-                      staticFriction IS b3msc1170-staticFric
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_pitch_mimic_joint"
-                        maxVelocity IS b3msc1170-maxVero
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque IS b3msc1170-torque
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "right_waist_pitch_mimic_joint_sensor"
-                        resolution IS positionresolution
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_waist_pitch_mimic_link Solid {
@@ -1951,5 +1960,11 @@ PROTO GankenKun [
         0.000000e+00 0.000000e+00 0.000000e+00
       ]
     }
+    controller IS controller
+    controllerArgs IS controllerArgs
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+    selfCollision IS selfCollision
   }
 }
