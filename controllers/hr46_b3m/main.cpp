@@ -37,11 +37,14 @@
 #include <webots/Accelerometer.hpp>
 #include <webots/Gyro.hpp>
 #include <webots/Keyboard.hpp>
+#include <webots/Camera.hpp>
 #include <cmath>
 #include <set>
 #include <exception>
 #include <cstdint>
 #include <tuple>
+#include "picture.pb.h"
+#include <boost/interprocess/ipc/message_queue.hpp>
 #endif
 
 #include "pc_motion.h"
@@ -82,7 +85,7 @@ constexpr int32_t FRAME_RATE = 10;
 using namespace std;
 using namespace boost;
 
-static mutex lock_obj;
+static boost::mutex lock_obj;
 static string cmd;
 static bool response_ready = false;
 static string res;
@@ -99,7 +102,7 @@ extern "C"
 	int
 	scif1_tx_fun()
 {
-	mutex::scoped_lock look(lock_obj);
+	boost::mutex::scoped_lock look(lock_obj);
 
 	int len = 0;
 	for (int i = 0; i < SFMT_SIZE - 1 && sfmt[i] != EOF_CODE && sfmt[i] != EOF_CODE3; i++)
@@ -119,7 +122,7 @@ extern "C"
 	int cnt = 0;
 	if (str.size() > 0)
 	{
-		mutex::scoped_lock look(lock_obj);
+		boost::mutex::scoped_lock look(lock_obj);
 		cmd = str;
 		response_ready = false;
 	}
@@ -136,7 +139,7 @@ extern "C"
 		{
 			std::cerr << "recvHajimeCommand: timeout" << std::endl;
 		}
-		mutex::scoped_lock look(lock_obj);
+		boost::mutex::scoped_lock look(lock_obj);
 		return res;
 	}
 }
@@ -319,12 +322,15 @@ private:
 	webots::Gyro *robot_gyro;
 	webots::Accelerometer *robot_accelerometer;
 	webots::Keyboard *pc_keyboard;
+	webots::Camera *robot_camera;
 	int32_t mTimeStep;
 	std::set<std::string> reverse_motors;
 	int32_t current_key;
+    boost::interprocess::message_queue msgq;
+
 
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0)
+	webots_motor_control() : mTimeStep(0), current_key(0),msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION")
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -394,12 +400,19 @@ public:
 			std::cerr << " getKeyboard memory allocation error !!" << std::endl;
 			std::terminate();
 		}
+		robot_camera = robot->getCamera("camera_sensor");
+		if (robot_camera == nullptr)
+		{
+			std::cerr << " getCamera memory allocation error !!" << std::endl;
+			std::terminate();
+		}
 
 		mTimeStep = (int)robot->getBasicTimeStep();
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
 		pc_keyboard->enable(mTimeStep);
+		robot_camera->enable(mTimeStep);
 	}
 
 	int32_t send_target_degrees()
@@ -587,6 +600,15 @@ public:
 		return get_new_command;
 	}
 
+	void get_and_send_image(int64_t current_loop){
+		webotsvision::CameraMeasurement picture;
+		std::string send_data;
+		picture.set_image(std::string(reinterpret_cast<const char*>(robot_camera->getImage())));
+		picture.set_simtime(current_loop*mTimeStep);
+		send_data = picture.SerializeAsString();
+		msgq.send(&send_data[0], send_data.size(), 0);
+	}
+
 	bool step()
 	{
 		return robot->step(mTimeStep) != -1;
@@ -634,7 +656,7 @@ int main(int argc, char *argv[])
 		bool cmd_accept = false;
 		{
 			// accept command
-			mutex::scoped_lock look(lock_obj);
+			boost::mutex::scoped_lock look(lock_obj);
 			if (cmd.size() > 0)
 			{
 				memcpy(rfmt, &cmd[0], cmd.size());
@@ -762,6 +784,7 @@ int main(int argc, char *argv[])
 					keyboard_loop = count_time_l;
 				}
 			}
+			wb_ganken.get_and_send_image(count_time_l);
 			/*boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
 			while(diff.total_milliseconds() < wb_ganken.getmTimeStep()){

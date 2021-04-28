@@ -1,4 +1,5 @@
 project(hr46_b3m)
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -24,10 +25,13 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 
-FIND_PACKAGE(Boost COMPONENTS system thread filesystem)
+find_package(Boost REQUIRED COMPONENTS system thread filesystem date_time)
+find_package(Protobuf REQUIRED)
+
 add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
 #add_subdirectory(RTIMULib)
+add_subdirectory(protobuf)
 
 set(ICE_DIR $ENV{ICE_HOME} CACHE PATH "ZeroC ICE installation dir(Default: $ICE_HOME)")
 
@@ -66,6 +70,8 @@ include_directories(
 	${Boost_INCLUDE_DIR}
 	${WEBOTS_HOME}/include/controller/c 
 	${WEBOTS_HOME}/include/controller/cpp
+	/usr/local/include/google/protobuf
+	protobuf
 	#../SimDriver
 	../HCServer
 	#RTIMULib
@@ -125,6 +131,9 @@ target_link_libraries(hr46_b3m
 	${Boost_LIBRARIES}
 	${hr46_b3m_LIBRARIES}
 	${WEBOTS_LIBRARIES}
+	-lrt 
+	protobuf::libprotobuf 
+	libpictureproto
 	#RTIMULib
 )
 
