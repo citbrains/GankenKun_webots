@@ -18,7 +18,7 @@ PROTO GankenKun [
   field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
-  field  SFBool      enable_backlash FALSE        # Enables backlash on all joints.
+  field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
 ]
 {
   %{
@@ -102,9 +102,13 @@ PROTO GankenKun [
           }
         ]
       }
+    %{ if enable_backlash then }%
       HingeJointWithBacklash {
         backlash %{= backlash }%
         gearMass %{= gearmass }%
+    %{ else }%
+      HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.000000 0.000000 0.094750
@@ -193,9 +197,13 @@ PROTO GankenKun [
           }
         }
       }
+    %{ if enable_backlash then }%
       HingeJointWithBacklash {
         backlash %{= backlash }%
         gearMass %{= gearmass }%
+    %{ else }%
+      HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 0.060000 0.072000
@@ -245,9 +253,13 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
             HingeJointWithBacklash {
               backlash %{= backlash }%
               gearMass %{= gearmass }%
+          %{ else }%
+            HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 0.031500
@@ -290,9 +302,13 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                %{ if enable_backlash then }%
                   HingeJointWithBacklash {
                     backlash %{= backlash }%
                     gearMass %{= gearmass }%
+                %{ else }%
+                  HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
@@ -394,9 +410,13 @@ PROTO GankenKun [
           }
         }
       }
+    %{ if enable_backlash then }%
       HingeJointWithBacklash {
         backlash %{= backlash }%
         gearMass %{= gearmass }%
+    %{ else }%
+      HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 -0.060000 0.072000
@@ -430,9 +450,13 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
             HingeJointWithBacklash {
               backlash %{= backlash }%
               gearMass %{= gearmass }%
+          %{ else }%
+            HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 -0.031500
@@ -465,9 +489,13 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                %{ if enable_backlash then }%
                   HingeJointWithBacklash {
                     backlash %{= backlash }%
                     gearMass %{= gearmass }%
+                %{ else }%
+                  HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
@@ -559,9 +587,13 @@ PROTO GankenKun [
           }
         }
       }
+    %{ if enable_backlash then }%
       HingeJointWithBacklash {
         backlash %{= backlash }%
         gearMass %{= gearmass }%
+    %{ else }%
+      HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 0.044000 -0.072500
@@ -605,9 +637,13 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
             HingeJointWithBacklash {
               backlash %{= backlash }%
               gearMass %{= gearmass }%
+          %{ else }%
+            HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
@@ -702,9 +738,13 @@ PROTO GankenKun [
                       name "left_slider_crank_link"
                     }
                   }
+                %{ if enable_backlash then }%
                   HingeJointWithBacklash {
                     backlash %{= backlash }%
                     gearMass %{= gearmass }%
+                %{ else }%
+                  HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
@@ -795,9 +835,13 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
+                            %{ if enable_backlash then }%
                               HingeJointWithBacklash {
                                 backlash %{= backlash }%
                                 gearMass %{= gearmass }%
+                            %{ else }%
+                              HingeJoint {
+                            %{ end }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
@@ -888,9 +932,13 @@ PROTO GankenKun [
                                               }
                                             ]
                                           }
+                                        %{ if enable_backlash then }%
                                           HingeJointWithBacklash {
                                             backlash %{= backlash }%
                                             gearMass %{= gearmass }%
+                                        %{ else }%
+                                          HingeJoint {
+                                        %{ end }%
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
@@ -934,9 +982,13 @@ PROTO GankenKun [
                                                     }
                                                   ]
                                                 }
+                                              %{ if enable_backlash then }%
                                                 HingeJointWithBacklash {
                                                   backlash %{= backlash }%
                                                   gearMass %{= gearmass }%
+                                              %{ else }%
+                                                HingeJoint {
+                                              %{ end }%
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
@@ -1272,9 +1324,13 @@ PROTO GankenKun [
           }
         }
       }
+    %{ if enable_backlash then }%
       HingeJointWithBacklash {
         backlash %{= backlash }%
         gearMass %{= gearmass }%
+    %{ else }%
+      HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 -0.044000 -0.072500
@@ -1308,9 +1364,13 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
             HingeJointWithBacklash {
               backlash %{= backlash }%
               gearMass %{= gearmass }%
+          %{ else }%
+            HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
@@ -1395,9 +1455,13 @@ PROTO GankenKun [
                       name "right_slider_crank_link"
                     }
                   }
+                %{ if enable_backlash then }%
                   HingeJointWithBacklash {
                     backlash %{= backlash }%
                     gearMass %{= gearmass }%
+                %{ else }%
+                  HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
@@ -1478,9 +1542,13 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
+                            %{ if enable_backlash then }%
                               HingeJointWithBacklash {
                                 backlash %{= backlash }%
                                 gearMass %{= gearmass }%
+                            %{ else }%
+                              HingeJoint {
+                            %{ end }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
@@ -1551,9 +1619,13 @@ PROTO GankenKun [
                                               }
                                             ]
                                           }
+                                        %{ if enable_backlash then }%
                                           HingeJointWithBacklash {
                                             backlash %{= backlash }%
                                             gearMass %{= gearmass }%
+                                        %{ else }%
+                                          HingeJoint {
+                                        %{ end }%
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
@@ -1597,9 +1669,13 @@ PROTO GankenKun [
                                                     }
                                                   ]
                                                 }
+                                              %{ if enable_backlash then }%
                                                 HingeJointWithBacklash {
                                                   backlash %{= backlash }%
                                                   gearMass %{= gearmass }%
+                                              %{ else }%
+                                                HingeJoint {
+                                              %{ end }%
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
