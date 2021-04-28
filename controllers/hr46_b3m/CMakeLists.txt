@@ -26,10 +26,10 @@ set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 
 FIND_PACKAGE(Boost COMPONENTS system thread filesystem)
 add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
 #add_subdirectory(RTIMULib)
 
-#set(ICE_DIR $ENV{ICE_HOME} CACHE PATH "ZeroC ICE installation dir(Default: $ICE_HOME)")
+set(ICE_DIR $ENV{ICE_HOME} CACHE PATH "ZeroC ICE installation dir(Default: $ICE_HOME)")
 
 #set(USE_VREP_SIMULATOR CACHE BOOL FORCE)
 #IF($ENV{VREP_DIR})
@@ -59,7 +59,7 @@ message(${WEBOTS_LIBRARIES})
 add_definitions(-D_AFXDLL -DSIM -D_CRT_SECURE_NO_WARNINGS)
 
 include_directories(
-	#${ICE_DIR}/include
+	${ICE_DIR}/include
 	${CMAKE_BINARY_DIR}/gen
 	${CMAKE_CURRENT_SOURCE_DIR}
 	${BOOST_INCLUDE_DIRS}
@@ -67,12 +67,12 @@ include_directories(
 	${WEBOTS_HOME}/include/controller/c 
 	${WEBOTS_HOME}/include/controller/cpp
 	#../SimDriver
-	#../HCServer
+	../HCServer
 	#RTIMULib
 )
 
 link_directories(
-	#${ICE_DIR}/lib
+	${ICE_DIR}/lib
 	${Boost_LIBRARY_DIRS}
 	${Boost_LIBRARY_DIR}
 	${WEBOTS_HOME}/lib/controller
@@ -104,26 +104,26 @@ add_executable(hr46_b3m
 	${HR46_B3M_SRCS}
 )
 
-#SET(hr46_b3m_LIBRARIES
-#	Ice
+SET(hr46_b3m_LIBRARIES
+	Ice
 	##IceUtil
-#	HCLib
-#)
+	HCLib
+)
 
 #IF(USE_VREP_SIMULATOR)
 #MESSAGE("!!!!! hr42 uses vrep simulator !!!!!")
 #SET(hr46_b3m_LIBRARIES ${hr46_b3m_LIBRARIES} SimIPCLib)
 #ENDIF(USE_VREP_SIMULATOR)
 
-#add_dependencies(hr46_b3m
-#	HCLib
+add_dependencies(hr46_b3m
+	HCLib
 #	SimIPCLib
-#)
+)
 
 
 target_link_libraries(hr46_b3m
 	${Boost_LIBRARIES}
-	#${hr46_b3m_LIBRARIES}
+	${hr46_b3m_LIBRARIES}
 	${WEBOTS_LIBRARIES}
 	#RTIMULib
 )
