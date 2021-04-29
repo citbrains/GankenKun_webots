@@ -326,11 +326,12 @@ private:
 	int32_t mTimeStep;
 	std::set<std::string> reverse_motors;
 	int32_t current_key;
+	bool forced_wait;
     boost::interprocess::message_queue msgq;
 
 
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0),msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION")
+	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION")
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -413,6 +414,26 @@ public:
 		robot_gyro->enable(mTimeStep);
 		pc_keyboard->enable(mTimeStep);
 		robot_camera->enable(mTimeStep);
+	}
+
+	bool waitForCreateQueue(){
+			std::cout << "call wait" << std::endl;
+            while (1)
+            {
+            try
+            {
+                boost::interprocess::message_queue wait(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION");
+            }
+            catch (boost::interprocess::interprocess_exception ex)
+            {
+                std::cout << "not exist" << std::endl;
+                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+                continue;
+            }
+            std::cout << "arimasita!" << std::endl;
+            break;
+        }
+		return true;
 	}
 
 	int32_t send_target_degrees()
@@ -603,10 +624,16 @@ public:
 	void get_and_send_image(int64_t current_loop){
 		webotsvision::CameraMeasurement picture;
 		std::string send_data;
+		send_data.resize();
 		picture.set_image(std::string(reinterpret_cast<const char*>(robot_camera->getImage())));
 		picture.set_simtime(current_loop*mTimeStep);
 		send_data = picture.SerializeAsString();
-		msgq.send(&send_data[0], send_data.size(), 0);
+		try{
+			msgq.send(&send_data[0], send_data.size(), 0);
+		}
+		catch(boost::interprocess::interprocess_exception eee){
+			cout << "-----------------------------buffer is full ----------------------------------" << endl;
+		}
 	}
 
 	bool step()
