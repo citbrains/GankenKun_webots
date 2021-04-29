@@ -89,8 +89,8 @@ target_link_libraries(HCLib
 	${Boost_LIBRARIES}
 	debug Iced
 	optimized Ice
-	debug IceUtild
-	optimized IceUtil
+	#debug IceUtild
+	#optimized IceUtil
 )
 
 add_executable(HCServer

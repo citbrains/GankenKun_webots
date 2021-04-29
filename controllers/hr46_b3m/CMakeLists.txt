@@ -74,7 +74,7 @@ include_directories(
 	/usr/local/include/google/protobuf
 	protobuf
 	#../SimDriver
-	../HCServer
+	HCServer
 	#RTIMULib
 )
 
