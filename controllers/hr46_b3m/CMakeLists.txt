@@ -29,8 +29,9 @@ find_package(Boost REQUIRED COMPONENTS system thread filesystem date_time)
 find_package(Protobuf REQUIRED)
 
 add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
 #add_subdirectory(RTIMULib)
+add_subdirectory(HCServer)
 add_subdirectory(protobuf)
 
 set(ICE_DIR $ENV{ICE_HOME} CACHE PATH "ZeroC ICE installation dir(Default: $ICE_HOME)")

@@ -27,7 +27,7 @@
 
 #include <boost/thread.hpp>
 #include <string>
-//#include <HCIPC.h>
+#include <HCIPC.h>
 
 #define WEBOTS_GANKEN_SIMULATOR
 
@@ -90,7 +90,7 @@ static string cmd;
 static bool response_ready = false;
 static string res;
 
-char ParamTable[53] =
+char ParamTableAlte[53] =
 	{
 		'z', 'y', 'x', 'w', 'v', 'u', 't', 's', 'r', 'q', 'p', 'o', 'n', 'm', 'l', 'k', 'j', 'i', 'h', 'g', 'f', 'e', 'd', 'c', 'b', 'a', // -26 - -1
 		'0',																															  // 0
@@ -116,7 +116,7 @@ extern "C"
 	return 1;
 }
 
-/* string recvHajimeCommand(const string &str, void *context)
+ string recvHajimeCommand(const string &str, void *context)
 {
 	static const int CMD_TIMEOUT_MS = 100;
 	int cnt = 0;
@@ -150,7 +150,7 @@ void ipcthread(int argc, char *argv[], int id)
 	hcipc->setCallback(recvHajimeCommand, NULL);
 	hcipc->wait();
 }
- */
+ 
 extern "C" int servo_offset[SERV_NUM]; // �I�t�Z�b�g�ۑ��p
 
 //========================
@@ -479,11 +479,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(15 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(15 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -492,11 +492,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(-15 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(-15 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -505,11 +505,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(-15 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(-15 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -518,11 +518,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(15 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(15 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -531,11 +531,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -544,11 +544,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(20 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(20 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -557,11 +557,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'A';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(-20 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(-20 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -571,11 +571,11 @@ public:
 				//motion_flag = false;
 				std::cout << "get M key" << std::endl;
 				unsigned char walk_cmd = 'M';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(3 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(3 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -584,11 +584,11 @@ public:
 			{
 				//motion_flag = false;
 				unsigned char walk_cmd = 'C';
-				unsigned char num_step = ParamTable[(int)(0 + 26)];
-				unsigned char period = ParamTable[(int)(0 + 26)];
-				unsigned char stride_x = ParamTable[(int)(0 + 26)];
-				unsigned char stride_y = ParamTable[(int)(0 + 26)];
-				unsigned char stride_th = ParamTable[(int)(0 + 26)];
+				unsigned char num_step = ParamTableAlte[(int)(0 + 26)];
+				unsigned char period = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_x = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_y = ParamTableAlte[(int)(0 + 26)];
+				unsigned char stride_th = ParamTableAlte[(int)(0 + 26)];
 				set_xv_comm(&xv_comm, walk_cmd, num_step, stride_th, stride_x, period, stride_y);
 				convert_bin(&xv_comm_bin, &xv_comm);
 			}
@@ -665,66 +665,6 @@ int main(int argc, char *argv[])
 				cmd = "";
 			}
 		}
-		/* 
-#if !defined WEBOTS_GANKEN_SIMULATOR
-		{
-			///// MPU9250 reading sensor data, calc quaternion and settings
-			static int continueous_error_count = 0;
-
-			if (imu->IMURead())
-			{
-				continueous_error_count = 0;
-				RTIMU_DATA imuData = imu->getIMUData();
-				m_sampleCount++;
-				m_now = RTMath::currentUSecsSinceEpoch();
-
-				if ((m_now - m_displayTimer) > 1000000)
-				{
-					m_displayTimer = m_now;
-				}
-
-				if ((m_now - m_rateTimer) > 1000000)
-				{
-					m_sampleRate = m_sampleCount;
-					m_sampleCount = 0;
-					m_rateTimer = m_now;
-				}
-
-				xv_acc.acc_data1 = -imu->getIMUData().accel.y();
-				xv_acc.acc_data2 = imu->getIMUData().accel.x();
-				xv_acc.acc_data3 = imu->getIMUData().accel.z();
-
-				const float radian_to_degree = 180.0 / M_PI;
-				xv_gyro.gyro_data1 = -imu->getIMUData().gyro.y() * radian_to_degree;
-				xv_gyro.gyro_data2 = imu->getIMUData().gyro.x() * radian_to_degree;
-				xv_gyro.gyro_data3 = imu->getIMUData().gyro.z() * radian_to_degree;
-
-				xv_gyro.quaternion[0] = -imuData.fusionQPose.x();
-				xv_gyro.quaternion[1] = imuData.fusionQPose.z();
-				xv_gyro.quaternion[2] = imuData.fusionQPose.scalar();
-				xv_gyro.quaternion[3] = imuData.fusionQPose.y();
-
-				double pitch_abs = 180.0 - abs(imuData.fusionPose.x() * RTMATH_RAD_TO_DEGREE);
-				if (imuData.fusionPose.x() < 0)
-					pitch_abs = -pitch_abs;
-				xv_gyro.gyro_roll = xv_gyro.gyro_roll2 = imuData.fusionPose.y() * RTMATH_RAD_TO_DEGREE;
-				xv_gyro.gyro_pitch = xv_gyro.gyro_pitch2 = pitch_abs;
-				xv_gyro.gyro_yaw = xv_gyro.gyro_yaw2 = -(imuData.fusionPose.z() * RTMATH_RAD_TO_DEGREE);
-			}
-			else
-			{
-				FILE *fp = fopen("/var/tmp/error.txt", "a");
-				if (fp != NULL)
-				{
-					fprintf(fp, "IMU Read Error\r\n");
-					fclose(fp);
-				}
-				continueous_error_count++;
-				if (continueous_error_count > 10)
-					shutdown_flag = 1;
-			}
-		}
-#endif //!defined WEBOTS_GANKEN_SIMULATOR */
 		if (!shutdown_flag)
 			cntr();
 
