@@ -328,10 +328,12 @@ private:
 	int32_t current_key;
 	bool forced_wait;
     boost::interprocess::message_queue msgq;
+	//ここの大きさはreceive側と同じにする必要がある
+	const int32_t message_len;
 
 
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION")
+	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION"),message_len(700*480)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -624,7 +626,7 @@ public:
 	void get_and_send_image(int64_t current_loop){
 		webotsvision::CameraMeasurement picture;
 		std::string send_data;
-		send_data.resize();
+		send_data.resize(message_len);
 		picture.set_image(std::string(reinterpret_cast<const char*>(robot_camera->getImage())));
 		picture.set_simtime(current_loop*mTimeStep);
 		send_data = picture.SerializeAsString();
