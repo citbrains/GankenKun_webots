@@ -3,7 +3,11 @@
 
 int main(int argc, char const *argv[])
 {
-    boost::interprocess::message_queue::remove("WEBOTS_PICTURE_COMMUNICATION");
-    std::cout << "remove message_queue which has key of [WEBOTS_PICTURE_COMMUNICATION] " << std::endl;
+    if(boost::interprocess::message_queue::remove("WEBOTS_PICTURE_COMMUNICATION"){
+        std::cout << "success removing  message_queue which has key of [WEBOTS_PICTURE_COMMUNICATION] " << std::endl;
+    }
+    else{
+        std::cout << "fail removing message_queue" << std::endl;
+    }
     return 0;
 }
