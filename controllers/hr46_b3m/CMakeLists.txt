@@ -71,7 +71,7 @@ include_directories(
 	${Boost_INCLUDE_DIR}
 	${WEBOTS_HOME}/include/controller/c 
 	${WEBOTS_HOME}/include/controller/cpp
-	/usr/local/include/google/protobuf
+	${Protobuf_INCLUDE_DIRS}
 	protobuf
 	#../SimDriver
 	HCServer
