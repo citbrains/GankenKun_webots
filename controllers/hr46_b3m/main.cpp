@@ -330,10 +330,12 @@ private:
     boost::interprocess::message_queue msgq;
 	//ここの大きさはreceive側と同じにする必要がある
 	const int32_t message_len;
+	uint32_t highest_priority;
 
 
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION"),message_len(700*480)
+	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),
+							msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION"),message_len(700*480),highest_priority(0)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -624,6 +626,8 @@ public:
 	}
 
 	void get_and_send_image(int64_t current_loop){
+		//highest_priorityがオーバーフローした場合壊れる。しかしuint32の為オーバーフローするのは
+		//シミュレーション時間で9544時間連続起動した場合なので問題ないはず
 		webotsvision::CameraMeasurement picture;
 		std::string send_data;
 		send_data.resize(message_len);
@@ -631,11 +635,12 @@ public:
 		picture.set_simtime(current_loop*mTimeStep);
 		send_data = picture.SerializeAsString();
 		try{
-			msgq.send(&send_data[0], send_data.size(), 0);
+			msgq.send(&send_data[0], send_data.size(), highest_priority);
 		}
 		catch(boost::interprocess::interprocess_exception eee){
-			cout << "-----------------------------buffer is full ----------------------------------" << endl;
+			std::cout << "-----------------------------buffer is full ----------------------------------" << std::endl;
 		}
+		++highest_priority;
 	}
 
 	bool step()
