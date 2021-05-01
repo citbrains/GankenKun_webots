@@ -671,6 +671,8 @@ int main(int argc, char *argv[])
 	OrientationEstimator orientationEst((double)(1000.0 / wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
 #endif
+	boost::thread thread(boost::bind(ipcthread, argc, argv, id));
+	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time(); 
 	const char *servo_port = "/dev/kondoservo";
 	if (argc > 1)
 		servo_port = argv[1];
