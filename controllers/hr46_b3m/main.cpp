@@ -685,7 +685,6 @@ int main(int argc, char *argv[])
 	eeprom_load((char *)"eeprom_list.txt");
 	flag_gyro.zero = ON;
 
-	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	// loop start
 	for (count_time_l = 0; wb_ganken.step(); count_time_l++)
 	{
