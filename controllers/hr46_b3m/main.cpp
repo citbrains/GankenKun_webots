@@ -631,23 +631,25 @@ public:
 		webotsvision::CameraMeasurement picture;
 		std::string send_data;
 		//std::cout << "call image " << std::endl;
-		send_data.resize(message_len * 4);
+		send_data.resize(message_len - 100);
 		//std::cout << "resize ok" << std::endl;
-		std::cout << "string construct" << std::endl;
-		picture.set_image(std::string(reinterpret_cast<const char*>(robot_camera->getImage())));
+		//std::cout << "string construct" << std::endl;
+		std::string in(reinterpret_cast<const char*>(robot_camera->getImage()));
+		std::cout << "in " << in.size() << std::endl;
+		picture.set_image(in);
 		//std::cout << "set_image ok" << std::endl;
 		picture.set_simtime(current_loop*mTimeStep);
 		send_data = picture.SerializeAsString();
 		//std::cout << "serialize ok" << std::endl;
 		try{
-			msgq.send(&send_data[0], send_data.size(), highest_priority);
+			msgq.send(&send_data[0], send_data.size(), 0);
 		}
 		catch(boost::interprocess::interprocess_exception eee){
 			std::cout << "-----------------------------buffer is full ----------------------------------" << std::endl;
 			//std::cout << eee.what() << std::endl;
 		}
 		std::cout << "send ok" << std::endl;
-		++highest_priority;
+		//++highest_priority;
 	}
 
 	bool step()
