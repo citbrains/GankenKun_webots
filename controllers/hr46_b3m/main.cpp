@@ -635,20 +635,20 @@ public:
 		//std::cout << "resize ok" << std::endl;
 		//std::cout << "string construct" << std::endl;
 		std::string in(reinterpret_cast<const char*>(robot_camera->getImage()));
-		std::cout << "in " << in.size() << std::endl;
+		//std::cout << "in " << in.size() << std::endl;
 		picture.set_image(in);
 		//std::cout << "set_image ok" << std::endl;
 		picture.set_simtime(current_loop*mTimeStep);
 		send_data = picture.SerializeAsString();
 		//std::cout << "serialize ok" << std::endl;
 		try{
-			msgq.send(&send_data[0], send_data.size(), 0);
+			msgq.try_send(&send_data[0], send_data.size(), 0);
 		}
 		catch(boost::interprocess::interprocess_exception eee){
 			std::cout << "-----------------------------buffer is full ----------------------------------" << std::endl;
 			//std::cout << eee.what() << std::endl;
 		}
-		std::cout << "send ok" << std::endl;
+		//std::cout << "send ok" << std::endl;
 		//++highest_priority;
 	}
 
