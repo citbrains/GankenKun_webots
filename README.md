@@ -6,8 +6,8 @@ https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3
 
 ## 環境構築
 
-Webots用の環境構築scriptの内容を実行する。
-
+Webots用の環境構築scriptの内容を実行する。 
+ 
 CMakeを3.18以上にする。参考https://askubuntu.com/questions/829310/how-to-upgrade-cmake-in-ubuntu 
 cd /opt/ 
 wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2-linux-x86_64.sh 
