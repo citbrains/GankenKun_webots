@@ -13,20 +13,34 @@ PROTO GankenKun [
   field  SFString    customData      ""           # Is `Robot.customData`.
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
-  field  SFBool      selfCollision   FALSE        # Is `Robot.selfCollision`.
+  field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
+  field  SFInt32     cameraWidth     640          # Is `Camera.width`.
+  field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
+  field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
 ]
 {
+  %{
+    local enable_backlash = fields.enable_backlash.value
+    local backlash = 0.01
+    local gearmass = 0.001
+
+    local b3msc1040_torque = 4.6
+    local b3msc1040_maxVelo = 5.65
+    local b3msc1040_staticFric = 0.05888
+    local b3msc1040_damping = 0.803738053
+
+    local b3msc1170_torque = 7.6
+    local b3msc1170_maxVelo = 4.817
+    local b3msc1170_staticFric = 0.07296
+    local b3msc1170_damping = 1.562599128
+
+    local positionresolution = 0.0015
+  }%
   Robot {
     translation IS translation
     rotation IS rotation
-    controller IS controller
-    controllerArgs IS controllerArgs
-    customData IS customData
-    supervisor IS supervisor
-    synchronization IS synchronization
-    selfCollision IS selfCollision
     children [
       Transform {
         translation 0.000000 0.000000 0.000000
@@ -88,23 +102,31 @@ PROTO GankenKun [
           }
         ]
       }
+    %{ if enable_backlash then }%
+      HingeJointWithBacklash {
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
+    %{ else }%
       HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.000000 0.000000 0.094750
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant %{= b3msc1040_damping }%
+          staticFriction %{= b3msc1040_staticFric }%
         }
         device [
           RotationalMotor {
             name "head_yaw_joint"
-            maxVelocity 1.0
+            maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque %{= b3msc1040_torque }%
+
           }
           PositionSensor {
             name "head_yaw_joint_sensor"
+            resolution %{= positionresolution }%
           }
         ]
         endPoint DEF head_yaw_link Solid {
@@ -144,54 +166,61 @@ PROTO GankenKun [
                 Camera {
                   rotation 1.0 0.0 0.0 0.0
                   name "camera_sensor"
-                  fieldOfView 1.396263
-                  width 160
-                  height 120
-                  noise 0.007000
+                  fieldOfView 2.05
+                  width IS cameraWidth
+                  height IS cameraHeight
+                  noise 0.0
+                  spherical TRUE
                 }
               ]
               name "camera_link"
-              physics Physics {
-                density -1
-                mass 0.000000
-                centerOfMass [ 0.000000 0.000000 0.000000 ]
-              }
             }
           ]
           name "head_yaw_link"
           boundingObject Transform {
-            translation 0.002923 -0.000000 0.054996
+            translation 0.015000 -0.000000 0.085000
             rotation -0.969980 0.000000 0.243186 3.141593
             children [
               Box {
-                 size 0.068779 0.072919 0.111536
+                 size 0.068779 0.072919 0.050000
               }
             ]
           }
           physics Physics {
             density -1
-            mass 0.103510
+            mass 0.111692
             centerOfMass [ 0.017325 0.000000 0.065059 ]
+            inertiaMatrix [
+              1.148365390e-04 8.968346100e-05 7.895650100e-05
+              9.572310000e-07 -7.715580000e-07 2.138747600e-05
+            ]
           }
         }
       }
+    %{ if enable_backlash then }%
+      HingeJointWithBacklash {
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
+    %{ else }%
       HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 0.060000 0.072000
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant %{= b3msc1040_damping }%
+          staticFriction %{= b3msc1040_staticFric }%
         }
         device [
           RotationalMotor {
             name "left_shoulder_pitch_joint"
-            maxVelocity 1.0
+            maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
             name "left_shoulder_pitch_joint_sensor"
+            resolution %{= positionresolution }%
           }
         ]
         endPoint DEF left_shoulder_link Solid {
@@ -224,22 +253,29 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
+            HingeJointWithBacklash {
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
+          %{ else }%
             HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 0.031500
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant %{= b3msc1040_damping }%
+                staticFriction %{= b3msc1040_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "left_shoulder_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity %{= b3msc1040_maxVelo }%
                   maxPosition 3.14159265359
-                  maxTorque 1000.0
+                  maxTorque %{= b3msc1040_torque }%
                 }
                 PositionSensor {
                   name "left_shoulder_roll_joint_sensor"
+                  resolution %{= positionresolution }%
                 }
               ]
               endPoint DEF left_upper_arm_link Solid {
@@ -266,28 +302,36 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                %{ if enable_backlash then }%
+                  HingeJointWithBacklash {
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
+                %{ else }%
                   HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1040_damping }%
+                      staticFriction %{= b3msc1040_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_elbow_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity %{= b3msc1040_maxVelo }%
                         minPosition -2.35619449019
                         maxPosition 2.35619449019
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1040_torque }%
                       }
                       PositionSensor {
                         name "left_elbow_pitch_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_lower_arm_link Solid {
                       translation 0.000000 0.109000 0.000000
                       rotation 0.000000 -1.000000 0.000000 1.570796
+                      model "left hand"
                       children [
                         Transform {
                           translation 0.000000 0.000000 0.000000
@@ -324,63 +368,73 @@ PROTO GankenKun [
                         density -1
                         mass 0.059757
                         centerOfMass [ 0.000000 0.132001 0.000000 ]
+                        inertiaMatrix [
+                          1.458002900e-05 3.803314190e-04 2.378206330e-04
+                          -2.211750500e-05 5.000000000e-12 3.000000000e-12
+                        ]
                       }
                     }
                   }
                 ]
                 name "left_upper_arm_link"
                 boundingObject Transform {
-                  translation 0.000500 0.054500 -0.000500
+                  translation 0.000500 0.035000 0.000000
                   rotation 0.577350 0.577350 -0.577350 2.094395
                   children [
                     Box {
-                       size 0.044500 0.044500 0.133000
+                       size 0.034500 0.034500 0.070000
                     }
                   ]
                 }
                 physics Physics {
                   density -1
-                  mass 0.185658
+                  mass 0.185577
                   centerOfMass [ 0.000000 0.054500 0.000000 ]
+                  inertiaMatrix [
+                    3.803475880e-04 3.803314190e-04 3.739587400e-05 
+                    1.422700000e-08 5.110460000e-07 -1.759358000e-06
+                  ]
                 }
               }
             }
           ]
           name "left_shoulder_link"
-          boundingObject Transform {
-            translation 0.000000 -0.000000 0.021455
-            rotation 0.577350 0.577350 0.577350 2.094395
-            children [
-              Box {
-                 size 0.042000 0.042911 0.046300
-              }
-            ]
-          }
           physics Physics {
             density -1
-            mass 0.090380
+            mass 0.090938
             centerOfMass [ 0.000000 0.000000 0.007500 ]
+            inertiaMatrix [
+              2.715985300e-05 1.484426400e-05 1.818353300e-05
+              -4.000000000e-12 0.000000000e+00 4.000000000e-12
+            ]
           }
         }
       }
+    %{ if enable_backlash then }%
+      HingeJointWithBacklash {
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
+    %{ else }%
       HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 1.000000 0.000000
           anchor 0.000000 -0.060000 0.072000
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant %{= b3msc1040_damping }%
+          staticFriction %{= b3msc1040_staticFric }%
         }
         device [
           RotationalMotor {
             name "right_shoulder_pitch_joint"
-            maxVelocity 1.0
+            maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
             name "right_shoulder_pitch_joint_sensor"
-          }
+            resolution %{= positionresolution }%
+          } 
         ]
         endPoint DEF right_shoulder_link Solid {
           translation 0.000000 -0.060000 0.072000
@@ -396,22 +450,29 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
+            HingeJointWithBacklash {
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
+          %{ else }%
             HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.000000 0.000000 -0.031500
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant %{= b3msc1040_damping }%
+                staticFriction %{= b3msc1040_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "right_shoulder_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity %{= b3msc1040_maxVelo }%
                   minPosition -3.14159265359
-                  maxTorque 1000.0
+                  maxTorque %{= b3msc1040_torque }%
                 }
                 PositionSensor {
                   name "right_shoulder_roll_joint_sensor"
+                  resolution %{= positionresolution }%
                 }
               ]
               endPoint DEF right_upper_arm_link Solid {
@@ -428,28 +489,36 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                %{ if enable_backlash then }%
+                  HingeJointWithBacklash {
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
+                %{ else }%
                   HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis -1.000000 0.000000 0.000000
                       anchor 0.000000 0.109000 0.000000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1040_damping }%
+                      staticFriction %{= b3msc1040_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_elbow_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity %{= b3msc1040_maxVelo }%
                         minPosition -2.35619449019
                         maxPosition 2.35619449019
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1040_torque }%
                       }
                       PositionSensor {
                         name "right_elbow_pitch_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_lower_arm_link Solid {
                       translation 0.000000 0.109000 0.000000
                       rotation 0.000000 -1.000000 0.000000 1.570796
+                      model "right hand"
                       children [
                         Transform {
                           translation 0.000000 0.000000 0.000000
@@ -476,63 +545,73 @@ PROTO GankenKun [
                         density -1
                         mass 0.059757
                         centerOfMass [ 0.000000 0.132001 0.000000 ]
+                        inertiaMatrix [
+                          1.458002900e-05 3.803314190e-04 2.378206330e-04
+                          -2.211750500e-05 5.000000000e-12 3.000000000e-12
+                        ]
                       }
                     }
                   }
                 ]
                 name "right_upper_arm_link"
                 boundingObject Transform {
-                  translation 0.000500 0.054500 -0.000500
+                  translation 0.000500 0.035000 0.000000
                   rotation 0.577350 0.577350 -0.577350 2.094395
                   children [
                     Box {
-                       size 0.044500 0.044500 0.133000
+                       size 0.034500 0.034500 0.070000
                     }
                   ]
                 }
                 physics Physics {
                   density -1
-                  mass 0.185658
+                  mass 0.185577
                   centerOfMass [ 0.000000 0.054500 0.000000 ]
+                  inertiaMatrix [
+                    3.803475880e-04 3.803314190e-04 3.739587400e-05
+                    1.422700000e-08 5.110460000e-07 -1.759358000e-06
+                  ]
                 }
               }
             }
           ]
           name "right_shoulder_link"
-          boundingObject Transform {
-            translation 0.000000 -0.000000 -0.021455
-            rotation -0.577350 0.577350 -0.577350 2.094395
-            children [
-              Box {
-                 size 0.042000 0.042911 0.046300
-              }
-            ]
-          }
           physics Physics {
             density -1
-            mass 0.090380
+            mass 0.090938
             centerOfMass [ 0.000000 0.000000 -0.007500 ]
+            inertiaMatrix [
+              2.715985300e-05 1.484426400e-05 1.818353300e-05
+              -4.000000000e-12 0.000000000e+00 4.000000000e-12
+            ]
           }
         }
       }
+    %{ if enable_backlash then }%
+      HingeJointWithBacklash {
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
+    %{ else }%
       HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 0.044000 -0.072500
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant %{= b3msc1170_damping }%
+          staticFriction %{= b3msc1170_staticFric }%
         }
         device [
           RotationalMotor {
             name "left_waist_yaw_joint"
-            maxVelocity 1.0
+            maxVelocity %{= b3msc1170_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque %{= b3msc1170_torque }%
           }
           PositionSensor {
             name "left_waist_yaw_joint_sensor"
-          }
+            resolution %{= positionresolution }%
+          } 
         ]
         endPoint DEF left_waist_yaw_link Solid {
           translation 0.005000 0.044000 -0.072500
@@ -558,24 +637,31 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
+            HingeJointWithBacklash {
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
+          %{ else }%
             HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant %{= b3msc1170_damping }%
+                staticFriction %{= b3msc1170_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "left_waist_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity %{= b3msc1170_maxVelo }%
                   minPosition -0.785398163397
                   maxPosition 0.785398163397
-                  maxTorque 1000.0
+                  maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
                   name "left_waist_roll_joint_sensor"
-                }
+                  resolution %{= positionresolution }%
+                } 
               ]
               endPoint DEF left_waist_roll_link Solid {
                 translation 0.024975 0.000000 -0.055000
@@ -601,23 +687,27 @@ PROTO GankenKun [
                       }
                     ]
                   }
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
                   HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_roll_mimic_joint"
-                        maxVelocity 2.0
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 1.57079632679
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "left_waist_roll_mimic_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_slider_crank_link Solid {
@@ -646,39 +736,32 @@ PROTO GankenKun [
                         }
                       ]
                       name "left_slider_crank_link"
-                      boundingObject Transform {
-                        translation -0.004086 0.001886 -0.001000
-                        rotation -0.698714 0.153619 0.698714 2.836738
-                        children [
-                          Box {
-                             size 0.002000 0.021997 0.030516
-                          }
-                        ]
-                      }
-                      physics Physics {
-                        density -1
-                        mass 0.002638
-                        centerOfMass [ -0.010842 0.000000 -0.001000 ]
-                      }
                     }
                   }
+                %{ if enable_backlash then }%
+                  HingeJointWithBacklash {
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
+                %{ else }%
                   HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "left_waist_pitch_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_waist_pitch_link Solid {
@@ -705,23 +788,27 @@ PROTO GankenKun [
                             }
                           ]
                         }
+#                        HingeJointWithBacklash {
+#                          backlash %{= backlash }%
+#                          gearMass %{= gearmass }%
                         HingeJoint {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
-                            dampingConstant 0.0
-                            staticFriction 0.0
+                            dampingConstant %{= b3msc1170_damping }%
+                            staticFriction %{= b3msc1170_staticFric }%
                           }
                           device [
                             RotationalMotor {
                               name "left_knee_pitch_mimic_joint"
-                              maxVelocity 1.0
+                              maxVelocity %{= b3msc1170_maxVelo }%
                               minPosition -0.523598775598
                               maxPosition 1.57079632679
-                              maxTorque 1000.0
+                              maxTorque %{= b3msc1170_torque }%
                             }
                             PositionSensor {
                               name "left_knee_pitch_mimic_joint_sensor"
+                              resolution %{= positionresolution }%
                             }
                           ]
                           endPoint DEF left_knee_pitch_link Solid {
@@ -748,23 +835,30 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
+                            %{ if enable_backlash then }%
+                              HingeJointWithBacklash {
+                                backlash %{= backlash }%
+                                gearMass %{= gearmass }%
+                            %{ else }%
                               HingeJoint {
+                            %{ end }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "left_knee_pitch_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "left_knee_pitch_joint_sensor"
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF left_shin_pitch_link Solid {
@@ -791,23 +885,27 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
+#                                    HingeJointWithBacklash {
+#                                      backlash %{= backlash }%
+#                                      gearMass %{= gearmass }%
                                     HingeJoint {
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
-                                        dampingConstant 0.0
-                                        staticFriction 0.0
+                                        dampingConstant %{= b3msc1170_damping }%
+                                        staticFriction %{= b3msc1170_staticFric }%
                                       }
                                       device [
                                         RotationalMotor {
                                           name "left_ankle_pitch_mimic_joint"
-                                          maxVelocity 1.0
+                                          maxVelocity %{= b3msc1170_maxVelo }%
                                           minPosition -1.57079632679
                                           maxPosition 1.57079632679
-                                          maxTorque 1000.0
+                                          maxTorque %{= b3msc1170_torque }%
                                         }
                                         PositionSensor {
                                           name "left_ankle_pitch_mimic_joint_sensor"
+                                          resolution %{= positionresolution }%
                                         }
                                       ]
                                       endPoint DEF left_independent_pitch_link Solid {
@@ -834,23 +932,30 @@ PROTO GankenKun [
                                               }
                                             ]
                                           }
+                                        %{ if enable_backlash then }%
+                                          HingeJointWithBacklash {
+                                            backlash %{= backlash }%
+                                            gearMass %{= gearmass }%
+                                        %{ else }%
                                           HingeJoint {
+                                        %{ end }%
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
-                                              dampingConstant 0.0
-                                              staticFriction 0.0
+                                              dampingConstant %{= b3msc1170_damping }%
+                                              staticFriction %{= b3msc1170_staticFric }%
                                             }
                                             device [
                                               RotationalMotor {
                                                 name "left_ankle_pitch_joint"
-                                                maxVelocity 1.0
+                                                maxVelocity %{= b3msc1170_maxVelo }%
                                                 minPosition -2.35619449019
                                                 maxPosition 2.35619449019
-                                                maxTorque 1000.0
+                                                maxTorque %{= b3msc1170_torque }%
                                               }
                                               PositionSensor {
                                                 name "left_ankle_pitch_joint_sensor"
+                                                resolution %{= positionresolution }%
                                               }
                                             ]
                                             endPoint DEF left_ankle_pitch_link Solid {
@@ -877,28 +982,36 @@ PROTO GankenKun [
                                                     }
                                                   ]
                                                 }
+                                              %{ if enable_backlash then }%
+                                                HingeJointWithBacklash {
+                                                  backlash %{= backlash }%
+                                                  gearMass %{= gearmass }%
+                                              %{ else }%
                                                 HingeJoint {
+                                              %{ end }%
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
-                                                    dampingConstant 0.0
-                                                    staticFriction 0.0
+                                                    dampingConstant %{= b3msc1040_damping }%
+                                                    staticFriction %{= b3msc1040_staticFric }%
                                                   }
                                                   device [
                                                     RotationalMotor {
                                                       name "left_ankle_roll_joint"
-                                                      maxVelocity 1.0
+                                                      maxVelocity %{= b3msc1040_maxVelo }%
                                                       minPosition -1.57079632679
                                                       maxPosition 1.57079632679
-                                                      maxTorque 1000.0
+                                                      maxTorque %{= b3msc1040_torque }%
                                                     }
                                                     PositionSensor {
                                                       name "left_ankle_roll_joint_sensor"
+                                                      resolution %{= positionresolution }%
                                                     }
                                                   ]
                                                   endPoint DEF left_ankle_roll_link Solid {
                                                     translation 0.000000 0.032500 0.000000
                                                     rotation 1.000000 0.000000 0.000000 1.570796
+                                                    model "left foot"
                                                     children [
                                                       Transform {
                                                         translation 0.000000 0.000000 0.000000
@@ -920,24 +1033,27 @@ PROTO GankenKun [
                                                           }
                                                         ]
                                                       }
-                                                      DEF left_foot_link Solid {
-                                                        translation 0.044000 0.000000 0.000000
-                                                        rotation 0.000000 -1.000000 0.000000 1.570796
-                                                        name "left_foot_link"
-                                                        physics Physics {
-                                                          density -1
-                                                          mass 0.000000
-                                                          centerOfMass [ 0.000000 0.000000 0.000000 ]
-                                                        }
-                                                      }
                                                     ]
                                                     name "left_ankle_roll_link"
-                                                    boundingObject Transform {
-                                                      translation 0.016500 0.021000 0.022500
-                                                      rotation 0.000000 -1.000000 -0.000000 3.141593
-                                                      children [
-                                                        Box {
-                                                           size 0.055000 0.092500 0.176500
+                                                    boundingObject Group {
+                                                      children [ 
+                                                        Transform {
+                                                          translation 0.048500 0.021000 0.022500
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.013000 0.092500 0.176500
+                                                            }
+                                                          ]
+                                                        }
+                                                        Transform {
+                                                          translation 0.020000 0.000000 0.000000
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.05000 0.040000 0.110000
+                                                            }
+                                                          ]
                                                         }
                                                       ]
                                                     }
@@ -945,80 +1061,83 @@ PROTO GankenKun [
                                                       density -1
                                                       mass 0.073825
                                                       centerOfMass [ 0.038060 0.017131 0.023457 ]
+                                                      inertiaMatrix [
+                                                        6.715198800e-05 2.519623720e-04 3.004727940e-04
+                                                        -6.696554000e-06 5.561296000e-06 5.548109000e-06
+                                                      ]
                                                     }
                                                   }
                                                 }
                                               ]
                                               name "left_ankle_pitch_link"
-                                              boundingObject Transform {
-                                                translation -0.011092 0.030446 0.000500
-                                                rotation -0.593169 0.544335 0.593169 2.144626
-                                                children [
-                                                  Box {
-                                                     size 0.051500 0.054079 0.115158
-                                                  }
-                                                ]
-                                              }
                                               physics Physics {
                                                 density -1
                                                 mass 0.229672
                                                 centerOfMass [ -0.005371 0.031878 0.000000 ]
+                                                inertiaMatrix [
+                                                  6.571834300e-05 2.580934340e-04 2.589720750e-04
+                                                  -2.439140000e-07 3.079813500e-05 -3.878150000e-07
+                                                ]
                                               }
                                             }
                                           }
                                         ]
                                         name "left_independent_pitch_link"
-                                        boundingObject Transform {
-                                          translation -0.010014 0.010350 0.000000
-                                          rotation 0.376588 -0.926381 -0.000000 3.141593
-                                          children [
-                                            Box {
-                                               size 0.025904 0.054727 0.063500
-                                            }
-                                          ]
-                                        }
                                         physics Physics {
                                           density -1
                                           mass 0.012450
                                           centerOfMass [ -0.007630 0.000000 0.000000 ]
+                                          inertiaMatrix [
+                                            1.000000000e-06 1.000000000e-06 1.000000000e-06
+                                            0.000000000 0.000000000 0.000000000
+                                          ]
                                         }
                                       }
                                     }
                                   ]
                                   name "left_shin_pitch_link"
                                   boundingObject Transform {
-                                    translation 0.049438 -0.002825 -0.000000
+                                    translation 0.029438 -0.002825 -0.000000
                                     rotation 0.577350 0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.028350 0.063700 0.121507
+                                         size 0.028350 0.063700 0.060000
                                       }
                                     ]
                                   }
                                   physics Physics {
                                     density -1
-                                    mass 0.091894
+                                    mass 0.031894
                                     centerOfMass [ 0.048641 -0.006895 0.000000 ]
+                                    inertiaMatrix [
+                                      4.524458700e-05 2.641925700e-05 2.733424700e-05 
+                                      -1.228580000e-07 -7.002346000e-06 -4.585110000e-07
+                                    ]
+
                                   }
                                 }
                               }
+#                              HingeJointWithBacklash {
+#                                backlash %{= backlash }%
+#                                gearMass %{= gearmass }%
                               HingeJoint {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "left_shin_pitch_mimic_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "left_shin_pitch_mimic_joint_sensor"
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF left_shin_pitch_mimic_link Solid {
@@ -1048,11 +1167,11 @@ PROTO GankenKun [
                                   ]
                                   name "left_shin_pitch_mimic_link"
                                   boundingObject Transform {
-                                    translation 0.050049 -0.002250 -0.000000
+                                    translation 0.050049 0.002750 -0.000000
                                     rotation -0.577350 -0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.021500 0.063700 0.116875
+                                         size 0.011500 0.063700 0.060000
                                       }
                                     ]
                                   }
@@ -1060,62 +1179,69 @@ PROTO GankenKun [
                                     density -1
                                     mass 0.025866
                                     centerOfMass [ 0.039698 -0.001743 0.000000 ]
+                                     inertiaMatrix [
+                                       4.016673000e-05 2.396582400e-05 2.013130200e-05
+                                      -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
+                                     ]
                                   }
                                 }
                               }
                             ]
                             name "left_knee_pitch_link"
-                            boundingObject Transform {
-                              translation 0.029530 0.011250 -0.000000
-                              rotation -0.577350 0.577350 -0.577350 2.094395
-                              children [
-                                Box {
-                                   size 0.054500 0.063500 0.078939
-                                }
-                              ]
-                            }
                             physics Physics {
                               density -1
                               mass 0.161201
                               centerOfMass [ 0.037989 0.005000 0.000000 ]
+                              inertiaMatrix [
+                                9.262740500e-05 8.808380900e-05 7.167046500e-05
+                                4.339110000e-07 9.292810000e-06 1.173013000e-06
+                              ]
                             }
                           }
                         }
                       ]
                       name "left_waist_pitch_link"
                       boundingObject Transform {
-                        translation 0.048457 -0.003587 -0.000000
+                        translation 0.068457 -0.003587 -0.000000
                         rotation 0.566380 -0.582758 -0.582758 2.110929
                         children [
                           Box {
-                             size 0.027109 0.063700 0.119777
+                             size 0.027109 0.063700 0.060000
                           }
                         ]
                       }
                       physics Physics {
                         density -1
-                        mass 0.030589
+                        mass 0.030583
                         centerOfMass [ 0.057714 -0.007362 0.000000 ]
+                         inertiaMatrix [
+                           4.273640700e-05 2.465280500e-05 2.567543000e-05
+                           -1.228580000e-07 6.529856000e-06 4.585110000e-07
+                         ]
                       }
                     }
                   }
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
                   HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "left_waist_pitch_mimic_joint"
-                        maxVelocity 1.0
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "left_waist_pitch_mimic_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF left_waist_pitch_mimic_link Solid {
@@ -1145,36 +1271,34 @@ PROTO GankenKun [
                       ]
                       name "left_waist_pitch_mimic_link"
                       boundingObject Transform {
-                        translation 0.049927 -0.002250 0.000000
+                        translation 0.049927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
                         children [
                           Box {
-                             size 0.021500 0.063700 0.116855
+                             size 0.011500 0.063700 0.060000
                           }
                         ]
-                      }
-                      physics Physics {
+                      }                      physics Physics {
                         density -1
                         mass 0.026735
                         centerOfMass [ 0.059775 0.001384 0.000000 ]
+                         inertiaMatrix [
+                           4.135108800e-05 2.440779900e-05 2.098131300e-05
+                           6.507700000e-08 5.340292000e-06 -2.428710000e-07
+                         ]
                       }
                     }
                   }
                 ]
                 name "left_waist_roll_link"
-                boundingObject Transform {
-                  translation 0.003755 0.000000 -0.048259
-                  rotation -0.092137 0.092137 -0.991475 1.579358
-                  children [
-                    Box {
-                       size 0.056500 0.067002 0.096798
-                    }
-                  ]
-                }
                 physics Physics {
                   density -1
-                  mass 0.227844
+                  mass 0.277844
                   centerOfMass [ 0.002331 0.000000 -0.047630 ]
+                  inertiaMatrix [
+                    1.152903810e-04 2.360428560e-04 2.096762990e-04
+                    1.635109000e-06 3.745413700e-05 -2.377456000e-06
+                  ]
                 }
               }
             }
@@ -1193,26 +1317,37 @@ PROTO GankenKun [
             density -1
             mass 0.105945
             centerOfMass [ -0.006580 0.000000 -0.010416 ]
+            inertiaMatrix [
+              8.342129700e-05 2.956717800e-05 7.855805200e-05
+              0.000000000e+00 0.000000000e+00 9.499173000e-06
+            ]
           }
         }
       }
+    %{ if enable_backlash then }%
+      HingeJointWithBacklash {
+        backlash %{= backlash }%
+        gearMass %{= gearmass }%
+    %{ else }%
       HingeJoint {
+    %{ end }%
         jointParameters HingeJointParameters {
           axis 0.000000 0.000000 1.000000
           anchor 0.005000 -0.044000 -0.072500
-          dampingConstant 0.0
-          staticFriction 0.0
+          dampingConstant %{= b3msc1170_damping }%
+          staticFriction %{= b3msc1170_staticFric }%
         }
         device [
           RotationalMotor {
             name "right_waist_yaw_joint"
-            maxVelocity 1.0
+            maxVelocity %{= b3msc1170_maxVelo }%
             minPosition -2.35619449019
             maxPosition 2.35619449019
-            maxTorque 1000.0
+            maxTorque %{= b3msc1170_torque }%
           }
           PositionSensor {
             name "right_waist_yaw_joint_sensor"
+            resolution %{= positionresolution }%
           }
         ]
         endPoint DEF right_waist_yaw_link Solid {
@@ -1229,23 +1364,30 @@ PROTO GankenKun [
                 }
               ]
             }
+          %{ if enable_backlash then }%
+            HingeJointWithBacklash {
+              backlash %{= backlash }%
+              gearMass %{= gearmass }%
+          %{ else }%
             HingeJoint {
+          %{ end }%
               jointParameters HingeJointParameters {
                 axis 1.000000 0.000000 0.000000
                 anchor 0.024975 0.000000 -0.055000
-                dampingConstant 0.0
-                staticFriction 0.0
+                dampingConstant %{= b3msc1170_damping }%
+                staticFriction %{= b3msc1170_staticFric }%
               }
               device [
                 RotationalMotor {
                   name "right_waist_roll_joint"
-                  maxVelocity 1.0
+                  maxVelocity %{= b3msc1170_maxVelo }%
                   minPosition -0.785398163397
                   maxPosition 0.785398163397
-                  maxTorque 1000.0
+                  maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
                   name "right_waist_roll_joint_sensor"
+                  resolution %{= positionresolution }%
                 }
               ]
               endPoint DEF right_waist_roll_link Solid {
@@ -1272,23 +1414,27 @@ PROTO GankenKun [
                       }
                     ]
                   }
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
                   HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 0.000000 1.000000
                       anchor -0.018000 0.000000 -0.091475
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_roll_mimic_joint"
-                        maxVelocity 2.0
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 1.57079632679
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "right_waist_roll_mimic_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_slider_crank_link Solid {
@@ -1307,39 +1453,32 @@ PROTO GankenKun [
                         }
                       ]
                       name "right_slider_crank_link"
-                      boundingObject Transform {
-                        translation -0.004086 0.001886 -0.001000
-                        rotation -0.698714 0.153619 0.698714 2.836738
-                        children [
-                          Box {
-                             size 0.002000 0.021997 0.030516
-                          }
-                        ]
-                      }
-                      physics Physics {
-                        density -1
-                        mass 0.002638
-                        centerOfMass [ -0.010842 0.000000 -0.001000 ]
-                      }
                     }
                   }
+                %{ if enable_backlash then }%
+                  HingeJointWithBacklash {
+                    backlash %{= backlash }%
+                    gearMass %{= gearmass }%
+                %{ else }%
                   HingeJoint {
+                %{ end }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_pitch_joint"
-                        maxVelocity 1.0
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "right_waist_pitch_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_waist_pitch_link Solid {
@@ -1356,23 +1495,27 @@ PROTO GankenKun [
                             }
                           ]
                         }
+#                        HingeJointWithBacklash {
+#                          backlash %{= backlash }%
+#                          gearMass %{= gearmass }%
                         HingeJoint {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.100000 0.000000 0.000000
-                            dampingConstant 0.0
-                            staticFriction 0.0
+                            dampingConstant %{= b3msc1170_damping }%
+                            staticFriction %{= b3msc1170_staticFric }%
                           }
                           device [
                             RotationalMotor {
                               name "right_knee_pitch_mimic_joint"
-                              maxVelocity 1.0
+                              maxVelocity %{= b3msc1170_maxVelo }%
                               minPosition -0.523598775598
                               maxPosition 1.57079632679
-                              maxTorque 1000.0
+                              maxTorque %{= b3msc1170_torque }%
                             }
                             PositionSensor {
                               name "right_knee_pitch_mimic_joint_sensor"
+                              resolution %{= positionresolution }%
                             }
                           ]
                           endPoint DEF right_knee_pitch_link Solid {
@@ -1399,23 +1542,30 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
+                            %{ if enable_backlash then }%
+                              HingeJointWithBacklash {
+                                backlash %{= backlash }%
+                                gearMass %{= gearmass }%
+                            %{ else }%
                               HingeJoint {
+                            %{ end }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "right_knee_pitch_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "right_knee_pitch_joint_sensor"
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF right_shin_pitch_link Solid {
@@ -1432,23 +1582,27 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
+#                                    HingeJointWithBacklash {
+#                                      backlash %{= backlash }%
+#                                      gearMass %{= gearmass }%
                                     HingeJoint {
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.100000 0.000000 0.000000
-                                        dampingConstant 0.0
-                                        staticFriction 0.0
+                                        dampingConstant %{= b3msc1170_damping }%
+                                        staticFriction %{= b3msc1170_staticFric }%
                                       }
                                       device [
                                         RotationalMotor {
                                           name "right_ankle_pitch_mimic_joint"
-                                          maxVelocity 1.0
+                                          maxVelocity %{= b3msc1170_maxVelo }%
                                           minPosition -1.57079632679
                                           maxPosition 1.57079632679
-                                          maxTorque 1000.0
+                                          maxTorque %{= b3msc1170_torque }%
                                         }
                                         PositionSensor {
                                           name "right_ankle_pitch_mimic_joint_sensor"
+                                          resolution %{= positionresolution }%
                                         }
                                       ]
                                       endPoint DEF right_independent_pitch_link Solid {
@@ -1465,23 +1619,30 @@ PROTO GankenKun [
                                               }
                                             ]
                                           }
+                                        %{ if enable_backlash then }%
+                                          HingeJointWithBacklash {
+                                            backlash %{= backlash }%
+                                            gearMass %{= gearmass }%
+                                        %{ else }%
                                           HingeJoint {
+                                        %{ end }%
                                             jointParameters HingeJointParameters {
                                               axis 0.000000 0.000000 1.000000
                                               anchor 0.000100 0.000000 0.000000
-                                              dampingConstant 0.0
-                                              staticFriction 0.0
+                                              dampingConstant %{= b3msc1170_damping }%
+                                              staticFriction %{= b3msc1170_staticFric }%
                                             }
                                             device [
                                               RotationalMotor {
                                                 name "right_ankle_pitch_joint"
-                                                maxVelocity 1.0
+                                                maxVelocity %{= b3msc1170_maxVelo }%
                                                 minPosition -2.35619449019
                                                 maxPosition 2.35619449019
-                                                maxTorque 1000.0
+                                                maxTorque %{= b3msc1170_torque }%
                                               }
                                               PositionSensor {
                                                 name "right_ankle_pitch_joint_sensor"
+                                                resolution %{= positionresolution }%
                                               }
                                             ]
                                             endPoint DEF right_ankle_pitch_link Solid {
@@ -1508,28 +1669,36 @@ PROTO GankenKun [
                                                     }
                                                   ]
                                                 }
+                                              %{ if enable_backlash then }%
+                                                HingeJointWithBacklash {
+                                                  backlash %{= backlash }%
+                                                  gearMass %{= gearmass }%
+                                              %{ else }%
                                                 HingeJoint {
+                                              %{ end }%
                                                   jointParameters HingeJointParameters {
                                                     axis 0.000000 -1.000000 0.000000
                                                     anchor 0.000000 0.032500 0.000000
-                                                    dampingConstant 0.0
-                                                    staticFriction 0.0
+                                                    dampingConstant %{= b3msc1040_damping }%
+                                                    staticFriction %{= b3msc1040_staticFric }%
                                                   }
                                                   device [
                                                     RotationalMotor {
                                                       name "right_ankle_roll_joint"
-                                                      maxVelocity 1.0
+                                                      maxVelocity %{= b3msc1040_maxVelo }%
                                                       minPosition -1.57079632679
                                                       maxPosition 1.57079632679
-                                                      maxTorque 1000.0
+                                                      maxTorque %{= b3msc1040_torque }%
                                                     }
                                                     PositionSensor {
                                                       name "right_ankle_roll_joint_sensor"
+                                                      resolution %{= positionresolution }%
                                                     }
                                                   ]
                                                   endPoint DEF right_ankle_roll_link Solid {
                                                     translation 0.000000 0.032500 0.000000
                                                     rotation 1.000000 0.000000 0.000000 1.570796
+                                                    model "right foot"
                                                     children [
                                                       Transform {
                                                         translation 0.000000 0.000000 0.000000
@@ -1551,24 +1720,27 @@ PROTO GankenKun [
                                                           }
                                                         ]
                                                       }
-                                                      DEF right_foot_link Solid {
-                                                        translation 0.044000 0.000000 0.000000
-                                                        rotation 0.000000 -1.000000 0.000000 1.570796
-                                                        name "right_foot_link"
-                                                        physics Physics {
-                                                          density -1
-                                                          mass 0.000000
-                                                          centerOfMass [ 0.000000 0.000000 0.000000 ]
-                                                        }
-                                                      }
                                                     ]
                                                     name "right_ankle_roll_link"
-                                                    boundingObject Transform {
-                                                      translation 0.016500 -0.021000 0.022500
-                                                      rotation 0.000000 -1.000000 -0.000000 3.141593
-                                                      children [
-                                                        Box {
-                                                           size 0.055000 0.092500 0.176500
+                                                    boundingObject Group {
+                                                      children [ 
+                                                        Transform {
+                                                          translation 0.048500 -0.021000 0.022500
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.01300 0.092500 0.176500
+                                                            }
+                                                          ]
+                                                        }
+                                                        Transform {
+                                                          translation 0.020000 0.000000 0.000000
+                                                          rotation 0.000000 -1.000000 -0.000000 3.141593
+                                                          children [
+                                                            Box {
+                                                               size 0.05000 0.040000 0.110000
+                                                            }
+                                                          ]
                                                         }
                                                       ]
                                                     }
@@ -1576,80 +1748,82 @@ PROTO GankenKun [
                                                       density -1
                                                       mass 0.073825
                                                       centerOfMass [ 0.038060 -0.017131 0.023457 ]
+                                                      inertiaMatrix [
+                                                        6.715198800e-05 2.519623720e-04 3.004727940e-04
+                                                        -6.696554000e-06 5.561296000e-06 5.548109000e-06
+                                                      ]
                                                     }
                                                   }
                                                 }
                                               ]
                                               name "right_ankle_pitch_link"
-                                              boundingObject Transform {
-                                                translation -0.011203 0.030466 -0.000500
-                                                rotation -0.560850 -0.609010 -0.560850 2.047556
-                                                children [
-                                                  Box {
-                                                     size 0.051500 0.053981 0.115041
-                                                  }
-                                                ]
-                                              }
                                               physics Physics {
                                                 density -1
                                                 mass 0.229672
                                                 centerOfMass [ -0.005371 0.031878 0.000000 ]
+                                                  inertiaMatrix [
+                                                    6.571834300e-05 2.580934340e-04 2.589720750e-04 
+                                                    -2.439140000e-07 3.079813500e-05 -3.878150000e-07
+                                                  ]
                                               }
                                             }
                                           }
                                         ]
                                         name "right_independent_pitch_link"
-                                        boundingObject Transform {
-                                          translation -0.010014 0.010350 0.000000
-                                          rotation 0.376588 -0.926381 -0.000000 3.141593
-                                          children [
-                                            Box {
-                                               size 0.025904 0.054727 0.063500
-                                            }
-                                          ]
-                                        }
                                         physics Physics {
                                           density -1
                                           mass 0.012450
                                           centerOfMass [ -0.007630 0.000000 0.000000 ]
+                                          inertiaMatrix [
+                                            1.000000000e-06 1.000000000e-06 1.000000000e-06
+                                            0.000000000 0.000000000 0.000000000
+                                          ]
                                         }
                                       }
                                     }
                                   ]
                                   name "right_shin_pitch_link"
                                   boundingObject Transform {
-                                    translation 0.049438 -0.002825 -0.000000
+                                    translation 0.029438 -0.002825 -0.000000
                                     rotation 0.577350 0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.028350 0.063700 0.121507
+                                         size 0.028350 0.063700 0.060000
                                       }
                                     ]
                                   }
                                   physics Physics {
                                     density -1
-                                    mass 0.091894
+                                    mass 0.031894
                                     centerOfMass [ 0.048641 -0.006895 0.000000 ]
+                                    inertiaMatrix [
+                                      4.524458700e-05 2.641925700e-05 2.733424700e-05
+                                      -1.228580000e-07 -7.002346000e-06 -4.585110000e-07
+                                    ]
                                   }
                                 }
                               }
+#                              HingeJointWithBacklash {
+#                                backlash %{= backlash }%
+#                                gearMass %{= gearmass }%
                               HingeJoint {
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.037000 0.032000 0.000000
-                                  dampingConstant 0.0
-                                  staticFriction 0.0
+                                  dampingConstant %{= b3msc1170_damping }%
+                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 device [
                                   RotationalMotor {
                                     name "right_shin_pitch_mimic_joint"
-                                    maxVelocity 1.0
+                                    maxVelocity %{= b3msc1170_maxVelo }%
                                     minPosition -0.523598775598
                                     maxPosition 1.57079632679
-                                    maxTorque 1000.0
+                                    maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
                                     name "right_shin_pitch_mimic_joint_sensor"
+                                    resolution %{= positionresolution }%
                                   }
                                 ]
                                 endPoint DEF right_shin_pitch_mimic_link Solid {
@@ -1669,11 +1843,11 @@ PROTO GankenKun [
                                   ]
                                   name "right_shin_pitch_mimic_link"
                                   boundingObject Transform {
-                                    translation 0.050049 -0.002250 -0.000000
+                                    translation 0.050049 0.002750 -0.000000
                                     rotation -0.577350 -0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.021500 0.063700 0.116875
+                                         size 0.011500 0.063700 0.060000
                                       }
                                     ]
                                   }
@@ -1681,62 +1855,69 @@ PROTO GankenKun [
                                     density -1
                                     mass 0.025866
                                     centerOfMass [ 0.039698 -0.001743 0.000000 ]
+                                     inertiaMatrix [
+                                       4.016673000e-05 2.396582400e-05 2.013130200e-05
+                                       -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
+                                     ]
                                   }
                                 }
                               }
                             ]
                             name "right_knee_pitch_link"
-                            boundingObject Transform {
-                              translation 0.029530 0.011250 -0.000000
-                              rotation 0.577350 0.577350 0.577350 2.094395
-                              children [
-                                Box {
-                                   size 0.054500 0.063500 0.078939
-                                }
-                              ]
-                            }
                             physics Physics {
                               density -1
                               mass 0.161201
                               centerOfMass [ 0.037989 0.005000 0.000000 ]
+                              inertiaMatrix [
+                                9.262740500e-05 8.808380900e-05 7.167046500e-05
+                                4.339110000e-07 9.292810000e-06 1.173013000e-06
+                              ]
                             }
                           }
                         }
                       ]
                       name "right_waist_pitch_link"
                       boundingObject Transform {
-                        translation 0.048457 -0.003587 -0.000000
+                        translation 0.068457 -0.003587 -0.000000
                         rotation 0.566380 -0.582758 -0.582758 2.110929
                         children [
                           Box {
-                             size 0.027109 0.063700 0.119777
+                             size 0.027109 0.063700 0.060000
                           }
                         ]
                       }
                       physics Physics {
                         density -1
-                        mass 0.030589
+                        mass 0.030583
                         centerOfMass [ 0.057714 -0.007362 0.000000 ]
+                        inertiaMatrix [
+                          4.273640700e-05 2.465280500e-05 2.567543000e-05
+                          -1.228580000e-07 6.529856000e-06 4.585110000e-07
+                        ]
                       }
                     }
                   }
+#                  HingeJointWithBacklash {
+#                    backlash %{= backlash }%
+#                    gearMass %{= gearmass }%
                   HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.020000 0.000000 -0.057000
-                      dampingConstant 0.0
-                      staticFriction 0.0
+                      dampingConstant %{= b3msc1170_damping }%
+                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     device [
                       RotationalMotor {
                         name "right_waist_pitch_mimic_joint"
-                        maxVelocity 1.0
+                        maxVelocity %{= b3msc1170_maxVelo }%
                         minPosition -1.57079632679
                         maxPosition 0.523598775598
-                        maxTorque 1000.0
+                        maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
                         name "right_waist_pitch_mimic_joint_sensor"
+                        resolution %{= positionresolution }%
                       }
                     ]
                     endPoint DEF right_waist_pitch_mimic_link Solid {
@@ -1756,11 +1937,11 @@ PROTO GankenKun [
                       ]
                       name "right_waist_pitch_mimic_link"
                       boundingObject Transform {
-                        translation 0.049927 -0.002250 0.000000
+                        translation 0.049927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
                         children [
                           Box {
-                             size 0.021500 0.063700 0.116855
+                             size 0.011500 0.063700 0.060000
                           }
                         ]
                       }
@@ -1768,24 +1949,23 @@ PROTO GankenKun [
                         density -1
                         mass 0.026735
                         centerOfMass [ 0.059775 0.001384 0.000000 ]
+                        inertiaMatrix [
+                          4.135108800e-05 2.440779900e-05 2.098131300e-05
+                          6.507700000e-08 5.340292000e-06 -2.428710000e-07
+                        ]
                       }
                     }
                   }
                 ]
                 name "right_waist_roll_link"
-                boundingObject Transform {
-                  translation 0.003749 0.000000 -0.048261
-                  rotation -0.092572 0.092572 -0.991393 1.579440
-                  children [
-                    Box {
-                       size 0.056500 0.066984 0.096825
-                    }
-                  ]
-                }
                 physics Physics {
                   density -1
-                  mass 0.227844
+                  mass 0.277844
                   centerOfMass [ 0.002331 0.000000 -0.047630 ]
+                  inertiaMatrix [
+                    1.152903810e-04 2.360428560e-04 2.096762990e-04
+                    1.635109000e-06 3.745413700e-05 -2.377456000e-06
+                  ]
                 }
               }
             }
@@ -1804,6 +1984,10 @@ PROTO GankenKun [
             density -1
             mass 0.105945
             centerOfMass [ -0.006580 0.000000 -0.010416 ]
+            inertiaMatrix [
+              8.342129700e-05 2.956717800e-05 7.855805200e-05
+              0.000000000e+00 0.000000000e+00 9.499173000e-06
+            ]
           }
         }
       }
@@ -1813,9 +1997,13 @@ PROTO GankenKun [
         children [
           Accelerometer {
             name "imu/data accelerometer"
+            lookupTable [-78.455 -78.455 0,
+                         78.455 78.455 0 ]
           }
           Gyro {
             name "imu/data gyro"
+            lookupTable [-17.455 -17.455 0,
+                         17.455 17.455 0 ]
           }
           Compass {
             name "imu/data compass"
@@ -1824,18 +2012,22 @@ PROTO GankenKun [
         name "imu_link"
         physics Physics {
           density -1
-          mass 0.000000
+          mass 0.010000
           centerOfMass [ 0.000000 0.000000 0.000000 ]
+          inertiaMatrix [
+            1.000000e-06 1.000000e-06 1.000000e-06
+            0.000000e+00 0.000000e+00 0.000000e+00
+          ]
         }
       }
     ]
     name IS name 
     boundingObject Transform {
-      translation -0.049913 0.000000 0.026411
-      rotation 0.706002 -0.706002 -0.055879 3.029951
+      translation -0.049913 0.000000 0.040000
+      rotation 0.0 0.0 1 1.57
       children [
         Box {
-           size 0.142800 0.194748 0.196812
+           size 0.142800 0.160000 0.196812
         }
       ]
     }
@@ -1848,5 +2040,11 @@ PROTO GankenKun [
         0.000000e+00 0.000000e+00 0.000000e+00
       ]
     }
+    controller IS controller
+    controllerArgs IS controllerArgs
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+    selfCollision IS selfCollision
   }
 }
