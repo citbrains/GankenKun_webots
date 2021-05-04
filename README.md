@@ -19,7 +19,7 @@ sudo ln -s /opt/cmake-3.20.2-linux-x86_64.sh/bin/* /usr/local/bin
 以下方法  
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protobuf-cpp-3.15.8.tar.gz   
 tar -xvzf protobuf-cpp-3.15.8.tar.gz   
-解答した所に移動   
+解凍した所に移動   
 ./configure   
 make -j(cpuのコア数+1)  
 make check   
