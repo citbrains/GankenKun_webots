@@ -463,7 +463,7 @@ public:
 	int32_t get_acc_values()
 	{
 		const double *val = robot_accelerometer->getValues();
-		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x
+		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x ここのスケールが正しいのかが確認できない。
 		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y
 		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z
 		//std::cout << "acc--x: " << xv_acc.acc_data1 << " y: " << xv_acc.acc_data2 << " z: " << xv_acc.acc_data3 << "\n";
@@ -627,7 +627,8 @@ public:
 
 	void get_and_send_image(int64_t current_loop){
 		//highest_priorityがオーバーフローした場合壊れる。しかしuint32の為オーバーフローするのは
-		//シミュレーション時間で9544時間連続起動した場合なので問題ないはず
+		//シミュレーション時間で9544時間連続起動した場合なので問題ないはず。message_queueの動きがよく分からない為
+		//現状priorityは0固定。早い周期で送るとpriority_queueの並べ替えが間に合わないのかもしれない。
 		webotsvision::CameraMeasurement picture;
 		std::string send_data;
 		//std::cout << "call image " << std::endl;
@@ -642,10 +643,12 @@ public:
 		send_data = picture.SerializeAsString();
 		//std::cout << "serialize ok" << std::endl;
 		try{
-			msgq.try_send(&send_data[0], send_data.size(), 0);
+			if(!msgq.try_send(&send_data[0], send_data.size(), 0)){
+				std::cout << "-------------------------buffer is full-----------------------------------\n";
+			}
 		}
 		catch(boost::interprocess::interprocess_exception eee){
-			std::cout << "-----------------------------buffer is full ----------------------------------" << std::endl;
+			std::cout << "-----------------------------buffer is full ----------------------------------\n";
 			//std::cout << eee.what() << std::endl;
 		}
 		//std::cout << "send ok" << std::endl;
@@ -680,11 +683,13 @@ int main(int argc, char *argv[])
 	OrientationEstimator orientationEst((double)(1000.0 / wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
 #endif
+	if (argc > 1){
+		//servo_port = argv[1];
+		id = argv[1][3] - '0';
+	}
 	boost::thread thread(boost::bind(ipcthread, argc, argv, id));
 	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time(); 
 	const char *servo_port = "/dev/kondoservo";
-	if (argc > 1)
-		servo_port = argv[1];
 
 	var_init();		// �ϐ��̏�����
 	serv_init();	// �T�[�{���[�^�̏�����
