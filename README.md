@@ -8,14 +8,14 @@ https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3
 
 Webots用の環境構築scriptの内容を実行する。 
  
-CMakeを3.18以上にする。参考https://askubuntu.com/questions/829310/how-to-upgrade-cmake-in-ubuntu  
+### CMakeを3.18以上にする。参考https://askubuntu.com/questions/829310/how-to-upgrade-cmake-in-ubuntu  
 cd /opt/  
 wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2-linux-x86_64.sh  
 chmod +x /opt/cmake-3.20.2-linux-x86_64.sh  
 sudo bash cmake-3.20.2-linux-x86_64.sh  
 sudo ln -s /opt/cmake-3.20.2-linux-x86_64.sh/bin/* /usr/local/bin  
 
-protocol buffersをインストールする  
+### protocol buffersをインストールする  
 以下方法  
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protobuf-cpp-3.15.8.tar.gz   
 tar -xvzf protobuf-cpp-3.15.8.tar.gz   
@@ -26,13 +26,12 @@ make check
 sudo make install   
 sudo ldconfig   
  
-libusb-devをインストール  
-sudo apt install libusb-dev  
+ 
 
-pyfiles内で  
+### pyfiles内で  
 export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf  
   
-citbrains_humanoidのブランチをuse_picture_from_webotsnに変更し以下の作業を行う  
+### citbrains_humanoidのブランチをuse_picture_from_webotsnに変更し以下の作業を行う  
 srcディレクトリ内で  
 ccmake .  
 USE_VREP_SIMULATOR=OFF  
