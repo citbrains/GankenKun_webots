@@ -21,7 +21,7 @@ wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/proto
 tar -xvzf protobuf-cpp-3.15.8.tar.gz  
 解答した所に移動  
 ./configure  
-make -j(cpuのコア数+1)
+make -j(cpuのコア数+1) 
 make check  
 sudo make install  
 sudo ldconfig  
