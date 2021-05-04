@@ -10,7 +10,7 @@ Webots用の環境構築scriptの内容を実行する。
 CMakeを3.18以上にする。参考https://askubuntu.com/questions/829310/how-to-upgrade-cmake-in-ubuntu
 
 protocol buffersをインストールする
-以下方法
+以下方法 
 wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protobuf-cpp-3.15.8.tar.gz  
 tar -xvzf protobuf-cpp-3.15.8.tar.gz  
 解答した所に移動  
