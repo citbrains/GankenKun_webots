@@ -27,13 +27,10 @@ make check
 sudo make install   
 sudo ldconfig   
  
- 
-
-### .bashrcに以下を追記 
-export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf  
   
 ### citbrains_humanoidのブランチをuse_picture_from_webotsに変更し以下の作業を行う  
 HOMEディレクトリ内で 
+echo >> .bashrc "export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf/"
 cd citbrains_humanoid/for2050/src  
 make clean  
 cmake .
