@@ -1991,34 +1991,17 @@ PROTO GankenKun [
           }
         }
       }
-      DEF imu_link Solid {
-        translation -0.005000 0.016820 0.003000
-        rotation 0.000000 1.000000 0.000000 0.000000
-        children [
-          Accelerometer {
-            name "imu/data accelerometer"
-            lookupTable [-78.455 -78.455 0,
-                         78.455 78.455 0 ]
-          }
-          Gyro {
-            name "imu/data gyro"
-            lookupTable [-17.455 -17.455 0,
-                         17.455 17.455 0 ]
-          }
-          Compass {
-            name "imu/data compass"
-          }
-        ]
-        name "imu_link"
-        physics Physics {
-          density -1
-          mass 0.010000
-          centerOfMass [ 0.000000 0.000000 0.000000 ]
-          inertiaMatrix [
-            1.000000e-06 1.000000e-06 1.000000e-06
-            0.000000e+00 0.000000e+00 0.000000e+00
-          ]
-        }
+      Accelerometer {
+        name "accelerometer"
+        lookupTable [-78.455     0 0,
+                      78.455 65535 0 ]
+        resolution 1
+      }
+      Gyro {
+        name "gyro"
+        lookupTable [-17.455      0 0,
+                      17.455  65535 0 ]
+        resolution 1
       }
     ]
     name IS name 
