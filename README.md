@@ -33,7 +33,10 @@ sudo ldconfig
 export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf  
   
 ### citbrains_humanoidのブランチをuse_picture_from_webotsに変更し以下の作業を行う  
-srcディレクトリ内で  
+HOMEディレクトリ内で 
+cd citbrains_humanoid/for2050/src  
+make clean  
+cmake .
 ccmake .  
 USE_VREP_SIMULATOR=OFF  
 USE_WEBOTS_SIMULATOR=ONにする  
