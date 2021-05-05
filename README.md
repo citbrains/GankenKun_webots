@@ -29,7 +29,7 @@ sudo ldconfig
  
   
 ### citbrains_humanoidのブランチをuse_picture_from_webotsに変更し以下の作業を行う  
-HOMEディレクトリ内で 
+HOMEディレクトリ内で   
 echo >> .bashrc "export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf/"
 cd citbrains_humanoid/for2050/src  
 make clean  
