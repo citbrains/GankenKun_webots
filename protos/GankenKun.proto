@@ -119,8 +119,8 @@ PROTO GankenKun [
           RotationalMotor {
             name "head_yaw_joint"
             maxVelocity %{= b3msc1040_maxVelo }%
-            minPosition -2.35619449019
-            maxPosition 2.35619449019
+            minPosition -5.58505360638185
+            maxPosition  5.58505360638185
             maxTorque %{= b3msc1040_torque }%
 
           }
@@ -214,8 +214,8 @@ PROTO GankenKun [
           RotationalMotor {
             name "left_shoulder_pitch_joint"
             maxVelocity %{= b3msc1040_maxVelo }%
-            minPosition -2.35619449019
-            maxPosition 2.35619449019
+            minPosition -5.58505360638185
+            maxPosition  5.58505360638185
             maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
@@ -270,7 +270,8 @@ PROTO GankenKun [
                 RotationalMotor {
                   name "left_shoulder_roll_joint"
                   maxVelocity %{= b3msc1040_maxVelo }%
-                  maxPosition 3.14159265359
+                  minPosition -5.58505360638185
+                  maxPosition  5.58505360638185
                   maxTorque %{= b3msc1040_torque }%
                 }
                 PositionSensor {
@@ -319,8 +320,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "left_elbow_pitch_joint"
                         maxVelocity %{= b3msc1040_maxVelo }%
-                        minPosition -2.35619449019
-                        maxPosition 2.35619449019
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1040_torque }%
                       }
                       PositionSensor {
@@ -427,8 +428,8 @@ PROTO GankenKun [
           RotationalMotor {
             name "right_shoulder_pitch_joint"
             maxVelocity %{= b3msc1040_maxVelo }%
-            minPosition -2.35619449019
-            maxPosition 2.35619449019
+            minPosition -5.58505360638185
+            maxPosition  5.58505360638185
             maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
@@ -467,7 +468,8 @@ PROTO GankenKun [
                 RotationalMotor {
                   name "right_shoulder_roll_joint"
                   maxVelocity %{= b3msc1040_maxVelo }%
-                  minPosition -3.14159265359
+                  minPosition -5.58505360638185
+                  maxPosition  5.58505360638185
                   maxTorque %{= b3msc1040_torque }%
                 }
                 PositionSensor {
@@ -506,8 +508,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "right_elbow_pitch_joint"
                         maxVelocity %{= b3msc1040_maxVelo }%
-                        minPosition -2.35619449019
-                        maxPosition 2.35619449019
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1040_torque }%
                       }
                       PositionSensor {
@@ -604,8 +606,8 @@ PROTO GankenKun [
           RotationalMotor {
             name "left_waist_yaw_joint"
             maxVelocity %{= b3msc1170_maxVelo }%
-            minPosition -2.35619449019
-            maxPosition 2.35619449019
+            minPosition -5.58505360638185
+            maxPosition  5.58505360638185
             maxTorque %{= b3msc1170_torque }%
           }
           PositionSensor {
@@ -654,8 +656,8 @@ PROTO GankenKun [
                 RotationalMotor {
                   name "left_waist_roll_joint"
                   maxVelocity %{= b3msc1170_maxVelo }%
-                  minPosition -0.785398163397
-                  maxPosition 0.785398163397
+                  minPosition -5.58505360638185
+                  maxPosition  5.58505360638185
                   maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
@@ -701,8 +703,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "left_waist_roll_mimic_joint"
                         maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -1.57079632679
-                        maxPosition 1.57079632679
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
@@ -755,8 +757,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "left_waist_pitch_joint"
                         maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -1.57079632679
-                        maxPosition 0.523598775598
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
@@ -802,8 +804,8 @@ PROTO GankenKun [
                             RotationalMotor {
                               name "left_knee_pitch_mimic_joint"
                               maxVelocity %{= b3msc1170_maxVelo }%
-                              minPosition -0.523598775598
-                              maxPosition 1.57079632679
+                              minPosition -5.58505360638185
+                              maxPosition  5.58505360638185
                               maxTorque %{= b3msc1170_torque }%
                             }
                             PositionSensor {
@@ -852,8 +854,8 @@ PROTO GankenKun [
                                   RotationalMotor {
                                     name "left_knee_pitch_joint"
                                     maxVelocity %{= b3msc1170_maxVelo }%
-                                    minPosition -0.523598775598
-                                    maxPosition 1.57079632679
+                                    minPosition -5.58505360638185
+                                    maxPosition  5.58505360638185
                                     maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
@@ -899,8 +901,8 @@ PROTO GankenKun [
                                         RotationalMotor {
                                           name "left_ankle_pitch_mimic_joint"
                                           maxVelocity %{= b3msc1170_maxVelo }%
-                                          minPosition -1.57079632679
-                                          maxPosition 1.57079632679
+                                          minPosition -5.58505360638185
+                                          maxPosition  5.58505360638185
                                           maxTorque %{= b3msc1170_torque }%
                                         }
                                         PositionSensor {
@@ -949,8 +951,8 @@ PROTO GankenKun [
                                               RotationalMotor {
                                                 name "left_ankle_pitch_joint"
                                                 maxVelocity %{= b3msc1170_maxVelo }%
-                                                minPosition -2.35619449019
-                                                maxPosition 2.35619449019
+                                                minPosition -5.58505360638185
+                                                maxPosition  5.58505360638185
                                                 maxTorque %{= b3msc1170_torque }%
                                               }
                                               PositionSensor {
@@ -999,8 +1001,8 @@ PROTO GankenKun [
                                                     RotationalMotor {
                                                       name "left_ankle_roll_joint"
                                                       maxVelocity %{= b3msc1040_maxVelo }%
-                                                      minPosition -1.57079632679
-                                                      maxPosition 1.57079632679
+                                                      minPosition -5.58505360638185
+                                                      maxPosition  5.58505360638185
                                                       maxTorque %{= b3msc1040_torque }%
                                                     }
                                                     PositionSensor {
@@ -1131,8 +1133,8 @@ PROTO GankenKun [
                                   RotationalMotor {
                                     name "left_shin_pitch_mimic_joint"
                                     maxVelocity %{= b3msc1170_maxVelo }%
-                                    minPosition -0.523598775598
-                                    maxPosition 1.57079632679
+                                    minPosition -5.58505360638185
+                                    maxPosition  5.58505360638185
                                     maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
@@ -1235,8 +1237,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "left_waist_pitch_mimic_joint"
                         maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -1.57079632679
-                        maxPosition 0.523598775598
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
@@ -1341,8 +1343,8 @@ PROTO GankenKun [
           RotationalMotor {
             name "right_waist_yaw_joint"
             maxVelocity %{= b3msc1170_maxVelo }%
-            minPosition -2.35619449019
-            maxPosition 2.35619449019
+            minPosition -5.58505360638185
+            maxPosition  5.58505360638185
             maxTorque %{= b3msc1170_torque }%
           }
           PositionSensor {
@@ -1381,8 +1383,8 @@ PROTO GankenKun [
                 RotationalMotor {
                   name "right_waist_roll_joint"
                   maxVelocity %{= b3msc1170_maxVelo }%
-                  minPosition -0.785398163397
-                  maxPosition 0.785398163397
+                  minPosition -5.58505360638185
+                  maxPosition  5.58505360638185
                   maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
@@ -1428,8 +1430,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "right_waist_roll_mimic_joint"
                         maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -1.57079632679
-                        maxPosition 1.57079632679
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
@@ -1472,8 +1474,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "right_waist_pitch_joint"
                         maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -1.57079632679
-                        maxPosition 0.523598775598
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
@@ -1509,8 +1511,8 @@ PROTO GankenKun [
                             RotationalMotor {
                               name "right_knee_pitch_mimic_joint"
                               maxVelocity %{= b3msc1170_maxVelo }%
-                              minPosition -0.523598775598
-                              maxPosition 1.57079632679
+                              minPosition -5.58505360638185
+                              maxPosition  5.58505360638185
                               maxTorque %{= b3msc1170_torque }%
                             }
                             PositionSensor {
@@ -1559,8 +1561,8 @@ PROTO GankenKun [
                                   RotationalMotor {
                                     name "right_knee_pitch_joint"
                                     maxVelocity %{= b3msc1170_maxVelo }%
-                                    minPosition -0.523598775598
-                                    maxPosition 1.57079632679
+                                    minPosition -5.58505360638185
+                                    maxPosition  5.58505360638185
                                     maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
@@ -1596,8 +1598,8 @@ PROTO GankenKun [
                                         RotationalMotor {
                                           name "right_ankle_pitch_mimic_joint"
                                           maxVelocity %{= b3msc1170_maxVelo }%
-                                          minPosition -1.57079632679
-                                          maxPosition 1.57079632679
+                                          minPosition -5.58505360638185
+                                          maxPosition  5.58505360638185
                                           maxTorque %{= b3msc1170_torque }%
                                         }
                                         PositionSensor {
@@ -1636,8 +1638,8 @@ PROTO GankenKun [
                                               RotationalMotor {
                                                 name "right_ankle_pitch_joint"
                                                 maxVelocity %{= b3msc1170_maxVelo }%
-                                                minPosition -2.35619449019
-                                                maxPosition 2.35619449019
+                                                minPosition -5.58505360638185
+                                                maxPosition  5.58505360638185
                                                 maxTorque %{= b3msc1170_torque }%
                                               }
                                               PositionSensor {
@@ -1686,8 +1688,8 @@ PROTO GankenKun [
                                                     RotationalMotor {
                                                       name "right_ankle_roll_joint"
                                                       maxVelocity %{= b3msc1040_maxVelo }%
-                                                      minPosition -1.57079632679
-                                                      maxPosition 1.57079632679
+                                                      minPosition -5.58505360638185
+                                                      maxPosition  5.58505360638185
                                                       maxTorque %{= b3msc1040_torque }%
                                                     }
                                                     PositionSensor {
@@ -1817,8 +1819,8 @@ PROTO GankenKun [
                                   RotationalMotor {
                                     name "right_shin_pitch_mimic_joint"
                                     maxVelocity %{= b3msc1170_maxVelo }%
-                                    minPosition -0.523598775598
-                                    maxPosition 1.57079632679
+                                    minPosition -5.58505360638185
+                                    maxPosition  5.58505360638185
                                     maxTorque %{= b3msc1170_torque }%
                                   }
                                   PositionSensor {
@@ -1911,8 +1913,8 @@ PROTO GankenKun [
                       RotationalMotor {
                         name "right_waist_pitch_mimic_joint"
                         maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -1.57079632679
-                        maxPosition 0.523598775598
+                        minPosition -5.58505360638185
+                        maxPosition  5.58505360638185
                         maxTorque %{= b3msc1170_torque }%
                       }
                       PositionSensor {
@@ -1995,11 +1997,13 @@ PROTO GankenKun [
         name "accelerometer"
         lookupTable [-78.455     0 0,
                       78.455 65535 0 ]
+        resolution 1
       }
       Gyro {
         name "gyro"
         lookupTable [-17.455      0 0,
                       17.455  65535 0 ]
+        resolution 1
       }
     ]
     name IS name 
