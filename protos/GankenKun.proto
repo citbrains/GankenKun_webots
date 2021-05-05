@@ -1995,11 +1995,13 @@ PROTO GankenKun [
         name "accelerometer"
         lookupTable [-78.455     0 0,
                       78.455 65535 0 ]
+        resolution 1
       }
       Gyro {
         name "gyro"
         lookupTable [-17.455      0 0,
                       17.455  65535 0 ]
+        resolution 1
       }
     ]
     name IS name 
