@@ -41,10 +41,14 @@ c e q を順番に押す
 make -j(cpuのコア数+1)  
 make install  
 
+googleドライブの 12_シュミレータ/V-REP_ubuntu18.04環境構築/kid/actionconfにある２つのファイル(kid-keeperstrategy.cnf,  kid-strategy.cnf)をダウンロードする。  
+
+ダウンロードしてきたファイルをcitbrains_humanoid/for2050/src/pyfiles/kid/actionconfに移動させる  
+
 ### このリポジトリをクローンする  
 git checkout hr46_b3m_webots  
 cd GankenKun_webots/controllers/hr46_b3m  
-cmake .
+cmake .  
 make -j5
 
 https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3%E6%83%85%E5%A0%B1  
