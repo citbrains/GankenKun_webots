@@ -405,19 +405,20 @@ public:
 			std::cerr << " getKeyboard memory allocation error !!" << std::endl;
 			std::terminate();
 		}
-		robot_camera = robot->getCamera("camera_sensor");
+		/*robot_camera = robot->getCamera("camera_sensor");
 		if (robot_camera == nullptr)
 		{
 			std::cerr << " getCamera memory allocation error !!" << std::endl;
 			std::terminate();
 		}
+		カメラoff*/
 
 		mTimeStep = (int)robot->getBasicTimeStep();
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
 		pc_keyboard->enable(mTimeStep);
-		robot_camera->enable(mTimeStep);
+		//robot_camera->enable(mTimeStep);カメラoff
 	}
 
 	bool waitForCreateQueue(){
@@ -773,7 +774,7 @@ int main(int argc, char *argv[])
 					keyboard_loop = count_time_l;
 				}
 			}
-			wb_ganken.get_and_send_image(count_time_l);
+			//wb_ganken.get_and_send_image(count_time_l);カメラoff
 			/*boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
 			while(diff.total_milliseconds() < wb_ganken.getmTimeStep()){

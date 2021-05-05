@@ -1,0 +1,15 @@
+-I/usr/include/qt4
+-I/usr/include/qt4/QtGui
+-I/usr/include/qt4/QtCore
+-I/include
+-I/usr/include/qt4
+-I/home/hiroki/GankenKun_webots/controllers/hr46_b3m/HCServer
+-I/home/hiroki/GankenKun_webots/controllers/hr46_b3m/HCServer
+-I/home/hiroki/GankenKun_webots/controllers/hr46_b3m/gen
+-I/usr/include
+-D$<$<NOT:$<CONFIG:Debug>>:QT_NO_DEBUG>
+-DQT_GUI_LIB
+-DQT_CORE_LIB
+-o
+/home/hiroki/GankenKun_webots/controllers/hr46_b3m/HCServer/moc_HCDelegate.cxx
+/home/hiroki/GankenKun_webots/controllers/hr46_b3m/HCServer/HCDelegate.h
