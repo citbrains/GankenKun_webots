@@ -13,6 +13,7 @@ cd /opt/
 sudo wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2-linux-x86_64.sh  
 sudo chmod +x /opt/cmake-3.20.2-linux-x86_64.sh  
 sudo bash cmake-3.20.2-linux-x86_64.sh  
+cd  
 sudo ln -s /opt/cmake-3.20.2-linux-x86_64/bin/* /usr/local/bin  
 
 ### protocol buffersをインストールする  
