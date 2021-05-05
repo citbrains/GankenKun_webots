@@ -40,7 +40,7 @@ cmake .
 ccmake .  
 USE_VREP_SIMULATOR=OFF  
 USE_WEBOTS_SIMULATOR=ONにする  
-c q を順番に押す  
+c e q を順番に押す  
 make -j(cpuのコア数+1)  
 make install  
 
