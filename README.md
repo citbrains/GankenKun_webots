@@ -29,7 +29,7 @@ sudo ldconfig
  
  
 
-### pyfiles内で  
+### .bashrcに以下を追記 
 export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf  
   
 ### citbrains_humanoidのブランチをuse_picture_from_webotsに変更し以下の作業を行う  
