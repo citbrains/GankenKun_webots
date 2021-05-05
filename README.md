@@ -44,6 +44,12 @@ c e q を順番に押す
 make -j(cpuのコア数+1)  
 make install  
 
+### このリポジトリをクローンする  
+git checkout hr46_b3m_webots  
+cd GankenKun_webots/controllers/hr46_b3m  
+cmake .
+make -j5
+
 https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3%E6%83%85%E5%A0%B1  
 
 環境構築の方法  
