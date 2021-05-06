@@ -450,11 +450,11 @@ public:
 			std::tie(servo_number, target_motor, name_of_motor) = mp;
 			if (reverse_motors.find(name_of_motor) != reverse_motors.end())
 			{
-				(target_motor)->setPosition(xv_ref.d[servo_number] * (M_PI / 180.0));
+				(target_motor)->setPosition((xv_ref.d[servo_number] + servo_offset[servo_number])* (M_PI / 180.0));
 			}
 			else
 			{
-				(target_motor)->setPosition(-xv_ref.d[servo_number] * (M_PI / 180.0));
+				(target_motor)->setPosition((-xv_ref.d[servo_number] + servo_offset[servo_number])* (M_PI / 180.0));
 			}
 		}
 		return 0;
