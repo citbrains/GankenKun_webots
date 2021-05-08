@@ -166,11 +166,17 @@ PROTO GankenKun [
                 Camera {
                   rotation 1.0 0.0 0.0 0.0
                   name "camera_sensor"
-                  fieldOfView 2.05
+                  fieldOfView 2.1642
                   width IS cameraWidth
                   height IS cameraHeight
                   noise 0.0
                   spherical TRUE
+                  focus Focus {
+                    focalDistance 2.30
+                    focalLength 16.8
+                    maxFocalDistance 2.30
+                    minFocalDistance 2.30
+                  }
                 }
               ]
               name "camera_link"
