@@ -334,8 +334,8 @@ private:
 
 
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),
-							msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION"),message_len(700*480*4),highest_priority(0)
+	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(true),
+							msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 1, 100),message_len(700*480*4),highest_priority(0)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
