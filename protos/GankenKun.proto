@@ -354,7 +354,7 @@ PROTO GankenKun [
                           ]
                         }
                       ]
-                      name "left_lower_arm_link"
+                      name "left [arm]"
                       boundingObject Transform {
                         translation 0.000000 0.103436 0.000074
                         rotation -1.000000 0.000000 -0.000000 1.569656
@@ -376,7 +376,7 @@ PROTO GankenKun [
                     }
                   }
                 ]
-                name "left_upper_arm_link"
+                name "left [shoulder]"
                 boundingObject Transform {
                   translation 0.000500 0.035000 0.000000
                   rotation 0.577350 0.577350 -0.577350 2.094395
@@ -398,7 +398,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "left_shoulder_link"
+          name "left pitch [shoulder]"
           physics Physics {
             density -1
             mass 0.090938
@@ -531,7 +531,7 @@ PROTO GankenKun [
                           ]
                         }
                       ]
-                      name "right_lower_arm_link"
+                      name "right [arm]"
                       boundingObject Transform {
                         translation 0.000000 0.103436 -0.000074
                         rotation 0.000000 0.707510 0.706703 3.141593
@@ -553,7 +553,7 @@ PROTO GankenKun [
                     }
                   }
                 ]
-                name "right_upper_arm_link"
+                name "right [shoulder]"
                 boundingObject Transform {
                   translation 0.000500 0.035000 0.000000
                   rotation 0.577350 0.577350 -0.577350 2.094395
@@ -575,7 +575,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "right_shoulder_link"
+          name "right pitch [shoulder]"
           physics Physics {
             density -1
             mass 0.090938
@@ -1034,7 +1034,7 @@ PROTO GankenKun [
                                                         ]
                                                       }
                                                     ]
-                                                    name "left_ankle_roll_link"
+                                                    name "left [foot]"
                                                     boundingObject Group {
                                                       children [ 
                                                         Transform {
@@ -1069,7 +1069,7 @@ PROTO GankenKun [
                                                   }
                                                 }
                                               ]
-                                              name "left_ankle_pitch_link"
+                                              name "left pitch [foot]"
                                               physics Physics {
                                                 density -1
                                                 mass 0.229672
@@ -1200,7 +1200,7 @@ PROTO GankenKun [
                           }
                         }
                       ]
-                      name "left_waist_pitch_link"
+                      name "left pitch [hip]"
                       boundingObject Transform {
                         translation 0.068457 -0.003587 -0.000000
                         rotation 0.566380 -0.582758 -0.582758 2.110929
@@ -1269,7 +1269,7 @@ PROTO GankenKun [
                           ]
                         }
                       ]
-                      name "left_waist_pitch_mimic_link"
+                      name "left pitch mimic [hip]"
                       boundingObject Transform {
                         translation 0.049927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
@@ -1290,7 +1290,7 @@ PROTO GankenKun [
                     }
                   }
                 ]
-                name "left_waist_roll_link"
+                name "left roll [hip]"
                 physics Physics {
                   density -1
                   mass 0.277844
@@ -1303,7 +1303,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "left_waist_yaw_link"
+          name "left yaw [hip]"
           boundingObject Transform {
             translation -0.024750 0.000000 -0.031329
             rotation 0.577350 0.577350 0.577350 2.094395
@@ -1721,7 +1721,7 @@ PROTO GankenKun [
                                                         ]
                                                       }
                                                     ]
-                                                    name "right_ankle_roll_link"
+                                                    name "right [foot]"
                                                     boundingObject Group {
                                                       children [ 
                                                         Transform {
@@ -1756,7 +1756,7 @@ PROTO GankenKun [
                                                   }
                                                 }
                                               ]
-                                              name "right_ankle_pitch_link"
+                                              name "right pitch [foot]"
                                               physics Physics {
                                                 density -1
                                                 mass 0.229672
@@ -1876,7 +1876,7 @@ PROTO GankenKun [
                           }
                         }
                       ]
-                      name "right_waist_pitch_link"
+                      name "right pitch [hip]"
                       boundingObject Transform {
                         translation 0.068457 -0.003587 -0.000000
                         rotation 0.566380 -0.582758 -0.582758 2.110929
@@ -1935,7 +1935,7 @@ PROTO GankenKun [
                           ]
                         }
                       ]
-                      name "right_waist_pitch_mimic_link"
+                      name "right pitch mimic [hip]"
                       boundingObject Transform {
                         translation 0.049927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
@@ -1957,7 +1957,7 @@ PROTO GankenKun [
                     }
                   }
                 ]
-                name "right_waist_roll_link"
+                name "right roll [hip]"
                 physics Physics {
                   density -1
                   mass 0.277844
@@ -1970,7 +1970,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "right_waist_yaw_link"
+          name "right yaw [hip]"
           boundingObject Transform {
             translation -0.024750 0.000000 -0.031329
             rotation 0.577350 0.577350 0.577350 2.094395
