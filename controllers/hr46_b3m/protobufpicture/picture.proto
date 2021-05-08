@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package webotsvision;
+
+message CameraMeasurement {
+  string name = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  sint32 quality = 4;  // -1 = raw image, 100 = no compression, 0 = high compression
+  bytes image = 5;     // RAW or JPEG encoded data (note: JPEG is not yet implemented)
+  int64 simtime = 6;
+}

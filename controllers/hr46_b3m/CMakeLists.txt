@@ -32,7 +32,8 @@ add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
 #add_subdirectory(RTIMULib)
 add_subdirectory(HCServer)
-add_subdirectory(protobuf)
+add_subdirectory(protobufpicture)
+add_subdirectory(protobufangles)
 
 set(ICE_DIR $ENV{ICE_HOME} CACHE PATH "ZeroC ICE installation dir(Default: $ICE_HOME)")
 
@@ -72,7 +73,8 @@ include_directories(
 	${WEBOTS_HOME}/include/controller/c 
 	${WEBOTS_HOME}/include/controller/cpp
 	${Protobuf_INCLUDE_DIRS}
-	protobuf
+	protobufpicture
+	protobufangles
 	#../SimDriver
 	HCServer
 	#RTIMULib
@@ -135,6 +137,7 @@ target_link_libraries(hr46_b3m
 	-lrt 
 	protobuf::libprotobuf 
 	libpictureproto
+	libanglesproto
 	#RTIMULib
 )
 
