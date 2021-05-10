@@ -45,6 +45,7 @@
 #include <tuple>
 #include "picture.pb.h"
 #include <boost/interprocess/ipc/message_queue.hpp>
+#include "angles.pb.h"
 #endif
 
 #include "pc_motion.h"
@@ -116,7 +117,7 @@ extern "C"
 	return 1;
 }
 
- string recvHajimeCommand(const string &str, void *context)
+string recvHajimeCommand(const string &str, void *context)
 {
 	static const int CMD_TIMEOUT_MS = 100;
 	int cnt = 0;
@@ -150,7 +151,7 @@ void ipcthread(int argc, char *argv[], int id)
 	hcipc->setCallback(recvHajimeCommand, NULL);
 	hcipc->wait();
 }
- 
+
 extern "C" int servo_offset[SERV_NUM]; // �I�t�Z�b�g�ۑ��p
 
 //========================
@@ -327,15 +328,18 @@ private:
 	std::set<std::string> reverse_motors;
 	int32_t current_key;
 	bool forced_wait;
-    boost::interprocess::message_queue msgq;
+	boost::interprocess::message_queue msgq;
 	//ここの大きさはreceive側と同じにする必要がある
 	const int32_t message_len;
 	uint32_t highest_priority;
-
+	bool forced_remove_;
+	boost::interprocess::message_queue angle_q;
 
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(true),
-							msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 1, 100),message_len(700*480*4),highest_priority(0)
+	webots_motor_control() : mTimeStep(0), current_key(0), forced_wait(true),
+							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 1, 100), message_len(700 * 480 * 4), highest_priority(0)
+																																				forced_remove_(removeQueue()),
+							 angle_q(boost::interprocess::create_only, "WEBTOS_MOTIONCREATOR_COMMUNICATION", 1, 500)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -421,24 +425,48 @@ public:
 		//robot_camera->enable(mTimeStep);カメラoff
 	}
 
-	bool waitForCreateQueue(){
-			std::cout << "call wait" << std::endl;
-            while (1)
-            {
-            try
-            {
-                boost::interprocess::message_queue wait(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION");
-            }
-            catch (boost::interprocess::interprocess_exception ex)
-            {
-                std::cout << "not exist" << std::endl;
-                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-                continue;
-            }
-            std::cout << "arimasita!" << std::endl;
-            break;
-        }
+	bool waitForCreateQueue()
+	{
+		std::cout << "call wait" << std::endl;
+		while (1)
+		{
+			try
+			{
+				boost::interprocess::message_queue wait(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION");
+			}
+			catch (boost::interprocess::interprocess_exception ex)
+			{
+				std::cout << "not exist" << std::endl;
+				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+				continue;
+			}
+			std::cout << "arimasita!" << std::endl;
+			break;
+		}
 		return true;
+	}
+
+	bool removeQueue()
+	{
+		return boost::interprocess::message_queue::remove("WEBOTS_MOTIONCREATOR_COMMUNICATION");
+	}
+
+	void getMotionCreatorCommmand()
+	{
+		static std::string receive_buff;
+		if (angle_q.get_num_msg() == 0)
+		{
+			return;
+		}
+		receive_buff.clear();
+		receive_buff.resize(600);
+		uint32_t pri = 0;
+		angle_q.receive(&receive_buff[0], receive_buff.size(), pri);
+		SendAngles angle;
+		angle.ParseFromString(receive_buff);
+		for (int i = 0; i < angle.motor_name_size(); ++i)
+		{
+		}
 	}
 
 	int32_t send_target_degrees()
@@ -626,7 +654,8 @@ public:
 		return get_new_command;
 	}
 
-	void get_and_send_image(int64_t current_loop){
+	void get_and_send_image(int64_t current_loop)
+	{
 		//highest_priorityがオーバーフローした場合壊れる。しかしuint32の為オーバーフローするのは
 		//シミュレーション時間で9544時間連続起動した場合なので問題ないはず。message_queueの動きがよく分からない為
 		//現状priorityは0固定。早い周期で送るとpriority_queueの並べ替えが間に合わないのかもしれない。
@@ -636,19 +665,22 @@ public:
 		send_data.resize(message_len - 100);
 		//std::cout << "resize ok" << std::endl;
 		//std::cout << "string construct" << std::endl;
-		std::string in(reinterpret_cast<const char*>(robot_camera->getImage()));
+		std::string in(reinterpret_cast<const char *>(robot_camera->getImage()));
 		//std::cout << "in " << in.size() << std::endl;
 		picture.set_image(in);
 		//std::cout << "set_image ok" << std::endl;
-		picture.set_simtime(current_loop*mTimeStep);
+		picture.set_simtime(current_loop * mTimeStep);
 		send_data = picture.SerializeAsString();
 		//std::cout << "serialize ok" << std::endl;
-		try{
-			if(!msgq.try_send(&send_data[0], send_data.size(), 0)){
+		try
+		{
+			if (!msgq.try_send(&send_data[0], send_data.size(), 0))
+			{
 				std::cout << "-------------------------buffer is full-----------------------------------\n";
 			}
 		}
-		catch(boost::interprocess::interprocess_exception eee){
+		catch (boost::interprocess::interprocess_exception eee)
+		{
 			std::cout << "-----------------------------buffer is full ----------------------------------\n";
 			//std::cout << eee.what() << std::endl;
 		}
@@ -684,12 +716,13 @@ int main(int argc, char *argv[])
 	OrientationEstimator orientationEst((double)(1000.0 / wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
 #endif
-	if (argc > 1){
+	if (argc > 1)
+	{
 		//servo_port = argv[1];
 		id = argv[1][3] - '0';
 	}
 	boost::thread thread(boost::bind(ipcthread, argc, argv, id));
-	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time(); 
+	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	const char *servo_port = "/dev/kondoservo";
 
 	var_init();		// �ϐ��̏�����
