@@ -463,9 +463,9 @@ public:
 	int32_t get_acc_values()
 	{
 		const double *val = robot_accelerometer->getValues();
-		xv_acc.acc_data1 = val[0] * 0.3f * 3.1f; // x ここのスケールが正しいのかが確認できない。
-		xv_acc.acc_data2 = val[1] * 0.3f * 3.1f; // y
-		xv_acc.acc_data3 = val[2] * 0.3f * 3.1f; // z
+		xv_acc.acc_data1 = val[0] / 9.8; // x ここのスケールが正しいのかが確認できない。
+		xv_acc.acc_data2 = val[1] / 9.8; // y
+		xv_acc.acc_data3 = val[2] / 9.8; // z
 		//std::cout << "acc--x: " << xv_acc.acc_data1 << " y: " << xv_acc.acc_data2 << " z: " << xv_acc.acc_data3 << "\n";
 		return 0;
 	}
@@ -680,7 +680,7 @@ int main(int argc, char *argv[])
 
 	int64_t keyboard_loop = 0;
 
-	OrientationEstimator orientationEst((double)(1000.0 / wb_ganken.getmTimeStep()) / 1000.0, 0.1);
+	OrientationEstimator orientationEst((double)wb_ganken.getmTimeStep()/ 1000.0, 0.1);
 
 #endif
 	if (argc > 1){
