@@ -337,9 +337,9 @@ private:
 
 public:
 	webots_motor_control() : mTimeStep(0), current_key(0), forced_wait(true),
-							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 1, 100), message_len(700 * 480 * 4), highest_priority(0)
+							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 1, 100), message_len(700 * 480 * 4), highest_priority(0),
 																																				forced_remove_(removeQueue()),
-							 angle_q(boost::interprocess::create_only, "WEBTOS_MOTIONCREATOR_COMMUNICATION", 1, 500)
+							 angle_q(boost::interprocess::create_only, "WEBTOS_MOTIONCREATOR_COMMUNICATION", 30, 2000)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -448,34 +448,41 @@ public:
 
 	bool removeQueue()
 	{
-		return boost::interprocess::message_queue::remove("WEBOTS_MOTIONCREATOR_COMMUNICATION");
+		return boost::interprocess::message_queue::remove("WEBTOS_MOTIONCREATOR_COMMUNICATION");
 	}
 
-	void getMotionCreatorCommmand()
+	bool getMotionCreatorCommmand()
 	{
 		static std::string receive_buff;
 		if (angle_q.get_num_msg() == 0)
 		{
-			return;
+			return false;
 		}
+		std::cout << "------------------------------------getcommand-----------------------\n";
 		receive_buff.clear();
-		receive_buff.resize(600);
+		receive_buff.resize(2000);
 		uint32_t pri = 0;
-		angle_q.receive(&receive_buff[0], receive_buff.size(), pri);
+		uint64_t receive_size = 0;
+		angle_q.receive(&receive_buff[0], receive_buff.size(), receive_size,pri);
 		SendAngles angle;
 		angle.ParseFromString(receive_buff);
+		int32_t servo_number = 0;
+		webots::Motor *target_motor;
+		std::string name_of_motor;
 		for (int i = 0; i < angle.motor_name_size(); ++i)
 		{
 			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[i];
 			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
 			{
 				(target_motor)->setPosition(angle.angle(i) * (M_PI / 180.0));
+				std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
 			}
 			else
 			{
-				(target_motor)->setPosition(angle.angle(i) * (M_PI / 180.0));
+				(target_motor)->setPosition(angle.angle(i)  * (M_PI / 180.0));
 			}
 		}
+		return true;
 	}
 
 	int32_t send_target_degrees()
@@ -780,10 +787,10 @@ int main(int argc, char *argv[])
 		{
 
 			//ここで指令を出す
+			if(!wb_ganken.getMotionCreatorCommmand())
 			{
-				wb_ganken.send_target_degrees();
+				//wb_ganken.send_target_degrees();
 			}
-			wb_ganken.getMotionCreatorCommmand();
 
 			if (count_time_l > 100)
 			{
