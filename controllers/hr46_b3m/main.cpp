@@ -450,11 +450,11 @@ public:
 			std::tie(servo_number, target_motor, name_of_motor) = mp;
 			if (reverse_motors.find(name_of_motor) != reverse_motors.end())
 			{
-				(target_motor)->setPosition(xv_ref.d[servo_number] * (M_PI / 180.0));
+				(target_motor)->setPosition((xv_ref.d[servo_number] + servo_offset[servo_number])* (M_PI / 180.0));
 			}
 			else
 			{
-				(target_motor)->setPosition(-xv_ref.d[servo_number] * (M_PI / 180.0));
+				(target_motor)->setPosition((-xv_ref.d[servo_number] + servo_offset[servo_number])* (M_PI / 180.0));
 			}
 		}
 		return 0;
@@ -680,7 +680,9 @@ int main(int argc, char *argv[])
 
 	int64_t keyboard_loop = 0;
 
-	OrientationEstimator orientationEst((double)wb_ganken.getmTimeStep()/ 1000.0, 0.1);
+
+	OrientationEstimator orientationEst((double)(wb_ganken.getmTimeStep()) / 1000.0, 0.1);
+
 
 #endif
 	if (argc > 1){
@@ -752,7 +754,7 @@ int main(int argc, char *argv[])
 				if ((xv_acc.acc_data1 != 0.0) || (xv_acc.acc_data2 != 0.0) || (xv_acc.acc_data3 != 0.0))
 				{
 					orientationEst.update(xv_gyro.gyro_data1 * M_PI / 180.0, xv_gyro.gyro_data2 * M_PI / 180.0, xv_gyro.gyro_data3 * M_PI / 180.0,
-										  xv_acc.acc_data1 * 9.8, xv_acc.acc_data2 * 9.8, xv_acc.acc_data3 * 9.8);
+										  xv_acc.acc_data1 , xv_acc.acc_data2 , xv_acc.acc_data3);
 
 					xv_gyro.gyro_roll =
 						xv_gyro.gyro_roll2 = orientationEst.getRoll() * 180.0 / M_PI;

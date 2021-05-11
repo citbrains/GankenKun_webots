@@ -10,6 +10,7 @@ set(Boost_USE_STATIC_RUNTIME    OFF)
 
 SET(Boost_DEBUG TRUE)
 FIND_PACKAGE(Boost REQUIRED COMPONENTS system thread)
+FIND_PACKAGE(Ice)
 
 find_package(Qt4 REQUIRED)
 set(QT_USE_QTMAIN true)
@@ -84,13 +85,21 @@ add_library(HCLib
 	hajime_command.c
 )
 
-target_link_libraries(HCLib
-	pthread
-	${Boost_LIBRARIES}
+SET(ICE_LINKS
 	debug Iced
 	optimized Ice
-	#debug IceUtild
-	#optimized IceUtil
+)
+
+if(Ice_VERSION VERSION_LESS "3.6")
+	SET(ICE_LINKS ${ICE_LINKS}
+		debug IceUtild
+		optimized IceUtil
+	)
+endif()
+
+target_link_libraries(HCLib
+	${Boost_LIBRARIES}
+	${ICE_LINKS}
 )
 
 add_executable(HCServer
@@ -151,4 +160,3 @@ target_link_libraries(HCProxy
 	${Boost_LIBRARIES}
 	HCLib
 )
-

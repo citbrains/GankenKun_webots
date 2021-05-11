@@ -12,7 +12,9 @@
 #include <QtGui/QMainWindow>
 #include <QTimer>
 #include "ui_HCDelegate.h"
+#ifndef Q_MOC_RUN
 #include <boost/thread.hpp>
+#endif
 
 class HCDelegate : public QMainWindow
 {
