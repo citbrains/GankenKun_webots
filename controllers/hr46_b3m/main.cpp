@@ -466,6 +466,15 @@ public:
 		angle.ParseFromString(receive_buff);
 		for (int i = 0; i < angle.motor_name_size(); ++i)
 		{
+			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[i];
+			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
+			{
+				(target_motor)->setPosition(angle.angle(i) * (M_PI / 180.0));
+			}
+			else
+			{
+				(target_motor)->setPosition(angle.angle(i) * (M_PI / 180.0));
+			}
 		}
 	}
 
@@ -774,6 +783,7 @@ int main(int argc, char *argv[])
 			{
 				wb_ganken.send_target_degrees();
 			}
+			wb_ganken.getMotionCreatorCommmand();
 
 			if (count_time_l > 100)
 			{
