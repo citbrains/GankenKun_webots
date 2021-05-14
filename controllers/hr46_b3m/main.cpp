@@ -456,6 +456,7 @@ public:
 		static std::string receive_buff;
 		if (angle_q.get_num_msg() == 0)
 		{
+			std::cout << "there is no message\n";
 			return false;
 		}
 		std::cout << "------------------------------------getcommand-----------------------\n";
