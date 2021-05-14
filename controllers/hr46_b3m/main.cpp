@@ -473,7 +473,7 @@ public:
 		int32_t servo_number = 0;
 		webots::Motor *target_motor;
 		std::string name_of_motor;
-		for (int i = 0; i < angle.motor_name_size(); ++i)
+		for (int i = 0; i < std::min(angle.motor_name_size(),angle.angle_size()); ++i)
 		{
 			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[i];
 			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
