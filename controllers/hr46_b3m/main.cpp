@@ -456,10 +456,10 @@ public:
 		static std::string receive_buff;
 		if (angle_q.get_num_msg() == 0)
 		{
-			std::cout << "there is no message\n";
+			//std::cout << "there is no message\n";
 			return false;
 		}
-		std::cout << "------------------------------------getcommand-----------------------\n";
+		//std::cout << "------------------------------------getcommand-----------------------\n";
 		receive_buff.clear();
 		receive_buff.resize(20000);
 		uint32_t pri = 0;
@@ -484,6 +484,7 @@ public:
 			else
 			{
 				(target_motor)->setPosition(angle.angle(i)  * (M_PI / 180.0));
+				std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
 			}
 		}
 		return true;
