@@ -339,7 +339,7 @@ public:
 	webots_motor_control() : mTimeStep(0), current_key(0), forced_wait(true),
 							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 1, 100), message_len(700 * 480 * 4), highest_priority(0),
 																																				forced_remove_(removeQueue()),
-							 angle_q(boost::interprocess::create_only, "WEBTOS_MOTIONCREATOR_COMMUNICATION", 30, 2000)
+							 angle_q(boost::interprocess::create_only, "WEBTOS_MOTIONCREATOR_COMMUNICATION", 30, 20000)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
@@ -461,16 +461,19 @@ public:
 		}
 		std::cout << "------------------------------------getcommand-----------------------\n";
 		receive_buff.clear();
-		receive_buff.resize(2000);
+		receive_buff.resize(20000);
 		uint32_t pri = 0;
 		uint64_t receive_size = 0;
+		std::cout << "will receive " << std::endl;
 		angle_q.receive(&receive_buff[0], receive_buff.size(), receive_size,pri);
+		std::cout << "received" << std::endl;
 		SendAngles angle;
 		angle.ParseFromString(receive_buff);
+		std::cout << "parsed " << std::endl;
 		int32_t servo_number = 0;
 		webots::Motor *target_motor;
 		std::string name_of_motor;
-		for (int i = 0; i < motors_info.size(); ++i)
+		for (int i = 0; i < angle.motor_name_size(); ++i)
 		{
 			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[i];
 			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
