@@ -370,7 +370,8 @@ public:
 		reverse_motors.emplace("right_ankle_pitch_mimic_joint");
 		reverse_motors.emplace("left_knee_pitch_mimic_joint");
 		reverse_motors.emplace("left_ankle_pitch_mimic_joint");
-
+		reverse_motors.emplace("right_shoulder_roll_joint");
+		reverse_motors.emplace("left_shoulder_roll_joint");
 		for (auto &mp : motors_info)
 		{
 			auto motor_ptr = robot->getMotor(mp.second);
