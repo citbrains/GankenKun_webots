@@ -40,6 +40,7 @@
 #include <webots/Camera.hpp>
 #include <cmath>
 #include <set>
+#include <map>
 #include <exception>
 #include <cstdint>
 #include <tuple>
