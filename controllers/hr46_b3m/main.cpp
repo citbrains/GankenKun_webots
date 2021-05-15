@@ -454,6 +454,11 @@ public:
 	bool getMotionCreatorCommmand()
 	{
 		static std::string receive_buff;
+		//無駄が多すぎるけど我慢
+		std::map<std::string,int32_t> list_of_motor_string;
+		for(const auto& content){
+			list_of_motor_string.emplace(content.second,content.first);
+		}
 		if (angle_q.get_num_msg() == 0)
 		{
 			//std::cout << "there is no message\n";
@@ -475,7 +480,7 @@ public:
 		std::string name_of_motor;
 		for (int i = 0; i < std::min(angle.motor_name_size(),angle.angle_size()); ++i)
 		{
-			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[i];
+			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[ list_of_motor_string[angle.motor_name(i)]];
 			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
 			{
 				(target_motor)->setPosition(angle.angle(i) * (M_PI / 180.0));
