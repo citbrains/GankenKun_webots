@@ -456,7 +456,7 @@ public:
 		static std::string receive_buff;
 		//無駄が多すぎるけど我慢
 		std::map<std::string,int32_t> list_of_motor_string;
-		for(const auto& content){
+		for(const auto& content : list_of_motor_string){
 			list_of_motor_string.emplace(content.second,content.first);
 		}
 		if (angle_q.get_num_msg() == 0)
