@@ -14,8 +14,8 @@ PROTO GankenKun [
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
   field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
-  field  SFInt32     cameraWidth     160          # Is `Camera.width`.
-  field  SFInt32     cameraHeight    120          # Is `Camera.height`.
+  field  SFInt32     cameraWidth     320          # Is `Camera.width`.
+  field  SFInt32     cameraHeight    240          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
   field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
@@ -23,7 +23,7 @@ PROTO GankenKun [
 {
   %{
     local enable_backlash = fields.enable_backlash.value
-    local backlash = 0.01
+    local backlash = 0.005236
     local gearmass = 0.001
 
     local b3msc1040_torque = 4.6
@@ -36,7 +36,7 @@ PROTO GankenKun [
     local b3msc1170_staticFric = 0.07296
     local b3msc1170_damping = 1.562599128
 
-    local positionresolution = 0.0015
+    local positionresolution = 0.00153
   }%
   Robot {
     translation IS translation
@@ -1842,14 +1842,14 @@ PROTO GankenKun [
       }
       Accelerometer {
         name "accelerometer"
-        lookupTable [-78.455     0 0,
-                      78.455 65535 0 ]
+        lookupTable [-78.4     0 0,
+                      78.4 65535 0 ]
         resolution 1
       }
       Gyro {
         name "gyro"
-        lookupTable [-17.455      0 0,
-                      17.455  65535 0 ]
+        lookupTable [-17.453      0 0,
+                      17.453  65535 0 ]
         resolution 1
       }
     ]
