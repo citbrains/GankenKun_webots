@@ -23,7 +23,7 @@ PROTO GankenKun [
 {
   %{
     local enable_backlash = fields.enable_backlash.value
-    local backlash = 0.005236
+    local backlash = 0.01
     local gearmass = 0.001
 
     local b3msc1040_torque = 4.6
