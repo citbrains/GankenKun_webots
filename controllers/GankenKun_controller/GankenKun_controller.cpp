@@ -25,26 +25,16 @@ static const char *motorNames[NMOTORS] = {
   "right_elbow_pitch_joint" /*ID7 */,
   "left_waist_yaw_joint" /*ID8 */,
   "left_waist_roll_joint" /*ID9 */,
-  "left_waist_roll_mimic_joint" /*ID10*/,
-  "left_waist_pitch_joint" /*ID11*/,
-  "left_knee_pitch_mimic_joint" /*ID12*/,
-  "left_knee_pitch_joint" /*ID13*/,
-  "left_ankle_pitch_mimic_joint" /*ID14*/,
-  "left_ankle_pitch_joint" /*ID15*/,
-  "left_ankle_roll_joint" /*ID16*/,
-  "left_shin_pitch_mimic_joint" /*ID17*/,
-  "left_waist_pitch_mimic_joint" /*ID18*/,
-  "right_waist_yaw_joint" /*ID19*/,
-  "right_waist_roll_joint" /*ID20*/,
-  "right_waist_roll_mimic_joint" /*ID21*/,
-  "right_waist_pitch_joint" /*ID22*/,
-  "right_knee_pitch_mimic_joint" /*ID23*/,
-  "right_knee_pitch_joint" /*ID24*/,
-  "right_ankle_pitch_mimic_joint" /*ID25*/,
-  "right_ankle_pitch_joint" /*ID26*/,
-  "right_ankle_roll_joint" /*ID27*/,
-  "right_shin_pitch_mimic_joint" /*ID28*/,
-  "right_waist_pitch_mimic_joint" /*ID29*/,
+  "left_waist_pitch_joint" /*ID10*/,
+  "left_knee_pitch_joint" /*ID11*/,
+  "left_ankle_pitch_joint" /*ID12*/,
+  "left_ankle_roll_joint" /*ID13*/,
+  "right_waist_yaw_joint" /*ID14*/,
+  "right_waist_roll_joint" /*ID15*/,
+  "right_waist_pitch_joint" /*ID16*/,
+  "right_knee_pitch_joint" /*ID17*/,
+  "right_ankle_pitch_joint" /*ID18*/,
+  "right_ankle_roll_joint" /*ID19*/,
 };
 
 // This is the main program of your controller.
@@ -101,18 +91,10 @@ int main(int argc, char **argv) {
     mMotors[3]->setPosition(-1.0);
     mMotors[5]->setPosition(-0.75);
     mMotors[6]->setPosition(-1.0);
-    mMotors[10]->setPosition(-angle);
-    mMotors[11]->setPosition( angle);
-    mMotors[12]->setPosition( angle);
-    mMotors[13]->setPosition(-angle);
+    mMotors[9]->setPosition(-angle);
+    mMotors[10]->setPosition( angle);
+    mMotors[15]->setPosition(-angle);
     mMotors[16]->setPosition( angle);
-    mMotors[17]->setPosition(-angle);
-    mMotors[21]->setPosition(-angle);
-    mMotors[22]->setPosition( angle);
-    mMotors[23]->setPosition( angle);
-    mMotors[24]->setPosition(-angle);
-    mMotors[27]->setPosition( angle);
-    mMotors[28]->setPosition(-angle);
   };
 
   // Enter here exit cleanup code.
