@@ -375,6 +375,8 @@ public:
 		reverse_motors.emplace("right_ankle_pitch_mimic_joint");
 		reverse_motors.emplace("left_knee_pitch_mimic_joint");
 		reverse_motors.emplace("left_ankle_pitch_mimic_joint");
+		reverse_motors.emplace("right_shoulder_roll_joint");
+		reverse_motors.emplace("left_shoulder_roll_joint");
 
 		for (auto &mp : motors_info)
 		{
@@ -456,9 +458,10 @@ public:
 	{
 		static std::string receive_buff;
 		//無駄が多すぎるけど我慢
-		std::map<std::string,int32_t> list_of_motor_string;
-		for(const auto& content : motors_info){
-			list_of_motor_string.emplace(content.second,content.first);
+		std::map<std::string, int32_t> list_of_motor_string;
+		for (const auto &content : motors_info)
+		{
+			list_of_motor_string.emplace(content.second, content.first);
 		}
 		if (angle_q.get_num_msg() == 0)
 		{
@@ -470,27 +473,31 @@ public:
 		receive_buff.resize(20000);
 		uint32_t pri = 0;
 		uint64_t receive_size = 0;
-		std::cout << "will receive " << std::endl;
-		angle_q.receive(&receive_buff[0], receive_buff.size(), receive_size,pri);
-		std::cout << "received" << std::endl;
+		// std::cout << "will receive " << std::endl;
+		angle_q.receive(&receive_buff[0], receive_buff.size(), receive_size, pri);
+		// std::cout << "received" << std::endl;
 		SendAngles angle;
 		angle.ParseFromString(receive_buff);
-		std::cout << "parsed " << std::endl;
+		// std::cout << "parsed " << std::endl;
 		int32_t servo_number = 0;
 		webots::Motor *target_motor;
 		std::string name_of_motor;
-		for (int i = 0; i < std::min(angle.motor_name_size(),angle.angle_size()); ++i)
+		for (int32_t wait_times = 0; wait_times < angle.wait_frame(); ++wait_times, this->step())
 		{
-			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[ list_of_motor_string[angle.motor_name(i)]];
-			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
+			for (int i = 0; i < std::min(angle.motor_name_size(), angle.angle_size()); ++i)
 			{
-				(target_motor)->setPosition(angle.angle(i) * (M_PI / 180.0));
-				std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
-			}
-			else
-			{
-				(target_motor)->setPosition(angle.angle(i)  * (M_PI / 180.0));
-				std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
+				std::tie(servo_number, target_motor, name_of_motor) = robot_motors[list_of_motor_string[angle.motor_name(i)]];
+				//assert(name_of_motor == angle.motor_name(i));
+				if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
+				{
+					(target_motor)->setPosition(static_cast<double>(angle.angle(i)) * (M_PI / 180.0));
+					// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
+				}
+				else
+				{
+					(target_motor)->setPosition(static_cast<double>(angle.angle(i)) * (M_PI / 180.0));
+					// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
+				}
 			}
 		}
 		return true;
@@ -800,7 +807,7 @@ int main(int argc, char *argv[])
 			//ここで指令を出す
 			if(!wb_ganken.getMotionCreatorCommmand())
 			{
-				//wb_ganken.send_target_degrees();
+				wb_ganken.send_target_degrees();
 			}
 
 			if (count_time_l > 100)
