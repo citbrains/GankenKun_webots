@@ -225,7 +225,7 @@ PROTO GankenKun [
             maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
-            name "left_shoulder_pitch_joint_sensor"
+            name "left_shoulder_pitch_joint [shoulder]_sensor"
             resolution %{= positionresolution }%
           }
         ]
@@ -444,7 +444,7 @@ PROTO GankenKun [
             maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
-            name "right_shoulder_pitch_joint_sensor"
+            name "right_shoulder_pitch_joint [shoulder]_sensor"
             resolution %{= positionresolution }%
           } 
         ]
@@ -677,7 +677,7 @@ PROTO GankenKun [
                   maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
-                  name "left_waist_roll_joint_sensor"
+                  name "left_waist_roll_joint [hip]_sensor"
                   resolution %{= positionresolution }%
                 } 
               ]
@@ -1317,7 +1317,7 @@ PROTO GankenKun [
                   maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
-                  name "right_waist_roll_joint_sensor"
+                  name "right_waist_roll_joint [hip]_sensor"
                   resolution %{= positionresolution }%
                 }
               ]
