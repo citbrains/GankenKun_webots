@@ -218,14 +218,14 @@ PROTO GankenKun [
         }
         device [
           RotationalMotor {
-            name "left_shoulder_pitch_joint"
+            name "left_shoulder_pitch_joint [shoulder]"
             maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -5.58505360638185
             maxPosition  5.58505360638185
             maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
-            name "left_shoulder_pitch_joint_sensor"
+            name "left_shoulder_pitch_joint [shoulder]_sensor"
             resolution %{= positionresolution }%
           }
         ]
@@ -360,6 +360,11 @@ PROTO GankenKun [
                             }
                           ]
                         }
+                        DEF left_hand Solid {
+                          translation 0.000000 0.218000 0.000000
+                          rotation 0 0 1 0
+                          name "left [hand]"
+                        }
                       ]
                       name "left lower [arm]"
                       boundingObject Transform {
@@ -405,7 +410,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "left pitch [shoulder]"
+          name "left_shoulder_link"
           physics Physics {
             density -1
             mass 0.090938
@@ -432,14 +437,14 @@ PROTO GankenKun [
         }
         device [
           RotationalMotor {
-            name "right_shoulder_pitch_joint"
+            name "right_shoulder_pitch_joint [shoulder]"
             maxVelocity %{= b3msc1040_maxVelo }%
             minPosition -5.58505360638185
             maxPosition  5.58505360638185
             maxTorque %{= b3msc1040_torque }%
           }
           PositionSensor {
-            name "right_shoulder_pitch_joint_sensor"
+            name "right_shoulder_pitch_joint [shoulder]_sensor"
             resolution %{= positionresolution }%
           } 
         ]
@@ -538,6 +543,11 @@ PROTO GankenKun [
                             }
                           ]
                         }
+                        DEF right_hand Solid {
+                          translation 0.000000 0.218000 0.000000
+                          rotation 0 0 1 0
+                          name "right [hand]"
+                        }
                       ]
                       name "right lower [arm]"
                       boundingObject Transform {
@@ -583,7 +593,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "right pitch [shoulder]"
+          name "right_shoulder_link"
           physics Physics {
             density -1
             mass 0.090938
@@ -660,14 +670,14 @@ PROTO GankenKun [
               }
               device [
                 RotationalMotor {
-                  name "left_waist_roll_joint"
+                  name "left_waist_roll_joint [hip]"
                   maxVelocity %{= b3msc1170_maxVelo }%
                   minPosition -5.58505360638185
                   maxPosition  5.58505360638185
                   maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
-                  name "left_waist_roll_joint_sensor"
+                  name "left_waist_roll_joint [hip]_sensor"
                   resolution %{= positionresolution }%
                 } 
               ]
@@ -1224,7 +1234,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "left yaw [hip]"
+          name "left_waist_yaw_link"
           boundingObject Transform {
             translation -0.024750 0.000000 -0.031329
             rotation 0.577350 0.577350 0.577350 2.094395
@@ -1300,14 +1310,14 @@ PROTO GankenKun [
               }
               device [
                 RotationalMotor {
-                  name "right_waist_roll_joint"
+                  name "right_waist_roll_joint [hip]"
                   maxVelocity %{= b3msc1170_maxVelo }%
                   minPosition -5.58505360638185
                   maxPosition  5.58505360638185
                   maxTorque %{= b3msc1170_torque }%
                 }
                 PositionSensor {
-                  name "right_waist_roll_joint_sensor"
+                  name "right_waist_roll_joint [hip]_sensor"
                   resolution %{= positionresolution }%
                 }
               ]
@@ -1819,7 +1829,7 @@ PROTO GankenKun [
               }
             }
           ]
-          name "right yaw [hip]"
+          name "right_waist_yaw_link"
           boundingObject Transform {
             translation -0.024750 0.000000 -0.031329
             rotation 0.577350 0.577350 0.577350 2.094395
