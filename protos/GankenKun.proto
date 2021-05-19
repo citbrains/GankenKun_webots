@@ -1000,7 +1000,7 @@ PROTO GankenKun [
                                                           rotation 0.000000 -1.000000 -0.000000 3.141593
                                                           children [
                                                             Box {
-                                                               size 0.05000 0.040000 0.110000
+                                                               size 0.05000 0.040000 0.100000
                                                             }
                                                           ]
                                                         }
@@ -1107,11 +1107,11 @@ PROTO GankenKun [
                                   ]
                                   name "left_shin_pitch_mimic_link"
                                   boundingObject Transform {
-                                    translation 0.050049 0.002750 -0.000000
+                                    translation 0.024049 0.002750 -0.000000
                                     rotation -0.577350 -0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.011500 0.063700 0.060000
+                                         size 0.011500 0.063700 0.026000
                                       }
                                     ]
                                   }
@@ -1202,14 +1202,15 @@ PROTO GankenKun [
                       ]
                       name "left_waist_pitch_mimic_link"
                       boundingObject Transform {
-                        translation 0.049927 0.003750 0.000000
+                        translation 0.074927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
                         children [
                           Box {
-                             size 0.011500 0.063700 0.060000
+                             size 0.011500 0.063700 0.026000
                           }
                         ]
-                      }                      physics Physics {
+                      }
+                      physics Physics {
                         density -1
                         mass 0.026735
                         centerOfMass [ 0.059775 0.001384 0.000000 ]
@@ -1385,9 +1386,6 @@ PROTO GankenKun [
                             }
                           ]
                         }
-#                        HingeJointWithBacklash {
-#                          backlash %{= backlash }%
-#                          gearMass %{= gearmass }%
                         HingeJoint {
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
@@ -1615,7 +1613,7 @@ PROTO GankenKun [
                                                           rotation 0.000000 -1.000000 -0.000000 3.141593
                                                           children [
                                                             Box {
-                                                               size 0.05000 0.040000 0.110000
+                                                               size 0.05000 0.040000 0.100000
                                                             }
                                                           ]
                                                         }
@@ -1711,11 +1709,11 @@ PROTO GankenKun [
                                   ]
                                   name "right_shin_pitch_mimic_link"
                                   boundingObject Transform {
-                                    translation 0.050049 0.002750 -0.000000
+                                    translation 0.024049 0.002750 -0.000000
                                     rotation -0.577350 -0.577350 0.577350 2.094395
                                     children [
                                       Box {
-                                         size 0.011500 0.063700 0.060000
+                                         size 0.011500 0.063700 0.026000
                                       }
                                     ]
                                   }
@@ -1796,11 +1794,11 @@ PROTO GankenKun [
                       ]
                       name "right_waist_pitch_mimic_link"
                       boundingObject Transform {
-                        translation 0.049927 0.003750 0.000000
+                        translation 0.074927 0.003750 0.000000
                         rotation 0.577350 0.577350 0.577350 2.094395
                         children [
                           Box {
-                             size 0.011500 0.063700 0.060000
+                             size 0.011500 0.063700 0.026000
                           }
                         ]
                       }
