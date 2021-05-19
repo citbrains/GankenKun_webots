@@ -1101,7 +1101,7 @@ PROTO GankenKun [
                                         anchor 0.10 0 0
                                       }
                                       endPoint SolidReference {
-                                        solidName "left_ankle_pitch_link"
+                                        solidName "left_independent_pitch_link"
                                       }
                                     }
                                   ]
@@ -1705,7 +1705,7 @@ PROTO GankenKun [
                                         anchor 0.10 0 0
                                       }
                                       endPoint SolidReference {
-                                        solidName "right_ankle_pitch_link"
+                                        solidName "right_independent_pitch_link"
                                       }
                                     }
                                   ]
