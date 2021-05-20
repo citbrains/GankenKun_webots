@@ -47,7 +47,7 @@ TexturedBackgroundLight {
 #  supervisor TRUE
 #  controller "referee"
 #}
-GankenKun {
+latest_model {
   translation -0.3 0 0.43
   controller "hr46_b3m"
 }
