@@ -718,19 +718,6 @@ PROTO GankenKun [
                       dampingConstant %{= b3msc1170_damping }%
                       staticFriction %{= b3msc1170_staticFric }%
                     }
-                    device [
-                      RotationalMotor {
-                        name "left_waist_pitch_joint"
-                        maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -5.58505360638185
-                        maxPosition  5.58505360638185
-                        maxTorque %{= b3msc1170_torque }%
-                      }
-                      PositionSensor {
-                        name "left_waist_pitch_joint_sensor"
-                        resolution %{= positionresolution }%
-                      }
-                    ]
                     endPoint DEF left_waist_pitch_link Solid {
                       translation 0.000000 0.000000 -0.025000
                       rotation -1.000000 0.000000 0.000000 1.570796
@@ -784,15 +771,6 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
-                              HingeJoint {
-                                jointParameters HingeJointParameters {
-                                  axis 0.000000 0.000000 1.000000
-                                  anchor 0.020000 0.032000 0.000000
-                                }
-                                endPoint Solid {
-                                  name "left_knee_pitch_mimic_link"
-                                }
-                              }
                             %{ if enable_backlash then }%
                               HingeJointWithBacklash {
                                 backlash %{= backlash }%
@@ -806,19 +784,6 @@ PROTO GankenKun [
                                   dampingConstant %{= b3msc1170_damping }%
                                   staticFriction %{= b3msc1170_staticFric }%
                                 }
-                                device [
-                                  RotationalMotor {
-                                    name "left_knee_pitch_joint"
-                                    maxVelocity %{= b3msc1170_maxVelo }%
-                                    minPosition -5.58505360638185
-                                    maxPosition  5.58505360638185
-                                    maxTorque %{= b3msc1170_torque }%
-                                  }
-                                  PositionSensor {
-                                    name "left_knee_pitch_joint_sensor"
-                                    resolution %{= positionresolution }%
-                                  }
-                                ]
                                 endPoint DEF left_shin_pitch_link Solid {
                                   translation 0.057000 0.000000 0.000000
                                   rotation 0.000000 1.000000 0.000000 0.000000
@@ -1100,6 +1065,19 @@ PROTO GankenKun [
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.10 0 0
                                       }
+                                      device [
+                                        RotationalMotor {
+                                          name "left_knee_pitch_joint"
+                                          maxVelocity %{= b3msc1170_maxVelo }%
+                                          minPosition -5.58505360638185
+                                          maxPosition  5.58505360638185
+                                          maxTorque %{= b3msc1170_torque }%
+                                        }
+                                        PositionSensor {
+                                          name "left_knee_pitch_joint_sensor"
+                                          resolution %{= positionresolution }%
+                                        }
+                                      ]
                                       endPoint SolidReference {
                                         solidName "left_independent_pitch_link"
                                       }
@@ -1195,6 +1173,19 @@ PROTO GankenKun [
                             axis 0.000000 0.000000 1.000000
                             anchor 0.10 0 0
                           }
+                          device [
+                            RotationalMotor {
+                              name "left_waist_pitch_joint"
+                              maxVelocity %{= b3msc1170_maxVelo }%
+                              minPosition -5.58505360638185
+                              maxPosition  5.58505360638185
+                              maxTorque %{= b3msc1170_torque }%
+                            }
+                            PositionSensor {
+                              name "left_waist_pitch_joint_sensor"
+                              resolution %{= positionresolution }%
+                            }
+                          ]
                           endPoint SolidReference {
                             solidName "left_knee_pitch_link"
                           }
@@ -1359,19 +1350,6 @@ PROTO GankenKun [
                       dampingConstant %{= b3msc1170_damping }%
                       staticFriction %{= b3msc1170_staticFric }%
                     }
-                    device [
-                      RotationalMotor {
-                        name "right_waist_pitch_joint"
-                        maxVelocity %{= b3msc1170_maxVelo }%
-                        minPosition -5.58505360638185
-                        maxPosition  5.58505360638185
-                        maxTorque %{= b3msc1170_torque }%
-                      }
-                      PositionSensor {
-                        name "right_waist_pitch_joint_sensor"
-                        resolution %{= positionresolution }%
-                      }
-                    ]
                     endPoint DEF right_waist_pitch_link Solid {
                       translation 0.000000 0.000000 -0.025000
                       rotation -1.000000 0.000000 0.000000 1.570796
@@ -1417,15 +1395,6 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
-                              HingeJoint {
-                                jointParameters HingeJointParameters {
-                                  axis 0.000000 0.000000 1.000000
-                                  anchor 0.020000 0.032000 0.000000
-                                }
-                                endPoint Solid {
-                                  name "right_knee_pitch_mimic_link"
-                                }
-                              }
                             %{ if enable_backlash then }%
                               HingeJointWithBacklash {
                                 backlash %{= backlash }%
@@ -1439,19 +1408,6 @@ PROTO GankenKun [
                                   dampingConstant %{= b3msc1170_damping }%
                                   staticFriction %{= b3msc1170_staticFric }%
                                 }
-                                device [
-                                  RotationalMotor {
-                                    name "right_knee_pitch_joint"
-                                    maxVelocity %{= b3msc1170_maxVelo }%
-                                    minPosition -5.58505360638185
-                                    maxPosition  5.58505360638185
-                                    maxTorque %{= b3msc1170_torque }%
-                                  }
-                                  PositionSensor {
-                                    name "right_knee_pitch_joint_sensor"
-                                    resolution %{= positionresolution }%
-                                  }
-                                ]
                                 endPoint DEF right_shin_pitch_link Solid {
                                   translation 0.057000 0.000000 0.000000
                                   rotation 0.000000 1.000000 0.000000 0.000000
@@ -1702,6 +1658,19 @@ PROTO GankenKun [
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.10 0 0
                                       }
+                                      device [
+                                        RotationalMotor {
+                                          name "right_knee_pitch_joint"
+                                          maxVelocity %{= b3msc1170_maxVelo }%
+                                          minPosition -5.58505360638185
+                                          maxPosition  5.58505360638185
+                                          maxTorque %{= b3msc1170_torque }%
+                                        }
+                                        PositionSensor {
+                                          name "right_knee_pitch_joint_sensor"
+                                          resolution %{= positionresolution }%
+                                        }
+                                      ]
                                       endPoint SolidReference {
                                         solidName "right_independent_pitch_link"
                                       }
@@ -1787,6 +1756,19 @@ PROTO GankenKun [
                             axis 0.000000 0.000000 1.000000
                             anchor 0.10 0 0
                           }
+                          device [
+                            RotationalMotor {
+                              name "right_waist_pitch_joint"
+                              maxVelocity %{= b3msc1170_maxVelo }%
+                              minPosition -5.58505360638185
+                              maxPosition  5.58505360638185
+                              maxTorque %{= b3msc1170_torque }%
+                            }
+                            PositionSensor {
+                              name "right_waist_pitch_joint_sensor"
+                              resolution %{= positionresolution }%
+                            }
+                          ]
                           endPoint SolidReference {
                             solidName "right_knee_pitch_link"
                           }
