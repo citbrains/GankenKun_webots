@@ -91,10 +91,10 @@ int main(int argc, char **argv) {
     mMotors[3]->setPosition(-1.0);
     mMotors[5]->setPosition(-0.75);
     mMotors[6]->setPosition(-1.0);
-    mMotors[9]->setPosition(-angle);
-    mMotors[10]->setPosition( angle);
-    mMotors[15]->setPosition(-angle);
-    mMotors[16]->setPosition( angle);
+    mMotors[9]->setPosition( angle);
+    mMotors[10]->setPosition(-angle);
+    mMotors[15]->setPosition( angle);
+    mMotors[16]->setPosition(-angle);
   };
 
   // Enter here exit cleanup code.
