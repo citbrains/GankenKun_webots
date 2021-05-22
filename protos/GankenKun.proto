@@ -26,15 +26,15 @@ PROTO GankenKun [
     local backlash = 0.01
     local gearmass = 0.001
 
-    local b3msc1040_torque = 4.6
-    local b3msc1040_maxVelo = 5.65
+    local b3msc1040_torque = 6.94
+    local b3msc1040_maxVelo = 7.05
     local b3msc1040_staticFric = 0.05888
-    local b3msc1040_damping = 0.803738053
+    local b3msc1040_damping = 0.984
 
-    local b3msc1170_torque = 7.6
-    local b3msc1170_maxVelo = 4.817
+    local b3msc1170_torque = 10.3
+    local b3msc1170_maxVelo = 5.91
     local b3msc1170_staticFric = 0.07296
-    local b3msc1170_damping = 1.562599128
+    local b3msc1170_damping = 1.74
 
     local positionresolution = 0.00153
   }%
