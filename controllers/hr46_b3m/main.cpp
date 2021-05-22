@@ -457,11 +457,15 @@ public:
 	bool getMotionCreatorCommmand()
 	{
 		static std::string receive_buff;
-		//無駄が多すぎるけど我慢
-		std::map<std::string, int32_t> list_of_motor_string;
-		for (const auto &content : motors_info)
+		bool initialized = false;
+		static std::map<std::string, int32_t> list_of_motor_string;
+		if (!initialized)
 		{
-			list_of_motor_string.emplace(content.second, content.first);
+			for (const auto &content : motors_info)
+			{
+				list_of_motor_string.emplace(content.second, content.first);
+			}
+			initialized = true;
 		}
 		if (angle_q.get_num_msg() == 0)
 		{
@@ -482,23 +486,24 @@ public:
 		int32_t servo_number = 0;
 		webots::Motor *target_motor;
 		std::string name_of_motor;
-		for (int32_t wait_times = 0; wait_times < angle.wait_frame(); ++wait_times, this->step())
+		for (int i = 0; i < std::min(angle.motor_name_size(), angle.angle_size()); ++i)
 		{
-			for (int i = 0; i < std::min(angle.motor_name_size(), angle.angle_size()); ++i)
+			std::tie(servo_number, target_motor, name_of_motor) = robot_motors[list_of_motor_string[angle.motor_name(i)]];
+			//assert(name_of_motor == angle.motor_name(i));
+			if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
 			{
-				std::tie(servo_number, target_motor, name_of_motor) = robot_motors[list_of_motor_string[angle.motor_name(i)]];
-				//assert(name_of_motor == angle.motor_name(i));
-				if (reverse_motors.find(angle.motor_name(i)) != reverse_motors.end())
-				{
-					(target_motor)->setPosition(static_cast<double>(angle.angle(i)) * (M_PI / 180.0));
-					// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
-				}
-				else
-				{
-					(target_motor)->setPosition(static_cast<double>(angle.angle(i)) * (M_PI / 180.0));
-					// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
-				}
+				(target_motor)->setPosition(static_cast<double>(angle.angle(i)) * (M_PI / 180.0));
+				// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
 			}
+			else
+			{
+				(target_motor)->setPosition(static_cast<double>(angle.angle(i)) * (M_PI / 180.0));
+				// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
+			}
+		}
+		for (int32_t wait_times = 0; wait_times < angle.wait_frame()/8; ++wait_times, this->step())
+		{
+			// std::cout << "wait now" << std::endl;
 		}
 		return true;
 	}
