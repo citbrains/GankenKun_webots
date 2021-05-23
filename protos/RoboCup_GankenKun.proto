@@ -13,6 +13,7 @@ PROTO RoboCup_GankenKun [
   field SFRotation              rotation       0 0 1 0 # Is `Transform.rotation`.
   field SFString                name           "blue player 2"      # Is `Solid.name`.
   field MFString                controllerArgs []      # Is `Robot.controllerArgs`.
+  field SFString                customData     ""      # Is `Robot.customData`.
 ]
 {
   GankenKun {
@@ -20,6 +21,7 @@ PROTO RoboCup_GankenKun [
     rotation IS rotation
     name IS name
     controllerArgs IS controllerArgs
+    customData IS customData
     controller "player"
     selfCollision TRUE
     cameraWidth 640
