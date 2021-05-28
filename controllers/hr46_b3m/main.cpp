@@ -420,14 +420,14 @@ public:
 			}
 		}
 
-		robot_accelerometer = robot->getAccelerometer("imu/data accelerometer");
+		robot_accelerometer = robot->getAccelerometer("accelerometer");
 		if (robot_accelerometer == nullptr)
 		{
 			std::cerr << " getAccelerometer memory allocation error !!" << std::endl;
 			std::terminate();
 		}
 
-		robot_gyro = robot->getGyro("imu/data gyro");
+		robot_gyro = robot->getGyro("gyro");
 		if (robot_gyro == nullptr)
 		{
 			std::cerr << " getGyro memory allocation error !!" << std::endl;
