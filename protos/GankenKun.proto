@@ -231,7 +231,7 @@ PROTO GankenKun [
         ]
         endPoint DEF left_shoulder_link Solid {
           translation 0.000000 0.060000 0.072000
-          rotation -1.000000 0.000000 0.000000 1.570796
+          rotation -1.000000 0.000000 0.000000 1.483530
           children [
             Transform {
               translation 0.000000 0.000000 0.000000
@@ -450,7 +450,7 @@ PROTO GankenKun [
         ]
         endPoint DEF right_shoulder_link Solid {
           translation 0.000000 -0.060000 0.072000
-          rotation -1.000000 0.000000 0.000000 1.570796
+          rotation -1.000000 0.000000 0.000000 1.658063
           children [
             Transform {
               translation 0.000000 0.000000 0.000000
@@ -705,18 +705,10 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                %{ if enable_backlash then }%
-                  HingeJointWithBacklash {
-                    backlash %{= backlash }%
-                    gearMass %{= gearmass }%
-                %{ else }%
                   HingeJoint {
-                %{ end }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant %{= b3msc1170_damping }%
-                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     endPoint DEF left_waist_pitch_link Solid {
                       translation 0.000000 0.000000 -0.025000
@@ -771,18 +763,10 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
-                            %{ if enable_backlash then }%
-                              HingeJointWithBacklash {
-                                backlash %{= backlash }%
-                                gearMass %{= gearmass }%
-                            %{ else }%
                               HingeJoint {
-                            %{ end }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant %{= b3msc1170_damping }%
-                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 endPoint DEF left_shin_pitch_link Solid {
                                   translation 0.057000 0.000000 0.000000
@@ -1060,10 +1044,18 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
+                                  %{ if enable_backlash then }%
+                                    HingeJointWithBacklash {
+                                    backlash %{= backlash }%
+                                    gearMass %{= gearmass }%
+                                  %{ else }%
                                     HingeJoint {
+                                  %{ end }%
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.10 0 0
+                                        dampingConstant %{= b3msc1170_damping }%
+                                        staticFriction %{= b3msc1170_staticFric }%
                                       }
                                       device [
                                         RotationalMotor {
@@ -1168,10 +1160,18 @@ PROTO GankenKun [
                             }
                           ]
                         }
+                      %{ if enable_backlash then }%
+                        HingeJointWithBacklash {
+                          backlash %{= backlash }%
+                          gearMass %{= gearmass }%
+                      %{ else }%
                         HingeJoint {
+                      %{ end }%
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.10 0 0
+                            dampingConstant %{= b3msc1170_damping }%
+                            staticFriction %{= b3msc1170_staticFric }%
                           }
                           device [
                             RotationalMotor {
@@ -1337,18 +1337,10 @@ PROTO GankenKun [
                       }
                     ]
                   }
-                %{ if enable_backlash then }%
-                  HingeJointWithBacklash {
-                    backlash %{= backlash }%
-                    gearMass %{= gearmass }%
-                %{ else }%
                   HingeJoint {
-                %{ end }%
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
                       anchor 0.000000 0.000000 -0.025000
-                      dampingConstant %{= b3msc1170_damping }%
-                      staticFriction %{= b3msc1170_staticFric }%
                     }
                     endPoint DEF right_waist_pitch_link Solid {
                       translation 0.000000 0.000000 -0.025000
@@ -1395,18 +1387,10 @@ PROTO GankenKun [
                                   }
                                 ]
                               }
-                            %{ if enable_backlash then }%
-                              HingeJointWithBacklash {
-                                backlash %{= backlash }%
-                                gearMass %{= gearmass }%
-                            %{ else }%
                               HingeJoint {
-                            %{ end }%
                                 jointParameters HingeJointParameters {
                                   axis 0.000000 0.000000 1.000000
                                   anchor 0.057000 0.000000 0.000000
-                                  dampingConstant %{= b3msc1170_damping }%
-                                  staticFriction %{= b3msc1170_staticFric }%
                                 }
                                 endPoint DEF right_shin_pitch_link Solid {
                                   translation 0.057000 0.000000 0.000000
@@ -1653,10 +1637,18 @@ PROTO GankenKun [
                                         }
                                       ]
                                     }
+                                  %{ if enable_backlash then }%
+                                    HingeJointWithBacklash {
+                                      backlash %{= backlash }%
+                                      gearMass %{= gearmass }%
+                                  %{ else }%
                                     HingeJoint {
+                                  %{ end }%
                                       jointParameters HingeJointParameters {
                                         axis 0.000000 0.000000 1.000000
                                         anchor 0.10 0 0
+                                        dampingConstant %{= b3msc1170_damping }%
+                                        staticFriction %{= b3msc1170_staticFric }%
                                       }
                                       device [
                                         RotationalMotor {
@@ -1751,10 +1743,18 @@ PROTO GankenKun [
                             }
                           ]
                         }
+                      %{ if enable_backlash then }%
+                        HingeJointWithBacklash {
+                          backlash %{= backlash }%
+                          gearMass %{= gearmass }%
+                      %{ else }%
                         HingeJoint {
+                      %{ end }%
                           jointParameters HingeJointParameters {
                             axis 0.000000 0.000000 1.000000
                             anchor 0.10 0 0
+                            dampingConstant %{= b3msc1170_damping }%
+                            staticFriction %{= b3msc1170_staticFric }%
                           }
                           device [
                             RotationalMotor {
