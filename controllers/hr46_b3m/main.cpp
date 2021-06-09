@@ -116,7 +116,7 @@ extern "C"
 	return 1;
 }
 
- string recvHajimeCommand(const string &str, void *context)
+string recvHajimeCommand(const string &str, void *context)
 {
 	static const int CMD_TIMEOUT_MS = 100;
 	int cnt = 0;
@@ -150,7 +150,7 @@ void ipcthread(int argc, char *argv[], int id)
 	hcipc->setCallback(recvHajimeCommand, NULL);
 	hcipc->wait();
 }
- 
+
 extern "C" int servo_offset[SERV_NUM]; // �I�t�Z�b�g�ۑ��p
 
 //========================
@@ -327,49 +327,39 @@ private:
 	std::set<std::string> reverse_motors;
 	int32_t current_key;
 	bool forced_wait;
-    boost::interprocess::message_queue msgq;
+	// boost::interprocess::message_queue msgq;
 	//ここの大きさはreceive側と同じにする必要がある
 	const int32_t message_len;
 	uint32_t highest_priority;
 
-
 public:
-	webots_motor_control() : mTimeStep(0), current_key(0),forced_wait(waitForCreateQueue()),
-							msgq(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION"),message_len(700*480*4),highest_priority(0)
+	webots_motor_control() : mTimeStep(0), current_key(0), forced_wait(), message_len(700 * 480 * 4), highest_priority(0)
 	{
 		robot = new webots::Robot();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
-		motors_info.push_back({KNEE_R1, "right_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R1, "right_knee_pitch_joint"});
-		motors_info.push_back({KNEE_R1, "right_shin_pitch_mimic_joint"});
-		motors_info.push_back({KNEE_R2, "right_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_R2, "right_waist_pitch_joint"});
-		motors_info.push_back({KNEE_R2, "right_waist_pitch_mimic_joint"});
-		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_joint"});
+		motors_info.push_back({LEG_ROLL_R, "right_waist_roll_joint [hip]"});
 		motors_info.push_back({LEG_YAW_R, "right_waist_yaw_joint"});
 		motors_info.push_back({ARM_ROLL_R, "right_shoulder_roll_joint"});
-		motors_info.push_back({ARM_PITCH_R, "right_shoulder_pitch_joint"});
+		motors_info.push_back({ARM_PITCH_R, "right_shoulder_pitch_joint [shoulder]"});
 		motors_info.push_back({ELBOW_PITCH_R, "right_elbow_pitch_joint"});
 		motors_info.push_back({FOOT_ROLL_L, "left_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_L, "left_ankle_pitch_joint"});
-		motors_info.push_back({KNEE_L1, "left_ankle_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L1, "left_knee_pitch_joint"});
-		motors_info.push_back({KNEE_L1, "left_shin_pitch_mimic_joint"});
-		motors_info.push_back({KNEE_L2, "left_knee_pitch_mimic_joint"});
 		motors_info.push_back({KNEE_L2, "left_waist_pitch_joint"});
-		motors_info.push_back({KNEE_L2, "left_waist_pitch_mimic_joint"});
-		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_joint"});
+		motors_info.push_back({LEG_ROLL_L, "left_waist_roll_joint [hip]"});
 		motors_info.push_back({LEG_YAW_L, "left_waist_yaw_joint"});
-		motors_info.push_back({ARM_PITCH_L, "left_shoulder_pitch_joint"});
+		motors_info.push_back({ARM_PITCH_L, "left_shoulder_pitch_joint [shoulder]"});
 		motors_info.push_back({ARM_ROLL_L, "left_shoulder_roll_joint"});
 		motors_info.push_back({ELBOW_PITCH_L, "left_elbow_pitch_joint"});
 		motors_info.push_back({HEAD_YAW, "head_yaw_joint"});
 
-		reverse_motors.emplace("right_knee_pitch_mimic_joint");
-		reverse_motors.emplace("right_ankle_pitch_mimic_joint");
-		reverse_motors.emplace("left_knee_pitch_mimic_joint");
-		reverse_motors.emplace("left_ankle_pitch_mimic_joint");
+		reverse_motors.emplace("right_knee_pitch_joint");
+		reverse_motors.emplace("right_waist_pitch_joint");
+		reverse_motors.emplace("left_knee_pitch_joint");
+		reverse_motors.emplace("left_waist_pitch_joint");
 		reverse_motors.emplace("right_shoulder_roll_joint");
 		reverse_motors.emplace("left_shoulder_roll_joint");
 		for (auto &mp : motors_info)
@@ -386,14 +376,14 @@ public:
 			}
 		}
 
-		robot_accelerometer = robot->getAccelerometer("imu/data accelerometer");
+		robot_accelerometer = robot->getAccelerometer("accelerometer");
 		if (robot_accelerometer == nullptr)
 		{
 			std::cerr << " getAccelerometer memory allocation error !!" << std::endl;
 			std::terminate();
 		}
 
-		robot_gyro = robot->getGyro("imu/data gyro");
+		robot_gyro = robot->getGyro("gyro");
 		if (robot_gyro == nullptr)
 		{
 			std::cerr << " getGyro memory allocation error !!" << std::endl;
@@ -418,26 +408,27 @@ public:
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
 		pc_keyboard->enable(mTimeStep);
-		robot_camera->enable(mTimeStep);
+		// robot_camera->enable(mTimeStep);
 	}
 
-	bool waitForCreateQueue(){
-			std::cout << "call wait" << std::endl;
-            while (1)
-            {
-            try
-            {
-                boost::interprocess::message_queue wait(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION");
-            }
-            catch (boost::interprocess::interprocess_exception ex)
-            {
-                std::cout << "not exist" << std::endl;
-                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
-                continue;
-            }
-            std::cout << "arimasita!" << std::endl;
-            break;
-        }
+	bool waitForCreateQueue()
+	{
+		std::cout << "call wait" << std::endl;
+		while (1)
+		{
+			try
+			{
+				boost::interprocess::message_queue wait(boost::interprocess::open_only, "WEBOTS_PICTURE_COMMUNICATION");
+			}
+			catch (boost::interprocess::interprocess_exception ex)
+			{
+				std::cout << "not exist" << std::endl;
+				boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+				continue;
+			}
+			std::cout << "arimasita!" << std::endl;
+			break;
+		}
 		return true;
 	}
 
@@ -451,11 +442,11 @@ public:
 			std::tie(servo_number, target_motor, name_of_motor) = mp;
 			if (reverse_motors.find(name_of_motor) != reverse_motors.end())
 			{
-				(target_motor)->setPosition((xv_ref.d[servo_number] + servo_offset[servo_number])* (M_PI / 180.0));
+				(target_motor)->setPosition((xv_ref.d[servo_number] + servo_offset[servo_number]) * (M_PI / 180.0));
 			}
 			else
 			{
-				(target_motor)->setPosition((-xv_ref.d[servo_number] + servo_offset[servo_number])* (M_PI / 180.0));
+				(target_motor)->setPosition((-xv_ref.d[servo_number] + servo_offset[servo_number]) * (M_PI / 180.0));
 			}
 		}
 		return 0;
@@ -626,35 +617,35 @@ public:
 		return get_new_command;
 	}
 
-	void get_and_send_image(int64_t current_loop){
-		//highest_priorityがオーバーフローした場合壊れる。しかしuint32の為オーバーフローするのは
-		//シミュレーション時間で9544時間連続起動した場合なので問題ないはず。message_queueの動きがよく分からない為
-		//現状priorityは0固定。早い周期で送るとpriority_queueの並べ替えが間に合わないのかもしれない。
-		webotsvision::CameraMeasurement picture;
-		std::string send_data;
-		//std::cout << "call image " << std::endl;
-		send_data.resize(message_len - 100);
-		//std::cout << "resize ok" << std::endl;
-		//std::cout << "string construct" << std::endl;
-		std::string in(reinterpret_cast<const char*>(robot_camera->getImage()));
-		//std::cout << "in " << in.size() << std::endl;
-		picture.set_image(in);
-		//std::cout << "set_image ok" << std::endl;
-		picture.set_simtime(current_loop*mTimeStep);
-		send_data = picture.SerializeAsString();
-		//std::cout << "serialize ok" << std::endl;
-		try{
-			if(!msgq.try_send(&send_data[0], send_data.size(), 0)){
-				std::cout << "-------------------------buffer is full-----------------------------------\n";
-			}
-		}
-		catch(boost::interprocess::interprocess_exception eee){
-			std::cout << "-----------------------------buffer is full ----------------------------------\n";
-			//std::cout << eee.what() << std::endl;
-		}
-		//std::cout << "send ok" << std::endl;
-		//++highest_priority;
-	}
+	// void get_and_send_image(int64_t current_loop){
+	// 	//highest_priorityがオーバーフローした場合壊れる。しかしuint32の為オーバーフローするのは
+	// 	//シミュレーション時間で9544時間連続起動した場合なので問題ないはず。message_queueの動きがよく分からない為
+	// 	//現状priorityは0固定。早い周期で送るとpriority_queueの並べ替えが間に合わないのかもしれない。
+	// 	webotsvision::CameraMeasurement picture;
+	// 	std::string send_data;
+	// 	//std::cout << "call image " << std::endl;
+	// 	send_data.resize(message_len - 100);
+	// 	//std::cout << "resize ok" << std::endl;
+	// 	//std::cout << "string construct" << std::endl;
+	// 	std::string in(reinterpret_cast<const char*>(robot_camera->getImage()));
+	// 	//std::cout << "in " << in.size() << std::endl;
+	// 	picture.set_image(in);
+	// 	//std::cout << "set_image ok" << std::endl;
+	// 	picture.set_simtime(current_loop*mTimeStep);
+	// 	send_data = picture.SerializeAsString();
+	// 	//std::cout << "serialize ok" << std::endl;
+	// 	try{
+	// 		if(!msgq.try_send(&send_data[0], send_data.size(), 0)){
+	// 			std::cout << "-------------------------buffer is full-----------------------------------\n";
+	// 		}
+	// 	}
+	// 	catch(boost::interprocess::interprocess_exception eee){
+	// 		std::cout << "-----------------------------buffer is full ----------------------------------\n";
+	// 		//std::cout << eee.what() << std::endl;
+	// 	}
+	// 	//std::cout << "send ok" << std::endl;
+	// 	//++highest_priority;
+	// }
 
 	bool step()
 	{
@@ -681,17 +672,16 @@ int main(int argc, char *argv[])
 
 	int64_t keyboard_loop = 0;
 
-
 	OrientationEstimator orientationEst((double)(wb_ganken.getmTimeStep()) / 1000.0, 0.1);
 
-
 #endif
-	if (argc > 1){
+	if (argc > 1)
+	{
 		//servo_port = argv[1];
 		id = argv[1][3] - '0';
 	}
 	boost::thread thread(boost::bind(ipcthread, argc, argv, id));
-	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time(); 
+	boost::posix_time::ptime ptime = boost::posix_time::microsec_clock::local_time();
 	const char *servo_port = "/dev/kondoservo";
 
 	var_init();		// �ϐ��̏�����
@@ -755,7 +745,7 @@ int main(int argc, char *argv[])
 				if ((xv_acc.acc_data1 != 0.0) || (xv_acc.acc_data2 != 0.0) || (xv_acc.acc_data3 != 0.0))
 				{
 					orientationEst.update(xv_gyro.gyro_data1 * M_PI / 180.0, xv_gyro.gyro_data2 * M_PI / 180.0, xv_gyro.gyro_data3 * M_PI / 180.0,
-										  xv_acc.acc_data1 , xv_acc.acc_data2 , xv_acc.acc_data3);
+										  xv_acc.acc_data1, xv_acc.acc_data2, xv_acc.acc_data3);
 
 					xv_gyro.gyro_roll =
 						xv_gyro.gyro_roll2 = orientationEst.getRoll() * 180.0 / M_PI;
@@ -776,7 +766,7 @@ int main(int argc, char *argv[])
 					keyboard_loop = count_time_l;
 				}
 			}
-			wb_ganken.get_and_send_image(count_time_l);
+			// wb_ganken.get_and_send_image(count_time_l);
 			/*boost::posix_time::ptime now = boost::posix_time::microsec_clock::local_time(); 
 			boost::posix_time::time_duration diff = now - ptime;
 			while(diff.total_milliseconds() < wb_ganken.getmTimeStep()){

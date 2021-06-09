@@ -1,0 +1,11 @@
+Webots Proto Cache File version 1.5
+protoFileHash: ca3f76ec0f1e48540ec94507e838a108
+needsRobotAncestor: 1
+baseType: Robot
+slotType: 
+parameters: translation,rotation,name,controller,controllerArgs,customData,supervisor,synchronization,selfCollision,cameraWidth,cameraHeight,jerseyTexture,jerseyColor,enable_backlash
+tags: 
+license:  Apache License 2.0
+licenseUrl:  http://www.apache.org/licenses/LICENSE-2.0
+documentationUrl: 
+info: This\sis\sa\sproto\sfile\sfor\sWebots\sfor\sthe\sGankenKun\nExtracted\sfrom:\sgankenkun_simple.urdf
