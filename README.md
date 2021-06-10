@@ -9,6 +9,7 @@ https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3
    
   
 モーション作る人用  
+webots入ってない人は
 wget https://github.com/cyberbotics/webots/releases/download/nightly_9_6_2021/webots_2021b_amd64.deb  
 dpkg -i 上のやつ  
 後は多分このブランチでビルドするだけ  
