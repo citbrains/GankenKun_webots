@@ -734,7 +734,8 @@ int main(int argc, char *argv[])
 				wb_ganken.send_target_degrees();
 			}
 
-			if (count_time_l > 100)
+			// if (count_time_l > 100)
+			if(false)
 			{
 
 				wb_ganken.get_gyro_values();
