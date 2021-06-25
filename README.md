@@ -4,52 +4,7 @@ RoboCup2021関連の情報
 
 https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3%E6%83%85%E5%A0%B1  
 
-## 環境構築
 
-Webots用の環境構築scriptの内容を実行する。 
- 
-### CMakeを3.18以上にする。参考https://askubuntu.com/questions/829310/how-to-upgrade-cmake-in-ubuntu  
-cd /opt/  
-sudo wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.20.2-linux-x86_64.sh  
-sudo chmod +x /opt/cmake-3.20.2-linux-x86_64.sh  
-sudo bash cmake-3.20.2-linux-x86_64.sh  
-cd  
-sudo ln -s /opt/cmake-3.20.2-linux-x86_64/bin/* /usr/local/bin  
-
-### protocol buffersをインストールする  
-以下方法  
-wget https://github.com/protocolbuffers/protobuf/releases/download/v3.15.8/protobuf-cpp-3.15.8.tar.gz   
-tar -xvzf protobuf-cpp-3.15.8.tar.gz   
-解凍した所に移動   
-./configure   
-make -j(cpuのコア数+1)  
-make check   
-sudo make install   
-sudo ldconfig   
- 
-  
-### citbrains_humanoidのブランチをuse_picture_from_webotsに変更し以下の作業を行う  
-HOMEディレクトリ内で   
-echo >> .bashrc "export LD_LIBRARY_PATH=~/citbrains_humanoid/for2050/src/vision/protobuf/"  
-cd citbrains_humanoid/for2050/src  
-make clean  
-cmake .
-ccmake .  
-USE_VREP_SIMULATOR=OFF  
-USE_WEBOTS_SIMULATOR=ONにする  
-c e q を順番に押す  
-make -j(cpuのコア数+1)  
-make install  
-
-googleドライブの 12_シュミレータ/V-REP_ubuntu18.04環境構築/kid/actionconfにある２つのファイル(kid-keeperstrategy.cnf,  kid-strategy.cnf)をダウンロードする。  
-
-ダウンロードしてきたファイルをcitbrains_humanoid/for2050/src/pyfiles/kid/actionconfに移動させる  
-
-### このリポジトリをクローンする  
-git checkout hr46_b3m_webots  
-cd GankenKun_webots/controllers/hr46_b3m  
-cmake .  
-make -j5
 
 https://github.com/citbrains/GankenKun_webots/wiki/RoboCup2021%E9%96%A2%E9%80%A3%E6%83%85%E5%A0%B1  
 
