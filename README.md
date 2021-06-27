@@ -4,27 +4,26 @@ This repository contains a proto file and a walking program to simulate GankenKu
 
 It has the following features.
 
-- Parallel links are used.
+- Parallel links are used.  
 I think it is rare to see a model of humanoid robot that simulates parallel links.
 
-- It is a simple model to reduce the load on the computer.
-It can be simulated almost in real time on a notebook PC without GPU.
+- It is a simple model to reduce the load on the computer.  
+It can be simulated almost in real time on a notebook PC without GPU.  
 (webots is a great simulator!)
 
-- It can be controlled by the same program as the real robot.
-The robot can be controlled with the same program as the real robot, including parameters, without changing the program of the real robot.
-(We were surprised!)
+- It can be controlled by the same program as the real robot.  
+The robot can be controlled with the same program as the real robot, including parameters, without changing the program of the real robot.  
+(We were surprised!)  
 
-The environment including webot can be found below.
+The environment including webot can be found below.  
 https://github.com/citbrains/webots
 
-dockhub
+dockhub  
 https://hub.docker.com/r/citb/webots_citbrains
 
-We participated in RoboCup2021 and got 4th place.
+We participated in RoboCup2021 and got 4th place.  
 https://humanoid.robocup.org/rc2021/
 
-How to build the program for walking
-https://github.com/citbrains/GankenKun_webots/wiki/webots%E3%81%A7%E8%A9%A6%E5%90%88%E3%81%AE%E7%92%B0%E5%A2%83%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E6%89%8B%E9%A0%86  
+[How to build the program for walking](https://github.com/citbrains/GankenKun_webots/wiki/webots%E3%81%A7%E8%A9%A6%E5%90%88%E3%81%AE%E7%92%B0%E5%A2%83%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E6%89%8B%E9%A0%86)
 
 ![image](https://user-images.githubusercontent.com/5755200/115998122-cc332400-a620-11eb-90d5-0e83166787e8.png)
