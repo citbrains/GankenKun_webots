@@ -14,6 +14,7 @@ PROTO RoboCup_GankenKun [
   field SFString                name           "blue player 2"      # Is `Solid.name`.
   field MFString                controllerArgs []      # Is `Robot.controllerArgs`.
   field SFString                customData     ""      # Is `Robot.customData`.
+  field SFString                controller     "player"      # Is `Robot.controller`.
   field SFBool                  enable_backlash FALSE  # Enables backlash on all joints.
 ]
 {
@@ -23,7 +24,7 @@ PROTO RoboCup_GankenKun [
     name IS name
     controllerArgs IS controllerArgs
     customData IS customData
-    controller "player"
+    controller IS controller
     selfCollision TRUE
     cameraWidth 640
     cameraHeight 480

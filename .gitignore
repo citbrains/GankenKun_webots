@@ -37,3 +37,10 @@ CMakeC*
 CMakeFiles/
 Makefile
 build/
+
+#others
+*.cache
+*.wbproj
+.idea/
+__pycache__/
+venv/
