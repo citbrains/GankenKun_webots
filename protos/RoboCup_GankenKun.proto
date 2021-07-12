@@ -14,6 +14,7 @@ PROTO RoboCup_GankenKun [
   field SFString                name           "blue player 2"      # Is `Solid.name`.
   field MFString                controllerArgs []      # Is `Robot.controllerArgs`.
   field SFString                customData     ""      # Is `Robot.customData`.
+  field SFBool                  enable_backlash FALSE  # Enables backlash on all joints.
 ]
 {
   GankenKun {
@@ -26,7 +27,7 @@ PROTO RoboCup_GankenKun [
     selfCollision TRUE
     cameraWidth 640
     cameraHeight 480
-    enable_backlash TRUE
+    enable_backlash IS enable_backlash
     %{
       if fields.name.value ~= '' then
         -- name is supposed to be something like "red player 2" or "blue player 1"
