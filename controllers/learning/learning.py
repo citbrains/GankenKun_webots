@@ -30,6 +30,7 @@ import sys
 import time
 import traceback
 import transforms3d
+import random
 
 from scipy.spatial import ConvexHull
 
@@ -45,10 +46,23 @@ children = supervisor.getRoot().getField('children')
 children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "kid" }}')
 children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.5 size 1 }}')
 children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.439 rotation 0 0 1 0 controller "GankenKun_controller"}}')
+player = supervisor.getFromDef('PLAYER')
+player_translation = supervisor.getFromDef('PLAYER').getField('translation')
+player_rotation = supervisor.getFromDef('PLAYER').getField('rotation')
 
 try:
     previous_real_time = time.time()
+    count = 0
     while supervisor.step(time_step) != -1:
         time_count += time_step
+        count += 1
+        if count > 100:
+            count = 0
+            x = -0.8+random.uniform(-0.5,0.5)
+            y = random.uniform(-0.5,0.5)
+            the = random.uniform(-3.14,3.14)
+            player.resetPhysics()
+            player_translation.setSFVec3f([x, y, 0.439])
+            player_rotation.setSFRotation([0, 0, 1, the])
 except Exception:
     error(f"Unexpected exception in main referee loop: {traceback.format_exc()}", fatal=True)
