@@ -36,6 +36,8 @@ Ported from [GankenKun_pybullet](https://github.com/citbrains/GankenKun_pybullet
 Install
 - webots R2021b https://www.cyberbotics.com/
 ```
+sudo apt install python3-pip
+pip3 install numpy, transforms3d, scipy control
 git clone https://github.com/citbrains/GankenKun_webots
 ```
 
