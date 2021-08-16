@@ -27,3 +27,23 @@ https://humanoid.robocup.org/rc2021/
 [How to build the program for walking](https://github.com/citbrains/GankenKun_webots/wiki/webots%E3%81%A7%E8%A9%A6%E5%90%88%E3%81%AE%E7%92%B0%E5%A2%83%E3%82%92%E4%BD%9C%E6%88%90%E3%81%99%E3%82%8B%E6%89%8B%E9%A0%86)
 
 ![image](https://user-images.githubusercontent.com/5755200/115998122-cc332400-a620-11eb-90d5-0e83166787e8.png)
+
+# GankenKun_walking
+
+A sample program of walking control using preview control  
+Ported from [GankenKun_pybullet](https://github.com/citbrains/GankenKun_pybullet)  
+
+Install
+- webots R2021b https://www.cyberbotics.com/
+```
+git clone https://github.com/citbrains/GankenKun_webots
+```
+
+Execute
+```
+cd ~/GankenKun_webots/worlds
+webots --batch walking.wbt
+```
+
+
+[![video](http://img.youtube.com/vi/lQauhJC1u4o/0.jpg)](https://www.youtube.com/watch?v=lQauhJC1u4o)
