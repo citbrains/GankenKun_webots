@@ -17,8 +17,8 @@ class walking():
     self.left_foot0, self.right_foot0 = left_foot0, right_foot0
     self.joint_angles = joint_angles
     self.pc = pc
-    self.period = 0.34
-    self.fsp = foot_step_planner(0.05, 0.03, 0.2, self.period, 0.06)
+    self.period = 0.32
+    self.fsp = foot_step_planner(0.10, 0.04, 0.4, self.period, 0.06)
     self.X = np.matrix([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
     self.pattern = []
     self.left_up = self.right_up = 0.0
@@ -77,7 +77,7 @@ class walking():
     start_up = round(BOTH_FOOT/2)
     end_up   = round(period/2)
     period_up = end_up - start_up
-    foot_hight = 0.06
+    foot_hight = 0.10
     if self.foot_step[0][4] == 'right':
       # up or down foot
       if start_up < (period-len(self.pattern)) <= end_up:

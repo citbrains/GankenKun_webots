@@ -32,7 +32,7 @@ class kinematics():
     knee_disp = math.acos(min(max(l/(2.0*self.L1),-1.0),1.0))
     waist_pitch = - pitch - knee_disp
     knee_pitch  = - pitch + knee_disp
-    joint_angles[self.motorNames.index('left_waist_yaw_joint'       )] = l_yaw
+    joint_angles[self.motorNames.index('left_waist_yaw_joint'       )] = -l_yaw
     joint_angles[self.motorNames.index('left_waist_roll_joint [hip]')] = waist_roll
     joint_angles[self.motorNames.index('left_waist_pitch_joint'     )] = -waist_pitch
     joint_angles[self.motorNames.index('left_knee_pitch_joint'      )] = -knee_pitch
@@ -54,7 +54,7 @@ class kinematics():
     knee_disp = math.acos(min(max(l/(2.0*self.L1),-1.0),1.0))
     waist_pitch = - pitch - knee_disp
     knee_pitch  = - pitch + knee_disp
-    joint_angles[self.motorNames.index('right_waist_yaw_joint'       )] = r_yaw
+    joint_angles[self.motorNames.index('right_waist_yaw_joint'       )] = -r_yaw
     joint_angles[self.motorNames.index('right_waist_roll_joint [hip]')] = waist_roll
     joint_angles[self.motorNames.index('right_waist_pitch_joint'     )] = -waist_pitch
     joint_angles[self.motorNames.index('right_knee_pitch_joint'      )] = -knee_pitch

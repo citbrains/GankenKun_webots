@@ -41,30 +41,28 @@ if __name__ == '__main__':
 
   joint_angles = [0]*len(motorNames)
 
-  left_foot  = [-0.015, +0.06, 0.02]
-  right_foot = [-0.015, -0.06, 0.02]
+  left_foot  = [-0.02, +0.054, 0.02]
+  right_foot = [-0.02, -0.054, 0.02]
 
   pc = preview_control(timestep/1000, 1.0, 0.27)
   walk = walking(timestep/1000, motorNames, left_foot, right_foot, joint_angles, pc)
 
   #goal position (x, y) theta
+#  foot_step = walk.setGoalPos([0.0*1.5, 0.0*1.3, 3.1*1.6])
   foot_step = walk.setGoalPos([0.4, 0.0, 0.5])
   step = 0
   while robot.step(timestep) != -1:
-    step += 1
-    if step >= 1:
-      joint_angles,lf,rf,xp,n = walk.getNextPos()
-      step = 0
-      if n == 0:
-        if (len(foot_step) <= 5):
-          x_goal, y_goal, th = random()-0.5, random()-0.5, random()-0.5
-          print("Goal: ("+str(x_goal)+", "+str(y_goal)+", "+str(th)+")")
-          foot_step = walk.setGoalPos([x_goal, y_goal, th])
-        else:
-          foot_step = walk.setGoalPos()
-        #if you want new goal, please send position
+    joint_angles,lf,rf,xp,n = walk.getNextPos()
+    step = 0
+    if n == 0:
+      if (len(foot_step) <= 5):
+        x_goal, y_goal, th = (random()-0.5)*2, random()-0.5, (random()-0.5)*4
+        print("Goal: ("+str(x_goal)+", "+str(y_goal)+", "+str(th)+")")
+        foot_step = walk.setGoalPos([x_goal, y_goal, th])
+      else:
+        foot_step = walk.setGoalPos()
+      #if you want new goal, please send position
     for i in range(len(motorNames)):
       motor[i].setPosition(joint_angles[i])
-
     pass
 
