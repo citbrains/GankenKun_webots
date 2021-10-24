@@ -529,10 +529,10 @@ public:
 				// std::cout << "this is " << angle.motor_name(i) << "::" << angle.angle(i) << std::endl;
 			}
 		}
-		for (int32_t wait_times = 0; wait_times < angle.wait_frame()/8; ++wait_times, this->step())
-		{
-			// std::cout << "wait now" << std::endl;
-		}
+		// for (int32_t wait_times = 0; wait_times < angle.wait_frame()/8; ++wait_times, this->step())
+		// {
+		// 	// std::cout << "wait now" << std::endl;
+		// }
 		return true;
 	}
 
