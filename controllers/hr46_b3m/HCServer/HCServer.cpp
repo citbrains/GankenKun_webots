@@ -10,7 +10,7 @@ using namespace hc;
 using namespace boost;
 using namespace boost::asio;
 
-static mutex lock_obj;
+static boost::mutex lock_obj;
 static string cmd;
 static string res;
 static bool received = false;
@@ -28,7 +28,7 @@ void thread_run()
 	}
 	port.setBaudRate(115200);
 	while(true) {
-		mutex::scoped_lock look(lock_obj);
+		boost::mutex::scoped_lock look(lock_obj);
 		if (cmd.size() > 0) {
 			memset(buf, 0, sizeof(buf));
 			port.write_some(cmd.c_str(), cmd.size(), err);
@@ -46,7 +46,7 @@ void thread_run()
 string recvCommand(const string &str, void *context)
 {
 	if (str.size() > 0) {
-		mutex::scoped_lock look(lock_obj);
+		boost::mutex::scoped_lock look(lock_obj);
 		cmd = str;
 		received = false;
 	}
@@ -54,7 +54,7 @@ string recvCommand(const string &str, void *context)
 		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 	}
 	{
-		mutex::scoped_lock look(lock_obj);
+		boost::mutex::scoped_lock look(lock_obj);
 		return res;	
 	}
 }

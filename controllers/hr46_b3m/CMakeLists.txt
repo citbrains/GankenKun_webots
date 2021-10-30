@@ -28,6 +28,8 @@ set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_LINK_EXECUTABLE} -ldl")
 find_package(Boost REQUIRED COMPONENTS system thread filesystem date_time)
 find_package(Protobuf REQUIRED)
 
+option(ENABLE_IMAGE "enable camera image" OFF)
+
 add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../HCServer ./HCServer)
 #add_subdirectory(RTIMULib)
@@ -111,6 +113,10 @@ add_executable(hr46_b3m
 	${HR46_B3M_SRCS}
 )
 
+if(ENABLE_IMAGE)
+	target_compile_definitions(hr46_b3m PRIVATE "ENABLE_IMAGE=1")
+endif()
+
 SET(hr46_b3m_LIBRARIES
 	Ice
 	##IceUtil
@@ -142,7 +148,7 @@ target_link_libraries(hr46_b3m
 SET(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/../)
 
 INSTALL(TARGETS hr46_b3m 
-  RUNTIME DESTINATION ../bin
+  RUNTIME DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}
   LIBRARY DESTINATION ../bin
   ARCHIVE DESTINATION ../bin
 )
