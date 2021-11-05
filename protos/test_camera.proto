@@ -1,0 +1,39 @@
+PROTO test_camera [
+field SFVec3f    translation 0.036495 0.000000 0.063504
+field SFRotation rotation       1 0 0 0
+field SFInt32    cameraWidth     320          # Is `Camera.width`.
+field SFInt32    cameraHeight    240          # Is `Camera.height`.
+field SFString   controller     "hr46_b3m"
+]
+{
+Robot {
+  translation IS translation
+  rotation IS rotation
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 1 0 1
+      }
+      geometry Box {
+        size 0.1 0.1 0.1
+      }
+    }
+    Camera {
+      rotation 1.0 0.0 0.0 0.0
+      name "camera_sensor"
+      fieldOfView 2.1642
+      width IS cameraWidth
+      height IS cameraHeight
+      noise 0.0
+      spherical TRUE
+      focus Focus {
+        focalDistance 2.30
+        focalLength 16.8
+        maxFocalDistance 2.30
+        minFocalDistance 2.30
+      }
+    }
+
+  ]
+}
+}
