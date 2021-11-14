@@ -2,7 +2,6 @@
 # 
 # solving kinematics for the GankenKun
 
-import pybullet as p
 import math
 
 class kinematics():

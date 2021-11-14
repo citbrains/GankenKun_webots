@@ -2,7 +2,6 @@
 # 
 # generating walking pattern for the GankenKun
 
-import pybullet as p
 import numpy as np
 from kinematics import *
 from foot_step_planner import *
