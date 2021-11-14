@@ -1,8 +1,12 @@
 from controller import Robot, Motor
 import csv
 import math
+import sys
 
-csv_file = open("./motion.csv", "r")
+file_name = "./motion.csv"
+if len(sys.argv) > 1:
+    file_name = sys.argv[1]
+csv_file = open(file_name, "r")
 f = csv.reader(csv_file, delimiter=",", lineterminator="\r\n")
 data = [row for row in f]
 
