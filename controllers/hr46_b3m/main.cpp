@@ -38,6 +38,7 @@
 #include <webots/Gyro.hpp>
 #include <webots/Keyboard.hpp>
 #include <webots/Camera.hpp>
+#include <webots/Supervisor.hpp>
 #include <cmath>
 #include <set>
 #include <exception>
