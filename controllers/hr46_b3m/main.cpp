@@ -39,6 +39,7 @@
 #include <webots/Keyboard.hpp>
 #include <webots/Camera.hpp>
 #include <webots/Supervisor.hpp>
+#include <webots/Node.hpp>
 #include <cmath>
 #include <set>
 #include <exception>
@@ -332,12 +333,15 @@ private:
 	//ここの大きさはreceive側と同じにする必要がある
 	const int32_t message_len;
 	uint32_t highest_priority;
+	webots::Supervisor *super_visor;
+	webots::Node *node;
 
 public:
 	webots_motor_control() : mTimeStep(0), current_key(0), // forced_wait(waitForCreateQueue()),
 							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 5, 1000), message_len(700 * 480 * 4), highest_priority(0)
 	{
 		robot = new webots::Robot();
+		super_visor = new webots::Supervisor();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
 		// motors_info.push_back({KNEE_R1, "right_ankle_pitch_mimic_joint"});
@@ -376,6 +380,7 @@ public:
 		reverse_motors.emplace("left_waist_pitch_joint");
 		reverse_motors.emplace("right_shoulder_roll_joint");
 		reverse_motors.emplace("left_shoulder_roll_joint");
+		node = super_visor->getFromDef("GankenKun");
 		for (auto &mp : motors_info)
 		{
 			auto motor_ptr = robot->getMotor(mp.second);
@@ -682,6 +687,7 @@ public:
 	{
 		return mTimeStep;
 	}
+
 };
 
 /*--------------------------------------*/
@@ -700,6 +706,8 @@ int main(int argc, char *argv[])
 
 	OrientationEstimator orientationEst((double)(FRAME_RATE) / 1000.0, 0.1);
 
+	//init_surper();
+	
 #endif
 	if (argc > 1)
 	{
