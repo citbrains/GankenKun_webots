@@ -16,7 +16,7 @@
 from field import Field
 #from forceful_contact_matrix import ForcefulContactMatrix
 
-from controller import Supervisor, AnsiCodes, Node, Display, Camera
+from controller import Supervisor, AnsiCodes, Node
 
 import copy
 import json
@@ -38,31 +38,22 @@ from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
 
-def append_solid(solid, solids, tagged_solids, active_tag=None):  # we list only the hands and feet
-    name_field = solid.getField('name')
-    if name_field:
-        name = name_field.getSFString()
-        tag_start = name.rfind('[')
-        tag_end = name.rfind(']')
-        if tag_start != -1 and tag_end != -1:
-            active_tag = name[tag_start+1:tag_end]
-        #if name.endswith("[hand]") or name.endswith("[foot]"):
+def append_solid(solid, solids):  # we list only the hands and feet
+    if solid.getField('name'):
         solids.append(solid)
-        if active_tag is not None:
-            tagged_solids[name] = active_tag
     children = solid.getProtoField('children') if solid.isProto() else solid.getField('children')
     for i in range(children.getCount()):
         child = children.getMFNode(i)
         if child.getType() in [Node.ROBOT, Node.SOLID, Node.GROUP, Node.TRANSFORM, Node.ACCELEROMETER, Node.CAMERA, Node.GYRO,
                                Node.TOUCH_SENSOR]:
-            append_solid(child, solids, tagged_solids, active_tag)
+            append_solid(child, solids)
             continue
         if child.getType() in [Node.HINGE_JOINT, Node.HINGE_2_JOINT, Node.SLIDER_JOINT, Node.BALL_JOINT]:
             endPoint = child.getProtoField('endPoint') if child.isProto() else child.getField('endPoint')
             solid = endPoint.getSFNode()
             if solid.getType() == Node.NO_NODE or solid.getType() == Node.SOLID_REFERENCE:
                 continue
-            append_solid(solid, solids, tagged_solids, None)  # active tag is reset after a joint
+            append_solid(solid, solids)  # active tag is reset after a joint
 
 # start the webots supervisor
 supervisor = Supervisor()
@@ -75,20 +66,10 @@ children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 
 children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 player = supervisor.getFromDef('PLAYER')
 solids = []
-tagged_solids = {}
-append_solid(player, solids, tagged_solids)
+append_solid(player, solids)
 print(len(solids))
-display = Display()
 for solid in solids:
     print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-    #pos = solid.getPosition()
-    #display.drawPixel(pos)
-#print(str(solids[0].getPosition()))
-#print(str(solids[1].getPosition()))
-#print(str(solids[2].getPosition()))
-firstObject = Camera.getRecognitionObjects()[0]
-print(firstObject.get_id())
-print(firstObject.get_position())
 
 ball = supervisor.getFromDef('BALL')
 player_translation = supervisor.getFromDef('PLAYER').getField('translation')
