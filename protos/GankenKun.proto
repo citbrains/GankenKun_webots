@@ -367,12 +367,34 @@ PROTO GankenKun [
                         }
                       ]
                       name "left lower [arm]"
-                      boundingObject Transform {
-                        translation 0.000000 0.103436 0.015074
-                        rotation -1.000000 0.000000 -0.000000 1.569656
+                      boundingObject Group {
                         children [
-                          Box {
-                             size 0.035000 0.017412 0.227823
+                          Transform {
+                            translation 0.000000 0.103500 0.016650
+                            rotation -1.000000 0.000000 -0.000000 1.569656
+                            children [
+                              Box {
+                                size 0.035000 0.014000 0.228000
+                              }
+                            ]
+                          }
+                          Transform {
+                            translation 0.000000 0.038750 -0.007000
+                            rotation -1.000000 0.000000 -0.000000 1.569656
+                            children [
+                              Shape {
+                                geometry IndexedFaceSet {
+                                  coord Coordinate {
+                                    point [
+                                      0.010500 0.016650 0.049250, -0.010500 0.016650 0.049250, -0.010500 -0.016650 0.140870, 0.010500 -0.016650 0.140870, 0.010500 0.016650 -0.049250, -0.010500 0.016650 -0.049250, -0.010500 -0.016650 -0.049250, 0.010500 -0.016650 -0.049250, 
+                                    ]
+                                  }
+                                  coordIndex [
+                                    0 1 2 3 -1 4 5 6 7 -1 0 1 5 4 -1 2 3 7 6 -1 0 3 7 4 -1 1 2 6 5 -1
+                                  ]
+                                }
+                              }
+                            ]
                           }
                         ]
                       }
@@ -550,12 +572,34 @@ PROTO GankenKun [
                         }
                       ]
                       name "right lower [arm]"
-                      boundingObject Transform {
-                        translation 0.000000 0.103436 -0.015074
-                        rotation 0.000000 0.707510 0.706703 3.141593
+                      boundingObject Group {
                         children [
-                          Box {
-                             size 0.035000 0.017412 0.227823
+                          Transform {
+                            translation 0.000000 0.103500 -0.016650
+                            rotation 0.000000 0.707510 0.706703 3.141593
+                            children [
+                              Box {
+                                size 0.035000 0.014000 0.228000
+                              }
+                            ]
+                          }
+                          Transform {
+                            translation 0.000000 0.038750 0.007000
+                            rotation 0.000000 0.707510 0.706703 3.141593
+                            children [
+                              Shape {
+                                geometry IndexedFaceSet {
+                                  coord Coordinate {
+                                    point [
+                                      0.010500 0.016650 0.049250, -0.010500 0.016650 0.049250, -0.010500 -0.016650 0.140870, 0.010500 -0.016650 0.140870, 0.010500 0.016650 -0.049250, -0.010500 0.016650 -0.049250, -0.010500 -0.016650 -0.049250, 0.010500 -0.016650 -0.049250, 
+                                    ]
+                                  }
+                                  coordIndex [
+                                    0 1 2 3 -1 4 5 6 7 -1 0 1 5 4 -1 2 3 7 6 -1 0 3 7 4 -1 1 2 6 5 -1
+                                  ]
+                                }
+                              }
+                            ]
                           }
                         ]
                       }
