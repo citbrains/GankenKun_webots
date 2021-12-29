@@ -368,11 +368,11 @@ PROTO GankenKun [
                       ]
                       name "left lower [arm]"
                       boundingObject Transform {
-                        translation 0.000000 0.103436 0.000074
+                        translation 0.000000 0.103436 0.015074
                         rotation -1.000000 0.000000 -0.000000 1.569656
                         children [
                           Box {
-                             size 0.035000 0.047412 0.227823
+                             size 0.035000 0.017412 0.227823
                           }
                         ]
                       }
@@ -551,11 +551,11 @@ PROTO GankenKun [
                       ]
                       name "right lower [arm]"
                       boundingObject Transform {
-                        translation 0.000000 0.103436 -0.000074
+                        translation 0.000000 0.103436 -0.015074
                         rotation 0.000000 0.707510 0.706703 3.141593
                         children [
                           Box {
-                             size 0.035000 0.047412 0.227823
+                             size 0.035000 0.017412 0.227823
                           }
                         ]
                       }
