@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.10)
+project(inverted_pend)
+find_package(Eigen3 REQUIRED)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/show.plt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_executable(main main.cpp)
+target_link_libraries(main Eigen3::Eigen)
+target_compile_options(main PUBLIC -Wpedantic)
+target_include_directories(main PUBLIC ${EIGEN3_INCLUDE_DIRS})
