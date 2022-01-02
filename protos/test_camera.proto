@@ -1,0 +1,94 @@
+PROTO test_camera [
+field SFVec3f    translation 4 0.35 0.063504
+field SFRotation rotation       1 0 0 0
+field SFInt32    cameraWidth     640          # Is `Camera.width`.
+field SFInt32    cameraHeight    480          # Is `Camera.height`.
+field SFString   controller     "test"
+]
+{
+Robot {
+  translation IS translation
+  rotation IS rotation
+#  children [
+#    Shape {
+#        appearance PBRAppearance {
+#          baseColor 0.917647 0.145098 0.145098
+#          #roughness 1
+#          #metalness 0
+#        }
+#        geometry Box {
+#          size 0.1 0.05 0.585
+#        }
+#      #appearance PBRAppearance {
+#      #  baseColor 1 0 1
+#      #}
+#      #geometry Box {
+#      #  size 0.1 0.1 0.1
+#      #}
+#			
+#    }
+		children [
+			Transform {
+				translation 0.015000 -0.000000 0.085000
+				rotation -0.969980 0.000000 0.243186 3.141593
+				children [
+					Shape {
+						appearance DEF grey PBRAppearance {
+							baseColor 0.500000 0.500000 0.500000
+							transparency 0.000000
+							roughness 1.000000
+							metalness 0
+							emissiveColor 0.000000 0.000000 0.000000
+						}
+						geometry DEF head Box {
+						 size 0.068779 0.072919 0.050000
+						}
+					}
+				]
+			}
+		DEF camera_link Solid {
+			translation 0.036495 0.000000 0.063504 #変更
+			rotation 0.357407 -0.357407 -0.862856 1.717772
+			children [
+				Camera {
+					rotation 1.0 0.0 0.0 0.0
+					name "camera_sensor"
+					fieldOfView 2.1642
+					width IS cameraWidth
+					height IS cameraHeight
+					noise 0.0
+					spherical TRUE
+					focus Focus {
+						focalDistance 2.30
+						focalLength 16.8
+						maxFocalDistance 2.30
+						minFocalDistance 2.30
+					}
+				}
+			]
+      name "camera_link"
+		}
+		]
+		boundingObject Transform {
+			translation 0.015000 -0.000000 0.085000
+			rotation -0.969980 0.000000 0.243186 3.141593
+			children [
+				Box {
+					 size 0.068779 0.072919 0.050000
+				}
+			]
+		}
+#		physics Physics {
+#			density -1
+#			mass 0.111692
+#			centerOfMass [ 0.017325 0.000000 0.065059 ]
+#			inertiaMatrix [
+#				1.148365390e-04 8.968346100e-05 7.895650100e-05
+#				9.572310000e-07 -7.715580000e-07 2.138747600e-05
+#			]
+#		}
+
+	#boundingObject USE head
+	controller IS controller
+}
+}
