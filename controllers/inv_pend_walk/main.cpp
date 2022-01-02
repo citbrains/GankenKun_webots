@@ -4,7 +4,9 @@
 #include <cmath>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include "foot_step_planner.hpp"
 using namespace Eigen;
+
 int main(int argc, char const *argv[])
 {
     std::ofstream ofs("d.dat");
