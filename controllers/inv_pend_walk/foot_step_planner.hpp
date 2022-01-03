@@ -16,7 +16,7 @@ static constexpr bool planner_debug = false;
 
 static constexpr double dt = 0.01;            // sampling period (s)
 static constexpr double zh = 0.01;            // height of CoM (m)
-static constexpr double g = 9.8;             // gravity (m/s^2)
+static constexpr double g = 9.8;              // gravity (m/s^2)
 static constexpr double MAX_X_STRIDE = 0.015; //(m)
 
 struct FootPrint
@@ -54,18 +54,24 @@ std::vector<FootPrint> footStepPlanner(const double &x_destination, const double
     }();
     const int32_t steps_ = x_destination / stride_;
     double x = 0, y = 0, xi = 0, yi = 0;
-    double xd = 0,yd = 0,xdi = 0,ydi = 0;
-    double Tc = std::sqrt(zh/g); //時定数
+    double xd = 0, yd = 0, xdi = 0, ydi = 0;
+    double x_local = 0., y_local = 0.;
+    double Tc = std::sqrt(zh / g); //時定数
     double t0 = 0;
-    int_fast64_t sampling_count = 0; 
+    int_fast64_t sampling_count = 0;
     for (double t = 0.0; t < (support_time * (steps * 2 + 1));)
     {
         for (double t_tmp = 0.0; t_tmp < support_time; t_tmp += dt, t += dt)
         {
             using namespace std;
-            x = (xi - px) * cosh((t - t0)/Tc) + Tc * xdi * sinh((t - t0)/Tc) + px;
-            y = (yi - py) * cosh((t - t0)/Tc) + Tc * ydi * sinh((t - t0)/Tc) + py;
-            xd = (xi - px)/Tc * sinh((t - t0)/Tc)
+            double C = cosh((t - t0) / Tc);
+            double S = sinh((t - t0) / Tc);
+            x_local = (xi - px) * C + Tc * xdi * S;
+            y_local = (yi - py) * C + Tc * ydi * S;
+            x = x_local + px;
+            y = y_local + py;
+            xd = (xi - px) / Tc * S + xdi * C;
+            yd = (yi - py) / Tc * S + ydi * C;
         }
         t0 = t;
         ++sampling_count;
