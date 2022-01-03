@@ -29,7 +29,7 @@ import subprocess
 import sys
 import time
 import traceback
-import transforms3d
+# import transforms3d
 import random
 import numpy as np
 import csv
@@ -79,24 +79,23 @@ ball_translation = supervisor.getFromDef('BALL').getField('translation')
 ball_rotation = supervisor.getFromDef('BALL').getField('rotation')
 
 try:
-    for x in np.arange(-0.35, -0.1, 0.01):
-        for y in np.arange(0, 0.25, 0.01):
-            count = 0
-            player.remove()
-            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation {x} {y} 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            player = supervisor.getFromDef('PLAYER')
-            ball.resetPhysics()
-            ball_translation.setSFVec3f([0, 0, 0.1])
-            ball_rotation.setSFRotation([0, 0, 1, 0])
-            while supervisor.step(time_step) != -1:
-                count += 1
-                if count > 800:
-                    break
-                if count > 800 - 1:
-                    pos = ball_translation.getSFVec3f()
-                    print(str(x)+", "+str(y)+", "+str(pos[0])+", "+str(pos[1]))
-                    with open('result.csv', 'a', newline='') as f:
-                        writer = csv.writer(f)
-                        writer.writerow([x, y, pos[0], pos[1]])
+    while(1):
+        count = 0
+        player.remove()
+        children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+        player = supervisor.getFromDef('PLAYER')
+        ball.resetPhysics()
+        ball_translation.setSFVec3f([3, 0, 0.1])
+        ball_rotation.setSFRotation([0, 0, 1, 0])
+        while supervisor.step(time_step) != -1:
+            count += 1
+            if count > 800:
+                break
+            #if count > 800 - 1:
+                #pos = ball_translation.getSFVec3f()
+                #print(str(x)+", "+str(y)+", "+str(pos[0])+", "+str(pos[1]))
+                #with open('result.csv', 'a', newline='') as f:
+                    #writer = csv.writer(f)
+                    #writer.writerow([x, y, pos[0], pos[1]])
 except Exception:
     error(f"Unexpected exception in main referee loop: {traceback.format_exc()}", fatal=True)

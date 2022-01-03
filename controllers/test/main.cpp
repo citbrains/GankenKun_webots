@@ -6,6 +6,7 @@
 #include <string>
 //#include <experimental/filesystem>
 #include <filesystem>
+#include <iomanip>
 
 //namespace fs = std::experimental::filesystem;
 namespace fs = std::filesystem;
@@ -80,7 +81,20 @@ int main() {
   camera->enable(13);
   // imagewriter.createCapturedImageDirectory();
 
+  time_t t = time(nullptr);
+  const tm* localTime = localtime(&t);
+  std::stringstream s;
+  // s << localTime->tm_year + 1900;
+  // setw(),setfill()で0詰め
+  s << std::setw(2) << std::setfill('0') << localTime->tm_mon + 1;
+  s << std::setw(2) << std::setfill('0') << localTime->tm_mday;
+  s << std::setw(2) << std::setfill('0') << localTime->tm_hour;
+  s << std::setw(2) << std::setfill('0') << localTime->tm_min;
+  // s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
+  fs::create_directory(s.str());
+
   while(robot->step(32) != -1){
+    static int i = 0;
     //mTimeStep = (int)robot->getBasicTimeStep();
     //camera->enable(mTimeStep * 13);
     const unsigned char *image = camera->getImage();
@@ -96,7 +110,12 @@ int main() {
     }
 
     //std::cout << "hello world" << std::endl;
-    cv::imshow("test", img);
+    // cv::imshow("test", img);
+    std::ostringstream oss;
+    oss << std::setfill( '0' ) << std::setw( 3 ) << i++;
+    cv::imwrite( s.str() + "/" + "output_" + oss.str() + ".jpg", img );
+
+    cv::imshow( "image", img );
     cv::waitKey(1);
     // imagewriter.saveCapturedImage(img);
   }
