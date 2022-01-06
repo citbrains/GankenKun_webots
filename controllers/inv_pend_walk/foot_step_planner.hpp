@@ -48,7 +48,9 @@ std::vector<FootPrint> foot_plan = {{0, 0, 0, true}, {0.8, 0.0, 0.2, false}, {1.
  * @param x_stride (m) 1歩の大きさ.遊脚が身体の前に出る長さ=x_stride/2.
  * @param support_time (s) 歩行周期.(=支持脚が支持している時間:Tsup)
  * @param steps (none) 歩数.目標地点まで何歩で進むか.0以下に指定すると最大のストライドで進む.
- * @return std::vector<FootPrint>
+ * @return std::vector<FootPrint> ロボットのローカル座標で表した着地位置を返す.
+ * @details 今の所x方向への直線移動しか対応していない.
+ * @todo y方向の移動の実装
  */
 std::vector<FootPrint> footStepPlanner(const double &x_destination, const double &y_destination, const double &x_stride, const double &support_time = (320.0 / 1000.0), const int32_t &steps = 0) noexcept
 {
@@ -78,6 +80,7 @@ std::vector<FootPrint> footStepPlanner(const double &x_destination, const double
     debugPrint(Tsup,"Tsup");
     std::deque<std::deque<double>> result;
     std::ofstream velofs("velo.dat");
+    std::vector<FootPrint> footprint_list(100);
     for (double t = 0.0; t < (Tsup * static_cast<double>(steps_ * 2 + 1)); ++step_n)
     {
         //決められた次の一歩を着く地点までの遊脚の移動を行っている時のシミュレーション---------------
@@ -120,7 +123,9 @@ std::vector<FootPrint> footStepPlanner(const double &x_destination, const double
         yd_target = (C - 1) / (Tc * S) * sy;
         px = -a * (C - 1) / D * (x_target - C * xi - Tc * S * xdi) - b * S / (Tc * D) * (xd_target - S * xi / Tc - C * xdi);
         py = -a * (C - 1) / D * (y_target - C * yi - Tc * S * ydi) - b * S / (Tc * D) * (yd_target - S * yi / Tc - C * ydi);
-        // ofs << px << " " << py;
+        static bool is_right = true;
+        footprint_list.push_back({Tsup,px - xi,py - yi,is_right});
+        is_right = !is_right;
         result.back().push_back(px);
         result.back().push_back(py);
     }
@@ -133,7 +138,7 @@ std::vector<FootPrint> footStepPlanner(const double &x_destination, const double
         }
         ofs << std::endl;
     }
-    return foot_plan;
+    return footprint_list;
     // ofs.close();
 }
 
