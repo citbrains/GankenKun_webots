@@ -12,66 +12,7 @@
 namespace fs = std::filesystem;
 using namespace webots;
 
-// class ImageWriter
-// {
-// public:
-// 	ImageWriter();
-// 	~ImageWriter();
-// 	void createCapturedImageDirectory();
-// 	void saveCapturedImage(cv::Mat);
-// private:
-// 	bool enable_capture;
-// 	int image_count;
-// 	std::chrono::time_point<std::chrono::high_resolution_clock> last_capture_time;
-// 	std::string capture_save_path;
-// };
-//
-// ImageWriter::ImageWriter() : enable_capture(false), image_count(0)
-// {
-// 	createCapturedImageDirectory();
-// 	enable_capture = true;
-// 	last_capture_time = std::chrono::high_resolution_clock::now();
-// }
-//
-//
-// ImageWriter::~ImageWriter()
-// {
-// }
-//
-// void ImageWriter::createCapturedImageDirectory(void)
-// {
-//   std::string capture_save_path;
-//   std::string capture_dir("game_images");
-//   if(!fs::exists(capture_dir)) {
-//     fs::create_directory(capture_dir);
-//   }
-//   std::stringstream ss_capture;
-//   auto now_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-//   ss_capture << capture_dir << "/" << std::put_time(std::localtime(&now_t), "%Y%m%dT%H%M%S");
-//   capture_save_path = ss_capture.str();
-//   fs::create_directory(capture_save_path);
-// }
-//
-// void ImageWriter::saveCapturedImage(cv::Mat img)
-// {
-//   static int image_count = 0;
-//   bool enable_capture = true;
-//   if(enable_capture) {
-//     const auto capture_interval = std::chrono::seconds(1);
-//     if(std::chrono::high_resolution_clock::now() - last_capture_time > capture_interval) {
-//       std::stringstream ss;
-//       ss << capture_save_path << "/" << std::setw(6) << std::setfill('0') << image_count << ".jpg";
-//       image_count++;
-//       cv::Mat save_img;
-//       cv::cvtColor(img, save_img, CV_YCrCb2BGR);
-//       cv::imwrite(ss.str().c_str(), save_img);
-//       last_capture_time = std::chrono::high_resolution_clock::now();
-//     }
-//   }
-// }
-
 int main() {
-  // ImageWriter imagewriter;
   cv::Mat img(480, 640, CV_8UC3);
   Robot *robot = new Robot();
   Camera *camera;
@@ -79,7 +20,6 @@ int main() {
   //camera->enable()
   //camera->getImage();
   camera->enable(13);
-  // imagewriter.createCapturedImageDirectory();
 
   time_t t = time(nullptr);
   const tm* localTime = localtime(&t);
@@ -91,7 +31,7 @@ int main() {
   s << std::setw(2) << std::setfill('0') << localTime->tm_hour;
   s << std::setw(2) << std::setfill('0') << localTime->tm_min;
   // s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
-  fs::create_directory(s.str());
+  // fs::create_directory(s.str());
 
   while(robot->step(32) != -1){
     static int i = 0;
@@ -112,8 +52,9 @@ int main() {
     //std::cout << "hello world" << std::endl;
     // cv::imshow("test", img);
     std::ostringstream oss;
-    oss << std::setfill( '0' ) << std::setw( 3 ) << i++;
-    cv::imwrite( s.str() + "/" + "output_" + oss.str() + ".jpg", img );
+    oss << std::setfill( '0' ) << std::setw( 4 ) << i++;
+    cv::imwrite( "/home/kanbe/GankenKun_webots/controllers/test/images/image_" + oss.str() + ".png", img );
+    // cv::imwrite( s.str() + "/" + "output_" + oss.str() + ".jpg", img );
 
     cv::imshow( "image", img );
     cv::waitKey(1);
