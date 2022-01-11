@@ -61,19 +61,16 @@ def func(param):
     player_translation = supervisor.getFromDef('PLAYER').getField('translation')
     while supervisor.step(time_step) != -1:
         count += 1
-        if count > 100:
+        if count > 1000:
             break
-        if count > 100 - 1:
-            print("PASS0")
+        if count > 1000 - 1:
             pos = player_translation.getSFVec3f()
-            print("PASS0")
             with open('result.csv', 'a', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow([param[0], param[1], param[2], param[3], pos[0], pos[1]])
+                writer.writerow([param[0], pos[0], pos[1]])
     return -pos[0]
 
-x0 = (0.0,0.5)
-x1 = (1,50)
-x = (x0, x1)
-result = gp_minimize(func, x, n_calls=100, noise=0.0, model_queue_size=1, verbose=True)
+x0 = (0.01,0.3)
+x = (x0,)
+result = gp_minimize(func, x, n_calls=20, noise=0.0, model_queue_size=1, verbose=True)
 
