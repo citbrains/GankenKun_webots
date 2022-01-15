@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(inverted_pend)
+project(capture_point)
 if(DEFINED ENV{WEBOTS_HOME})
     set(WEBOTS_HOME $ENV{WEBOTS_HOME})
 else()
@@ -11,13 +11,10 @@ set(WEBOTS_INCLUDE_DIRS ${WEBOTS_HOME}/include/controller/c ${WEBOTS_HOME}/inclu
 find_package(Eigen3 REQUIRED)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/show.plt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-add_executable(main main.cpp)
-add_executable(check_plan test/check_foot_step_planner.cpp)
-add_executable(check_interface test/check_motor_interface.cpp)
-list(APPEND target_list main check_plan check_interface)
+add_executable(main main.cpp plan_by_capture_point.hpp)
+list(APPEND target_list main )
 
 option(DEBUG_PLANNER "debug foot step planner" OFF)
-target_compile_definitions(check_plan PUBLIC PLANNER_DEBUG)
 
 foreach(target ${target_list})
     target_compile_options(${target} PRIVATE -Wall -Wpedantic -std=c++17)
