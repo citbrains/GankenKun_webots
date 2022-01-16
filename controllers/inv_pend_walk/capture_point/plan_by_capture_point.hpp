@@ -49,7 +49,7 @@ void footStepPlannerCapturePoint()
     int_fast64_t step_n = 0;
     const int32_t steps_ = 7;
     const double stride_x = 0.3;
-    const double stride_y = 0.08;
+    const double stride_y = 0.1;
     double cp_x_target = 0.0, cp_y_target = 0.0;
     double cp_x_now = 0.0, cp_y_now = 0.0;
     double cp_x_old = 0.0, cp_y_old = 0.0;
@@ -100,7 +100,7 @@ void footStepPlannerCapturePoint()
         else
         {
             sx = stride_x / 2;
-            sy = ((step_n % 2) ? -1 : 1) * stride_y / 2;
+            sy = ((step_n % 2) ? -1 : 1) * stride_y ;
         }
         cp_x_old = cp_x_now; //次の一歩の最初のCPの位置
         cp_y_old = cp_y_now;
