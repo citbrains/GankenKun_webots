@@ -8,5 +8,7 @@ int main(int argc, char const *argv[])
     footStepPlannerCapturePoint();
     system("sleep 0.1");
     system("gnuplot -persist show.plt");
+    system("sleep 0.1");
+    // system("gnuplot -persist show2.plt");
     return 0;
 }

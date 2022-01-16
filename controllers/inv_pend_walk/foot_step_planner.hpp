@@ -119,10 +119,12 @@ std::vector<FootPrint> footStepPlanner(const double &x_destination, const double
         }
         x_target = px + sx;
         y_target = py + sy;
+        std::cout << "x target " << x_target << " y target " << y_target;
         xd_target = (C + 1) / (Tc * S) * sx;
         yd_target = (C - 1) / (Tc * S) * sy;
         px = -a * (C - 1) / D * (x_target - C * xi - Tc * S * xdi) - b * S / (Tc * D) * (xd_target - S * xi / Tc - C * xdi);
         py = -a * (C - 1) / D * (y_target - C * yi - Tc * S * ydi) - b * S / (Tc * D) * (yd_target - S * yi / Tc - C * ydi);
+        std::cout << " px::" << px << " py::" << py << std::endl;
         static bool is_right = true;
         footprint_list.push_back({Tsup,px - xi,py - yi,is_right});
         is_right = !is_right;
@@ -148,8 +150,8 @@ std::vector<FootPrint> footStepPlanner(const double &x_destination, const double
  * 状態をなるべく持たせない.
  * 取り敢えず歩ける事を示したいのでなるべく簡便な実装にする。
  * 一連の重心軌道を全て生成してしまってそこからどうにかするので良い
- *
- *
+ * todo 速度が極大な所のtを表示させたい
+ * 
  *
  *
  */

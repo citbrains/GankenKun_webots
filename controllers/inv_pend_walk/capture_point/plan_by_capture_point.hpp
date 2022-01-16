@@ -42,15 +42,14 @@ void footStepPlannerCapturePoint()
 {
     double x = 0, y = 0, xinit = 0, yinit = 0;     //(m) CoMのワールド座標 {CoM = Center of Mass}
     double xd = 0, yd = 0, xdinit = 0, ydinit = 0; // CoMの速度 v(m/s) xdot(t)
-    double px = 0.0, py = 0.0;               //(m)　着地位置のワールド座標 これは実用的にはローカルの方が良いのでは？？
-    constexpr double Tc = std::sqrt(zh / g); //微分方程式の時定数
+    double px = 0.0, py = 0.0;                     //(m)　着地位置のワールド座標 これは実用的にはローカルの方が良いのでは？？
+    constexpr double Tc = std::sqrt(zh / g);       //微分方程式の時定数
     constexpr double w = std::sqrt(g / zh);
-    // const double Tsup = support_time - std::fmod(support_time, dt); //誤差を無くすため
-    const double Tsup = 0.34;
+    const double Tsup = 0.32;
     int_fast64_t step_n = 0;
-    const int32_t steps_ = 3;
-    const double stride_x = 0.2;
-    const double stride_y = 0.8;
+    const int32_t steps_ = 7;
+    const double stride_x = 0.3;
+    const double stride_y = 0.08;
     double cp_x_target = 0.0, cp_y_target = 0.0;
     double cp_x_now = 0.0, cp_y_now = 0.0;
     double cp_x_old = 0.0, cp_y_old = 0.0;
@@ -63,21 +62,26 @@ void footStepPlannerCapturePoint()
         //決められた次の一歩を着く地点までの遊脚の移動を行っている時のシミュレーション---------------
         for (double t_tmp = 0.0; t_tmp < Tsup; t_tmp += dt, t += dt)
         {
-            double C = std::cosh(t_tmp / Tc);
-            double S = std::sinh(t_tmp / Tc);
-            double ewt = std::exp(w*t_tmp);
-            double dT = Tsup - t_tmp;//次のCPまでの時間
-            x = (xinit - px) * C + Tc * xdinit * S + px; // x,xdともにn歩目開始時の状態
-            y = (yinit - py) * C + Tc * ydinit * S + py;
-            xd = (xinit - px) / Tc * S + xdinit * C;
-            yd = (yinit - py) / Tc * S + ydinit * C;
+            // double C = std::cosh(t_tmp / Tc);
+            // double S = std::sinh(t_tmp / Tc);
+            double ewt = std::exp(w * t_tmp);
+            double dT = Tsup - t_tmp; //次のCPまでの時間
+            // x = (xinit - px) * C + Tc * xdinit * S + px; // x,xdともにn歩目開始時の状態
+            // y = (yinit - py) * C + Tc * ydinit * S + py;
+            // xd = (xinit - px) / Tc * S + xdinit * C;
+            // yd = (yinit - py) / Tc * S + ydinit * C;
             // cp_x_now = ewt * cp_x_old + (1.0 - ewt)*px; //ここでのcp_targetは1ループ前の話。
             // cp_y_now = ewt * cp_y_old + (1.0 - ewt)*py;
-            cp_x_now = x + xd / w;
-            cp_y_now = y + yd / w;
-            // xd = -w*(x - cp_x_now);
-            // yd = -w*(y - cp_y_now);
-            result.push_back({x, y});
+            cp_x_now = ewt * cp_x_old + (1.0 - ewt) * px; // CPの軌道(x)
+            cp_y_now = ewt * cp_y_old + (1.0 - ewt) * py; // CPの軌道(y)
+            xdinit = xd;
+            ydinit = yd;
+            xd = -w * (x - cp_x_now);
+            yd = -w * (y - cp_y_now);
+            x += dt * xdinit;
+            y += dt * ydinit;
+            // result.push_back({x, y, cp_x_now, cp_y_now});
+            result.push_back({x, y, cp_x_now, cp_y_now});
             velofs << t << " " << xd << " " << yd << std::endl;
         }
         xinit = x;
@@ -85,9 +89,9 @@ void footStepPlannerCapturePoint()
         xdinit = xd;
         ydinit = yd;
         //次の一歩の目標位置を計算------------------
-        double b  = std::exp(w*Tsup);
+        double b = std::exp(w * Tsup);
         std::cout << b << std::endl;
-        double sx = 0.0, sy = 0.0; 
+        double sx = 0.0, sy = 0.0;
         if (steps_ < step_n)
         {
             sx = 0.0;
@@ -96,18 +100,17 @@ void footStepPlannerCapturePoint()
         else
         {
             sx = stride_x / 2;
-            sy = ((step_n % 2) ? 1 : -1) * stride_y / 2;
+            sy = ((step_n % 2) ? -1 : 1) * stride_y / 2;
         }
-        cp_x_old = cp_x_target;
-        cp_y_old = cp_y_target;
-        cp_x_target = px + sx;
-        cp_y_target = py + sy;
-        px = 1.0 /(1.0 - b) * cp_x_target - b / (1.0 - b) * cp_x_now;  
-        py = 1.0 /(1.0 - b) * cp_y_target - b / (1.0 - b) * cp_y_now;  
-
-        static bool is_right = true;
-        footprint_list.push_back({Tsup, px - xinit, py - yinit, is_right});
-        is_right = !is_right;
+        cp_x_old = cp_x_now; //次の一歩の最初のCPの位置
+        cp_y_old = cp_y_now;
+        cp_x_target = cp_x_old + sx;
+        cp_y_target = cp_y_old + sy;
+        if (step_n != 0)
+        {
+            px = 1.0 / (1.0 - b) * cp_x_target - b / (1.0 - b) * cp_x_now;
+            py = 1.0 / (1.0 - b) * cp_y_target - b / (1.0 - b) * cp_y_now;
+        }
         result.back().push_back(px);
         result.back().push_back(py);
     }

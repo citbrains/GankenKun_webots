@@ -11,6 +11,7 @@ set(WEBOTS_INCLUDE_DIRS ${WEBOTS_HOME}/include/controller/c ${WEBOTS_HOME}/inclu
 find_package(Eigen3 REQUIRED)
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/show.plt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/show2.plt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 add_executable(main main.cpp plan_by_capture_point.hpp)
 list(APPEND target_list main )
 
