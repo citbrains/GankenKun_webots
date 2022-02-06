@@ -19,6 +19,7 @@ PROTO GankenKun [
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
   field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
+  field  MFColor     recognitionColors [0.0 0.0 1.0]
 ]
 {
   %{
@@ -177,6 +178,11 @@ PROTO GankenKun [
                     maxFocalDistance 2.30
                     minFocalDistance 2.30
                   }
+                  recognition Recognition {
+                    occlusion FALSE
+                    frameThickness 0
+                    segmentation TRUE
+                  }
                 }
               ]
               name "camera_link"
@@ -201,6 +207,7 @@ PROTO GankenKun [
               9.572310000e-07 -7.715580000e-07 2.138747600e-05
             ]
           }
+          recognitionColors IS recognitionColors
         }
       }
     %{ if enable_backlash then }%
@@ -407,6 +414,7 @@ PROTO GankenKun [
                     1.422700000e-08 5.110460000e-07 -1.759358000e-06
                   ]
                 }
+                recognitionColors IS recognitionColors
               }
             }
           ]
@@ -419,7 +427,8 @@ PROTO GankenKun [
               2.715985300e-05 1.484426400e-05 1.818353300e-05
               -4.000000000e-12 0.000000000e+00 4.000000000e-12
             ]
-          }
+           }
+           recognitionColors IS recognitionColors
         }
       }
     %{ if enable_backlash then }%
@@ -568,6 +577,7 @@ PROTO GankenKun [
                           -2.211750500e-05 5.000000000e-12 3.000000000e-12
                         ]
                       }
+                      recognitionColors IS recognitionColors
                     }
                   }
                 ]
@@ -590,6 +600,7 @@ PROTO GankenKun [
                     1.422700000e-08 5.110460000e-07 -1.759358000e-06
                   ]
                 }
+                recognitionColors IS recognitionColors
               }
             }
           ]
@@ -603,6 +614,7 @@ PROTO GankenKun [
               -4.000000000e-12 0.000000000e+00 4.000000000e-12
             ]
           }
+          recognitionColors IS recognitionColors
         }
       }
     %{ if enable_backlash then }%
@@ -964,6 +976,7 @@ PROTO GankenKun [
                                                         -6.696554000e-06 5.561296000e-06 5.548109000e-06
                                                       ]
                                                     }
+                                                    recognitionColors IS recognitionColors
                                                   }
                                                 }
                                               ]
@@ -977,6 +990,7 @@ PROTO GankenKun [
                                                   -2.439140000e-07 3.079813500e-05 -3.878150000e-07
                                                 ]
                                               }
+                                              recognitionColors IS recognitionColors
                                             }
                                           }
                                         ]
@@ -990,6 +1004,7 @@ PROTO GankenKun [
                                             0.000000000 0.000000000 0.000000000
                                           ]
                                         }
+                                        recognitionColors IS recognitionColors
                                       }
                                     }
                                   ]
@@ -1011,8 +1026,8 @@ PROTO GankenKun [
                                       4.524458700e-05 2.641925700e-05 2.733424700e-05 
                                       -1.228580000e-07 -7.002346000e-06 -4.585110000e-07
                                     ]
-
                                   }
+                                  recognitionColors IS recognitionColors
                                 }
                               }
                               HingeJoint {
@@ -1092,8 +1107,9 @@ PROTO GankenKun [
                                      inertiaMatrix [
                                        4.016673000e-05 2.396582400e-05 2.013130200e-05
                                       -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
-                                     ]
+                                    ]
                                   }
+                                  recognitionColors IS recognitionColors
                                 }
                               }
                             ]
@@ -1107,6 +1123,7 @@ PROTO GankenKun [
                                 4.339110000e-07 9.292810000e-06 1.173013000e-06
                               ]
                             }
+                            recognitionColors IS recognitionColors
                           }
                         }
                       ]
@@ -1127,8 +1144,9 @@ PROTO GankenKun [
                          inertiaMatrix [
                            4.273640700e-05 2.465280500e-05 2.567543000e-05
                            -1.228580000e-07 6.529856000e-06 4.585110000e-07
-                         ]
+                        ]
                       }
+                      recognitionColors IS recognitionColors
                     }
                   }
                   HingeJoint {
@@ -1205,11 +1223,12 @@ PROTO GankenKun [
                         density -1
                         mass 0.026735
                         centerOfMass [ 0.059775 0.001384 0.000000 ]
-                         inertiaMatrix [
-                           4.135108800e-05 2.440779900e-05 2.098131300e-05
-                           6.507700000e-08 5.340292000e-06 -2.428710000e-07
-                         ]
+                        inertiaMatrix [
+                          4.135108800e-05 2.440779900e-05 2.098131300e-05
+                          6.507700000e-08 5.340292000e-06 -2.428710000e-07
+                        ]
                       }
+                      recognitionColors IS recognitionColors
                     }
                   }
                 ]
@@ -1223,6 +1242,7 @@ PROTO GankenKun [
                     1.635109000e-06 3.745413700e-05 -2.377456000e-06
                   ]
                 }
+                recognitionColors IS recognitionColors
               }
             }
           ]
@@ -1245,6 +1265,7 @@ PROTO GankenKun [
               0.000000000e+00 0.000000000e+00 9.499173000e-06
             ]
           }
+          recognitionColors IS recognitionColors
         }
       }
     %{ if enable_backlash then }%
@@ -1568,6 +1589,7 @@ PROTO GankenKun [
                                                         -6.696554000e-06 5.561296000e-06 5.548109000e-06
                                                       ]
                                                     }
+                                                    recognitionColors IS recognitionColors
                                                   }
                                                 }
                                               ]
@@ -1576,11 +1598,12 @@ PROTO GankenKun [
                                                 density -1
                                                 mass 0.229672
                                                 centerOfMass [ -0.005371 0.031878 0.000000 ]
-                                                  inertiaMatrix [
-                                                    6.571834300e-05 2.580934340e-04 2.589720750e-04 
-                                                    -2.439140000e-07 3.079813500e-05 -3.878150000e-07
-                                                  ]
+                                                inertiaMatrix [
+                                                  6.571834300e-05 2.580934340e-04 2.589720750e-04 
+                                                  -2.439140000e-07 3.079813500e-05 -3.878150000e-07
+                                                ]
                                               }
+                                              recognitionColors IS recognitionColors
                                             }
                                           }
                                         ]
@@ -1594,6 +1617,7 @@ PROTO GankenKun [
                                             0.000000000 0.000000000 0.000000000
                                           ]
                                         }
+                                        recognitionColors IS recognitionColors
                                       }
                                     }
                                   ]
@@ -1616,6 +1640,7 @@ PROTO GankenKun [
                                       -1.228580000e-07 -7.002346000e-06 -4.585110000e-07
                                     ]
                                   }
+                                  recognitionColors IS recognitionColors
                                 }
                               }
                               HingeJoint {
@@ -1682,11 +1707,12 @@ PROTO GankenKun [
                                     density -1
                                     mass 0.025866
                                     centerOfMass [ 0.039698 -0.001743 0.000000 ]
-                                     inertiaMatrix [
-                                       4.016673000e-05 2.396582400e-05 2.013130200e-05
-                                       -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
-                                     ]
+                                    inertiaMatrix [
+                                      4.016673000e-05 2.396582400e-05 2.013130200e-05
+                                      -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
+                                    ]
                                   }
+                                  recognitionColors IS recognitionColors
                                 }
                               }
                             ]
@@ -1700,6 +1726,7 @@ PROTO GankenKun [
                                 4.339110000e-07 9.292810000e-06 1.173013000e-06
                               ]
                             }
+                            recognitionColors IS recognitionColors
                           }
                         }
                       ]
@@ -1722,6 +1749,7 @@ PROTO GankenKun [
                           -1.228580000e-07 6.529856000e-06 4.585110000e-07
                         ]
                       }
+                      recognitionColors IS recognitionColors
                     }
                   }
                   HingeJoint {
@@ -1793,6 +1821,7 @@ PROTO GankenKun [
                           6.507700000e-08 5.340292000e-06 -2.428710000e-07
                         ]
                       }
+                      recognitionColors IS recognitionColors
                     }
                   }
                 ]
@@ -1806,6 +1835,7 @@ PROTO GankenKun [
                     1.635109000e-06 3.745413700e-05 -2.377456000e-06
                   ]
                 }
+                recognitionColors IS recognitionColors
               }
             }
           ]
@@ -1828,6 +1858,7 @@ PROTO GankenKun [
               0.000000000e+00 0.000000000e+00 9.499173000e-06
             ]
           }
+          recognitionColors IS recognitionColors
         }
       }
       Accelerometer {
@@ -1862,6 +1893,7 @@ PROTO GankenKun [
         0.000000e+00 0.000000e+00 0.000000e+00
       ]
     }
+    recognitionColors IS recognitionColors
     controller IS controller
     controllerArgs IS controllerArgs
     customData IS customData
