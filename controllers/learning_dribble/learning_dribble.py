@@ -4,25 +4,16 @@ import sys
 from controller import Supervisor
 import random
 
-try:
-    import gym
-    import numpy as np
-    from stable_baselines3 import PPO
-    from stable_baselines.common.env_checker import check_env
-except ImportError:
-    sys.exit(
-        'Please make sure you have all dependencies installed. '
-        'Run: "pip3 install numpy gym stable_baselines"'
-    )
-
-#from field import Field
+import gym
+import numpy as np
+from stable_baselines import PPO2
+from stable_baselines.common.vec_env import DummyVecEnv
 
 sys.path.append('./GankenKun')
 from kinematics import *
 from foot_step_planner import *
 from preview_control import *
 from walking import *
-from scipy.spatial.transform import Rotation as R
 
 motorNames = [
   "head_yaw_joint",                        # ID1
@@ -109,7 +100,14 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.simulationResetPhysics()
         self.simulationReset()
         super().step(self.__timestep)
-        self.getSelf().getField('translation').setSFVec3f([-0.3, random.uniform(-1.0, 1.0), 0.450])
+
+        obs_x_list = [random.uniform(1.0, 2.0), random.uniform(2.5, 3.5), random.uniform(2.5, 3.5)]
+        obs_y_list = [random.uniform(-0.25, 0.25), random.uniform(-1.8, -0.25), random.uniform(0.25, 1.8)]
+        self.getSelf().getField('translation').setSFVec3f([0.0, 0.0, 0.450])
+        self.getFromDef('BALL').getField('translation').setSFVec3f([0.2, 0.0, 0.1])
+        self.getFromDef('ENEMY1').getField('translation').setSFVec3f([obs_x_list[0], obs_y_list[0],0.450])
+        self.getFromDef('ENEMY2').getField('translation').setSFVec3f([obs_x_list[1], obs_y_list[1],0.450])
+        self.getFromDef('ENEMY3').getField('translation').setSFVec3f([obs_x_list[2], obs_y_list[2],0.450])
 
         # Motors
         self.__motors = []
@@ -119,12 +117,12 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         # Open AI Gym generic
         return np.array(self.state, dtype=np.float32)
 
-    def step(self, action):
+    def step(self, action_no):
         # Execute the action
-        action = self.actions_list[action]
+        action = self.actions_list[action_no]
         x_goal = self.foot_step[0][1] + action[0]
         y_goal = self.foot_step[0][2] - self.foot_step[0][5] + action[1]
-        th_goal = self.foot_step[0][3] + action[2]
+        th_goal = self.foot_step[0][3] - action[2]
         
         self.foot_step = self.walk.setGoalPos([x_goal, y_goal, th_goal])
         while super().step(self.__timestep) != -1:
@@ -140,21 +138,60 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         # Observation
         x, y, _ = self.getSelf().getPosition()
         q = self.getSelf().getField('rotation').getSFRotation()
-        r  = R.from_quat([q[0], q[1], q[2], q[3]])
-        yaw, _, _ = r.as_euler('zyx', degrees=True)
+        yaw = q[3] if q[2] > 0 else -q[3]
         ball_x, ball_y, _ = self.getFromDef('BALL').getPosition()
         ball_x_lc = (ball_x - x) * math.cos(-yaw) - (ball_y - y) * math.sin(-yaw)
         ball_y_lc = (ball_x - x) * math.sin(-yaw) + (ball_y - y) * math.cos(-yaw)
+        obs1_x, obs1_y, _ = self.getFromDef('ENEMY1').getPosition()
+        obs2_x, obs2_y, _ = self.getFromDef('ENEMY2').getPosition()
+        obs3_x, obs3_y, _ = self.getFromDef('ENEMY3').getPosition()
+        obs_x_list = [obs1_x, obs2_x, obs3_x]
+        obs_y_list = [obs1_y, obs2_y, obs3_y]
+        obs_x_gl_list = []
+        obs_y_gl_list = []
+        obs_x_lc_list = []
+        obs_y_lc_list = []
+        obs_dist_list = []
+        for i in range(len(obs_x_list)):
+            obs_x, obs_y = obs_x_list[i], obs_y_list[i]
+            obs_x_lc = (obs_x - x) * math.cos(-yaw) - (obs_y - y) * math.sin(-yaw)
+            obs_y_lc = (obs_x - x) * math.sin(-yaw) + (obs_y - y) * math.cos(-yaw)
+            if obs_x_lc < 0:
+                continue
+            obs_x_gl_list.append(obs_x)
+            obs_y_gl_list.append(obs_y)
+            obs_x_lc_list.append(obs_x_lc)
+            obs_y_lc_list.append(obs_y_lc)
+            obs_dist = math.sqrt(obs_x_lc**2 + obs_y_lc**2)
+            obs_dist_list.append(obs_dist)
+        if obs_dist_list:
+            num = np.argmin(obs_dist_list)
+            obs_x_gl, obs_y_gl = obs_x_gl_list[num], obs_y_gl_list[num]
+            self.old_obs_x_gl, self.old_obs_y_gl = obs_x_gl, obs_y_gl
+            obs_x_lc, obs_y_lc = obs_x_lc_list[num], obs_y_lc_list[num]
+            self.observation_obs_time = 0
+        else:
+            obs_x, obs_y = self.old_obs_x_gl, self.old_obs_y_gl
+            obs_x_lc = (obs_x - x) * math.cos(-yaw) - (obs_y - y) * math.sin(-yaw)
+            obs_y_lc = (obs_x - x) * math.sin(-yaw) + (obs_y - y) * math.cos(-yaw)
+        #print('\r%dstep [obs_x_lc, obs_y_lc] = %f, %f'% (self.time_step, obs_x_lc, obs_y_lc), end='')
+        self.old_obs_x_lc, self.old_obs_y_lc = obs_x_lc, obs_y_lc
 
-        self.state = np.array([x, y, math.sin(yaw), math.cos(yaw), ball_x_lc, ball_y_lc, 2, 0], dtype=np.float32)
+        self.state = (x, y, math.sin(yaw), math.cos(yaw), ball_x_lc, ball_y_lc, obs_x_lc, obs_y_lc)
+        print(str(action)+": %f, %f, %f, %f, %f, %f, %f"%(x, y, yaw, ball_x_lc, ball_y_lc, obs_x_lc, obs_y_lc))
 
-        # Done
         ball_distance = math.sqrt(ball_x_lc**2 + ball_y_lc**2)
         ball_direction_deg = math.degrees(math.atan2(ball_y_lc, ball_x_lc))
         goal_x, goal_y = self.goal_pos
         ball_goal_distance = math.sqrt((goal_x - ball_x)**2 + (goal_y - ball_y)**2)
-        obs_distance = 10
-        ball_obs_distance = 10
+        obs_distance = math.sqrt(obs_x_lc**2 + obs_y_lc**2)
+        dist_ball_obs_list = []
+        for i in range(len(obs_x_list)):
+            dist_ball_obs = math.sqrt((obs_x_list[i] - ball_x)**2 + (obs_y_list[i] - ball_y)**2)
+            dist_ball_obs_list.append(dist_ball_obs)
+        num = np.argmin(dist_ball_obs_list)
+        ball_obs_distance = dist_ball_obs_list[num]
+
         done = bool(
                 abs(x) > self.x_threshold
                 or abs(y) > self.y_threshold
@@ -165,8 +202,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 or obs_distance < self.obs_dist_threshold
                 or ball_obs_distance < self.obs_dist_threshold
         )
-
-        # Reward
         reward = 0
         if not done:
 #            reward += math.floor(-10.0 * ball_goal_distance)/10
@@ -179,36 +214,45 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 ball_goal_reward = 1 - 2 * (dis_ball_goal / ball_goal_threshold)
             elif ball_goal_threshold < dis_ball_goal:
                 ball_goal_reward = -1
-            
             if 0 <= dis_ball_obs <= ball_obs_threshold:
                 ball_obs_reward = 2 * (dis_ball_obs / ball_obs_threshold) - 1
             elif ball_obs_threshold < dis_ball_obs:
                 ball_obs_reward = 1
-            
             w1 = 0.8
             w2 = 1 - w1
             reward = round(w1*ball_goal_reward + w2*ball_obs_reward, 2) 
-
-        return self.state.astype(np.float32), reward, done, {}
-
+        else:
+            #print()
+            if ball_x > goal_x and self.goal_leftpole < ball_y < self.goal_rightpole:
+                self.num_successes += 1
+                print('GOAL!!')
+                print("%d step" %self.time_step)
+                print("successe_times : ", self.num_successes)
+                reward = 1500
+            elif ball_distance > self.dist_threshold or abs(ball_direction_deg) > self.direction_deg_threshold:
+                print('ball lost...')
+                reward = math.floor(-100.0 * ball_goal_distance)
+            else:
+                print('else')
+                reward = -500
+        
+        return np.array(self.state, dtype=np.float32), reward, done, {}
 
 if __name__ == '__main__':
     env = OpenAIGymEnvironment()
-    check_env(env)
+    env = DummyVecEnv([lambda: env])
+    model = PPO2.load('sample')
 
-    # Train
-    model = PPO('MlpPolicy', env, n_steps=2048, verbose=1)
-    model.learn(total_timesteps=1e5)
+    for num in range(100):
+        print("--------------------------")
+        print("{}episode...".format(num+1))
+        state = env.reset()
+        sleep(1)
+        for i in range(200):
+            action, _ = model.predict(state)
+            state, rewards, done, info = env.step(action)
+            if done:
+                break
 
-    # Replay
-    print('Training is finished, press `Y` for replay...')
-    env.wait_keyboard()
-
-    obs = env.reset()
-    for _ in range(100000):
-        action, _states = model.predict(obs)
-        obs, reward, done, info = env.step(action)
-        print(obs, reward, done, info)
-        if done:
-            obs = env.reset()
+    env.close()
 
