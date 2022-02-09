@@ -1,0 +1,12 @@
+syntax = "proto3";
+package webotsMotionEngine;
+
+message degrees{
+    repeated double motor_degs = 1;
+    repeated uint32 motor_number = 2;
+}
+
+message sensorData{
+    repeated double gyro = 1;
+    repeated double accelerometer = 2;
+}
