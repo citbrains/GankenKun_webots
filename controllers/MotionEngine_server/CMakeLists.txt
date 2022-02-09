@@ -10,11 +10,12 @@ endif()
 find_package(Protobuf REQUIRED)
 find_package(cppzmq)
 
+link_directories(${WEBOTS_HOME}/lib/controller)
+
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS message.proto)
 
 add_executable(main main.cpp server.hpp ${PROTO_SRCS} ${PROTO_HDRS} )
 
-link_directories(${WEBOTS_HOME}/lib/controller)
 set (WEBOTS_LIBRARIES Controller CppController)
 
 
