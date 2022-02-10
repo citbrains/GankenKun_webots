@@ -18,7 +18,7 @@ PROTO GankenKun [
   field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
-  field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
+  field  SFBool      enable_backlash FALSE         # Enables backlash on all joints.
   field  MFColor     recognitionColors [0.0 0.0 1.0]
 ]
 {

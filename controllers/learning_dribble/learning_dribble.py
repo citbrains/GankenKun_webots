@@ -42,6 +42,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         super().__init__()
 
         self.time_step = 0        
+        self.num_successes = 0
         self.goal_pos = [4.5, 0]
         self.goal_rightpole = self.goal_pos[1] + 1.3
         self.goal_leftpole = self.goal_pos[1] - 1.3
@@ -178,7 +179,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.old_obs_x_lc, self.old_obs_y_lc = obs_x_lc, obs_y_lc
 
         self.state = (x, y, math.sin(yaw), math.cos(yaw), ball_x_lc, ball_y_lc, obs_x_lc, obs_y_lc)
-        print(str(action)+": %f, %f, %f, %f, %f, %f, %f"%(x, y, yaw, ball_x_lc, ball_y_lc, obs_x_lc, obs_y_lc))
+        #print(str(action)+": %f, %f, %f, %f, %f, %f, %f"%(x, y, yaw, ball_x_lc, ball_y_lc, obs_x_lc, obs_y_lc))
 
         ball_distance = math.sqrt(ball_x_lc**2 + ball_y_lc**2)
         ball_direction_deg = math.degrees(math.atan2(ball_y_lc, ball_x_lc))
