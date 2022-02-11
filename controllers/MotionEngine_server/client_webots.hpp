@@ -17,64 +17,8 @@ struct st_xv_ref
 	float d_ref[SERV_NUM];
 };
 
-struct st_xv_acc
-{
-	float	acc_data1;				/*	x[G]			*/
-	float	acc_data2;				/*	y[G]			*/
-	float	acc_data3;				/*	z[G]			*/
-	float	acc_data1_d;			/*	x[G/sec]		*/
-	float	acc_data2_d;			/*	y[G/sec]		*/
-	float	acc_data3_d;			/*	z[G/sec]		*/
-	float	acc_data1_flt;			/*	filer x[G]		*/
-	float	acc_data2_flt;			/*	filter y[G]		*/
-	float	acc_data3_flt;			/*	filter z[G]		*/
-	float	acc_pitch;				/*	pitch angle [deg]			*/
-	float	acc_roll;				/*	roll angle [deg]			*/
-	float	acc_pitch_d;			/*	pitch angle velocity [deg/s]*/
-	float	acc_roll_d;				/*	roll angle velocity [deg/s]	*/
-	float	acc_pitch2;				/*	pitch angle [deg]			*/
-	float	acc_roll2;				/*	roll angle [deg]			*/
-	short	fall_fwd_work;			/*	[bit]			*/
-	short	fall_bwd_work;			/*	[bit]			*/
-	short	fall_right_work;		/*	[bit]			*/
-	short	fall_left_work;			/*	[bit]			*/
-};
-
-struct st_xv_gyro
-{
-	float	gyro_data1;				/*	[deg/sec]		*/
-	float	gyro_data2;				/*	[deg/sec]		*/
-	float	gyro_data3;				/*	[deg/sec]		*/
-	float	gyro_data1_d;			/*	[deg/sec/sec]	*/
-	float	gyro_data2_d;			/*	[deg/sec/sec]	*/
-	float	gyro_data3_d;			/*	[deg/sec/sec]	*/
-	float	gyro_data1_flt;			/*	[deg/sec]		*/
-	float	gyro_data2_flt;			/*	[deg/sec]		*/
-	float	gyro_data3_flt;			/*	[deg/sec]		*/
-	float	gyro_data3_flt2;		/*	[deg/sec]		*/
-	float	gyro_roll;				/*	roll [deg]		*/
-	float	gyro_pitch;				/*	pitch [deg]		*/
-	float	gyro_yaw;				/*	yaw [deg]		*/
-	float	gyro_yaw2;				/*	yaw [deg]		*/
-	float	gyro_roll2;				/*	roll [deg]		*/
-	float	gyro_pitch2;			/*	pitch [deg]		*/
-	float	deg_foot_roll;			/*	[deg]			*/
-	float	deg_foot_pitch;			/*	[deg]			*/
-	float	deg_hip_roll;			/*	[deg]			*/
-	float	deg_hip_pitch;			/*	[deg]			*/
-	float	deg_arm_roll;			/*	[deg]			*/
-	float	deg_arm_pitch;			/*	[deg]			*/
-	float	deg_waist_pitch;		/*	[deg]			*/
-	float	deg_waist_yaw;			/*	[deg]			*/
-	float	yaw_cntl_ref;			/*	reference [deg]	*/
-	float	yaw_cntl_fb;			/*	feedback [deg]	*/
-	float	quaternion[4];			/*  quaternion (w, x, y, z) */
-};
 
 st_xv_ref xv_ref;
-st_xv_acc xv_acc;
-st_xv_gyro xv_gyro;
-
 
 class webots_motor_control
 {
@@ -174,18 +118,24 @@ public:
 		return 0;
 	}
 
-	int32_t get_acc_values()
+	std::vector<double> get_acc_values()
 	{
-		const double *acc_val = robot_accelerometer->getValues();
-		std::cout << acc_val << std::endl;
-		return 0;
+		const double *val = robot_accelerometer->getValues();
+		std::vector<double> acc_val;
+		acc_val.emplace_back(val[0]);
+		acc_val.emplace_back(val[1]);
+		acc_val.emplace_back(val[2]);
+		return acc_val;
 	}
 
-	int32_t get_gyro_values()
+	std::vector<double> get_gyro_values()
 	{
-		const double *gyro_val = robot_gyro->getValues();
-		std::cout << gyro_val << std::endl;
-		return 0;
+		const double *val = robot_gyro->getValues();
+		std::vector<double> gyro_val;
+		gyro_val.emplace_back(val[0]);
+		gyro_val.emplace_back(val[1]);
+		gyro_val.emplace_back(val[2]);
+		return gyro_val;
 	}
 
 	bool step()
