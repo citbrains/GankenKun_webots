@@ -71,9 +71,9 @@ struct st_xv_gyro
 	float	quaternion[4];			/*  quaternion (w, x, y, z) */
 };
 
-extern st_xv_ref xv_ref;
-extern st_xv_acc xv_acc;
-extern st_xv_gyro xv_gyro;
+st_xv_ref xv_ref;
+st_xv_acc xv_acc;
+st_xv_gyro xv_gyro;
 
 
 class webots_motor_control
@@ -82,8 +82,8 @@ class webots_motor_control
 private:
     webots::Robot *robot;
     webots::Gyro *robot_gyro;
-    webots::Accelerometer *robot_accelerometer;
-    int32_t mTimeStep;
+	webots::Accelerometer *robot_accelerometer;
+	int32_t mTimeStep;
     std::map<int32_t, std::string> motors_info;
     std::vector<std::tuple<int32_t, webots::Motor *, std::string>> robot_motors;
     std::set<std::string> reverse_motors;
@@ -174,25 +174,21 @@ public:
 		return 0;
 	}
 
-		int32_t get_acc_values()
+	int32_t get_acc_values()
 	{
-		const double *val = robot_accelerometer->getValues();
-		xv_acc.acc_data1 = (val[0] - (1 << 15)) / (1 << 15) * 8.0; // x
-		xv_acc.acc_data2 = (val[1] - (1 << 15)) / (1 << 15) * 8.0; // y
-		xv_acc.acc_data3 = (val[2] - (1 << 15)) / (1 << 15) * 8.0; // z
+		const double *acc_val = robot_accelerometer->getValues();
+		std::cout << acc_val << std::endl;
 		return 0;
 	}
 
 	int32_t get_gyro_values()
 	{
-		const double *val = robot_gyro->getValues();
-		xv_gyro.gyro_data1 = (val[0] - (1 << 15)) / (1 << 15) * 1000.0; // roll
-		xv_gyro.gyro_data2 = (val[1] - (1 << 15)) / (1 << 15) * 1000.0; // pitch
-		xv_gyro.gyro_data3 = (val[2] - (1 << 15)) / (1 << 15) * 1000.0; // yaw
+		const double *gyro_val = robot_gyro->getValues();
+		std::cout << gyro_val << std::endl;
 		return 0;
 	}
 
-		bool step()
+	bool step()
 	{
 		return robot->step(mTimeStep) != -1;
 	}
@@ -201,4 +197,5 @@ public:
 	{
 		return mTimeStep;
 	}
+	
 };

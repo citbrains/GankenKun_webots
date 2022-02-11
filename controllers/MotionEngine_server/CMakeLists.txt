@@ -14,7 +14,7 @@ link_directories(${WEBOTS_HOME}/lib/controller)
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS message.proto)
 
-add_executable(main main.cpp server.hpp ${PROTO_SRCS} ${PROTO_HDRS} )
+add_executable(main main.cpp server.hpp client_webots.hpp ${PROTO_SRCS} ${PROTO_HDRS} )
 
 set (WEBOTS_LIBRARIES Controller CppController)
 
