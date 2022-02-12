@@ -12,6 +12,7 @@ static const std::string adress("ipc://WebotsMotionEngine");
 
 class MotionEngineCom
 {
+public:
     MotionEngineCom() : ctx_(), reply_(ctx_, zmq::socket_type::rep)
     {
         reply_.bind(adress);
@@ -21,7 +22,7 @@ class MotionEngineCom
      *
      * @return std::vector<std::pair<int32_t, double>> モーター番号とそれを動かす角度指令値[rad]
      */
-    std::vector<std::pair<uint32_t, double>> getMotorDgrees()
+    std::vector<std::pair<uint32_t, double>> getMotorDegrees()
     {
         std::array<std::byte, buf_size_> data;
         data.fill(static_cast<std::byte>(0));

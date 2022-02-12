@@ -11,15 +11,6 @@
 #include <cmath>
 #define SERV_NUM (19)
 
-struct st_xv_ref
-{
-	float d[SERV_NUM];
-	float d_ref[SERV_NUM];
-};
-
-
-st_xv_ref xv_ref;
-
 class webots_motor_control
 {
 
@@ -98,11 +89,19 @@ public:
 		robot_gyro->enable(mTimeStep);
     }
 
-	int32_t send_target_degrees()
+	int32_t send_target_degrees(std::vector<std::pair<uint32_t, double>> getMotorDegrees)
 	{
 		int32_t servo_number = 0;
 		webots::Motor * target_motor;
 		std::string name_of_motors;
+		std::vector<double> motor_deg;
+		double deg;
+		uint32_t id;
+		std::sort(getMotorDegrees.begin(), getMotorDegrees.end());
+		for(auto & [id , deg] : getMotorDegrees)
+		{
+		}
+
 		for(auto &mp : robot_motors)
 		{
 			std::tie(servo_number, target_motor, name_of_motors) = mp;

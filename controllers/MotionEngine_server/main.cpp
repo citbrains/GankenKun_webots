@@ -10,15 +10,15 @@ int main(int argc, char const *argv[])
     volatile unsigned long 	count_time_l;
 
     webots_motor_control wb_gankenkun;
-    //MotionEngineCom MotionEngine_webots;
+    MotionEngineCom MotionEngine_webots;
 
     for(count_time_l = 0; wb_gankenkun.step(); count_time_l++)
     {
-        wb_gankenkun.send_target_degrees();
+        wb_gankenkun.send_target_degrees(MotionEngine_webots.getMotorDegrees());
+
         if(count_time_l > 100)
         {
-            wb_gankenkun.get_acc_values();
-            wb_gankenkun.get_gyro_values();
+            MotionEngine_webots.sendIMUData(wb_gankenkun.get_gyro_values(), wb_gankenkun.get_acc_values());
         }
     }
     return 0;
