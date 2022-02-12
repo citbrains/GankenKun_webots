@@ -8,7 +8,7 @@
 #include <utility>
 #include <string_view>
 #include "message.pb.h"
-static const std::string adress("ipc://WebotsMotionEngine");
+static const std::string adress("ipc:///tmp/WebotsMotionEngine");
 
 class MotionEngineCom
 {
