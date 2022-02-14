@@ -14,15 +14,15 @@ link_directories(${WEBOTS_HOME}/lib/controller)
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS message.proto)
 
-add_executable(main main.cpp server.hpp client_webots.hpp ${PROTO_SRCS} ${PROTO_HDRS} )
+add_executable(MotionEngine_server main.cpp server.hpp client_webots.hpp ${PROTO_SRCS} ${PROTO_HDRS} )
 
 set (WEBOTS_LIBRARIES Controller CppController)
 
 
-target_compile_features(main PUBLIC cxx_std_17)
-target_compile_options(main PUBLIC -O2 -Wall -pedantic -Wall)
-target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${Protobuf_INCLUDE_DIR}
+target_compile_features(MotionEngine_server PUBLIC cxx_std_17)
+target_compile_options(MotionEngine_server PUBLIC -O2 -Wall -pedantic -Wall)
+target_include_directories(MotionEngine_server PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${Protobuf_INCLUDE_DIR}
                                         ${WEBOTS_HOME}/include/controller/c ${WEBOTS_HOME}/include/controller/cpp)
-target_link_libraries(main cppzmq ${WEBOTS_LIBRARIES} ${Protobuf_LIBRARIES})
+target_link_libraries(MotionEngine_server cppzmq ${WEBOTS_LIBRARIES} ${Protobuf_LIBRARIES})
 
-install(TARGETS main DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
+install(TARGETS MotionEngine_server DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})

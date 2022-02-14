@@ -94,13 +94,16 @@ public:
 		int32_t servo_number = 0;
 		webots::Motor * target_motor;
 		std::string name_of_motors;
-		std::vector<double> motor_deg;
-		double deg;
-		uint32_t id;
+		//server.hpp側から与えられたサーボIDとdegをwebotsのものに並び替える
 		std::sort(getMotorDegrees.begin(), getMotorDegrees.end());
-		for(auto & [id , deg] : getMotorDegrees)
-		{
-		}
+
+		/*
+		[実装できなかったこと]
+
+		与えられたgetMotorDegreesのpairのvectorから角度データ(deg)を抜き取って、
+		下のfor文のsetPositionにデータ入れたい。
+
+		*/
 
 		for(auto &mp : robot_motors)
 		{

@@ -4,9 +4,6 @@
 
 int main(int argc, char const *argv[])
 {
-    //int id = 0;
-    //short joint;
-    //int shutdown_flag = 0;
     volatile unsigned long 	count_time_l;
 
     webots_motor_control wb_gankenkun;
