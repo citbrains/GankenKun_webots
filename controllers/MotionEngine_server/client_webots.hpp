@@ -9,8 +9,28 @@
 #include <exception>
 #include <map>
 #include <cmath>
-#define SERV_NUM (19)
 
+enum {
+	FOOT_ROLL_R 	= 	0,
+	LEG_PITCH_R 	= 	1,
+	KNEE_R1		 	= 	2,
+	KNEE_R2 		= 	3,
+	LEG_ROLL_R	 	= 	4,
+	LEG_YAW_R 		= 	5,
+	ARM_PITCH_R		= 	6,
+	ARM_ROLL_R		= 	7,
+	ELBOW_PITCH_R	= 	8,
+	FOOT_ROLL_L 	= 	9,
+	LEG_PITCH_L 	= 	10,
+	KNEE_L1 		= 	11,
+	KNEE_L2 		= 	12,
+	LEG_ROLL_L	 	= 	13,
+	LEG_YAW_L 		= 	14,
+	ARM_PITCH_L		= 	15,
+	ARM_ROLL_L		= 	16,
+	ELBOW_PITCH_L	= 	17,
+	HEAD_YAW		= 	18,
+};
 class webots_motor_control
 {
 
@@ -20,47 +40,47 @@ private:
 	webots::Accelerometer *robot_accelerometer;
 	int32_t mTimeStep;
     std::map<int32_t, std::string> motors_info;
-    std::vector<std::tuple<int32_t, webots::Motor *, std::string>> robot_motors;
-    std::set<std::string> reverse_motors;
+    std::map<int32_t, webots::Motor *> robot_motors;
+    std::set<int32_t> reverse_motors;
 
 public:
     webots_motor_control() : mTimeStep(0)
     {
         robot = new webots::Robot();
-        
-		motors_info.emplace(0, "right_ankle_roll_joint");
-		motors_info.emplace(1, "right_ankle_pitch_joint");
-		motors_info.emplace(2, "right_knee_pitch_joint");
-		motors_info.emplace(3, "right_waist_pitch_joint");
-		motors_info.emplace(4, "right_waist_roll_joint [hip]");
-		motors_info.emplace(5, "right_waist_yaw_joint");
-		motors_info.emplace(6, "right_shoulder_roll_joint");
-		motors_info.emplace(7, "right_shoulder_pitch_joint [shoulder]");
-		motors_info.emplace(8, "right_elbow_pitch_joint");
-		motors_info.emplace(9, "left_ankle_roll_joint");
-		motors_info.emplace(10, "left_ankle_pitch_joint");
-		motors_info.emplace(11, "left_knee_pitch_joint");
-		motors_info.emplace(12, "left_waist_pitch_joint");
-		motors_info.emplace(13, "left_waist_roll_joint [hip]");
-		motors_info.emplace(14, "left_waist_yaw_joint");
-		motors_info.emplace(15, "left_shoulder_pitch_joint [shoulder]");
-		motors_info.emplace(16, "left_shoulder_roll_joint");
-		motors_info.emplace(17, "left_elbow_pitch_joint");
-		motors_info.emplace(18, "head_yaw_joint");
+        //enum の要素にする
+		motors_info.emplace(FOOT_ROLL_R , "right_ankle_roll_joint");
+		motors_info.emplace(LEG_PITCH_R, "right_ankle_pitch_joint");
+		motors_info.emplace(KNEE_R1, "right_knee_pitch_joint");
+		motors_info.emplace(KNEE_R2, "right_waist_pitch_joint");
+		motors_info.emplace(LEG_ROLL_R, "right_waist_roll_joint [hip]");
+		motors_info.emplace(LEG_YAW_R , "right_waist_yaw_joint");
+		motors_info.emplace(ARM_ROLL_R, "right_shoulder_roll_joint");
+		motors_info.emplace(ARM_PITCH_R, "right_shoulder_pitch_joint [shoulder]");
+		motors_info.emplace(ELBOW_PITCH_R, "right_elbow_pitch_joint");
+		motors_info.emplace(FOOT_ROLL_L, "left_ankle_roll_joint");
+		motors_info.emplace(LEG_PITCH_L, "left_ankle_pitch_joint");
+		motors_info.emplace(KNEE_L1, "left_knee_pitch_joint");
+		motors_info.emplace(KNEE_L2, "left_waist_pitch_joint");
+		motors_info.emplace(LEG_ROLL_L, "left_waist_roll_joint [hip]");
+		motors_info.emplace(LEG_YAW_L, "left_waist_yaw_joint");
+		motors_info.emplace(ARM_PITCH_L, "left_shoulder_pitch_joint [shoulder]");
+		motors_info.emplace(ARM_ROLL_L, "left_shoulder_roll_joint");
+		motors_info.emplace(ELBOW_PITCH_L, "left_elbow_pitch_joint");
+		motors_info.emplace(HEAD_YAW, "head_yaw_joint");
 
-		reverse_motors.emplace("right_knee_pitch_joint");
-		reverse_motors.emplace("right_waist_pitch_joint");
-		reverse_motors.emplace("left_knee_pitch_joint");
-		reverse_motors.emplace("left_waist_pitch_joint");
-		reverse_motors.emplace("right_shoulder_roll_joint");
-		reverse_motors.emplace("left_shoulder_roll_joint");
+		reverse_motors.emplace(KNEE_R1);
+		reverse_motors.emplace(KNEE_R2);
+		reverse_motors.emplace(KNEE_L1);
+		reverse_motors.emplace(KNEE_L2);
+		reverse_motors.emplace(ARM_ROLL_R);
+		reverse_motors.emplace(ARM_ROLL_L);
 
         for(auto &mp : motors_info)
         {
             auto motor_ptr = robot->getMotor(mp.second);
             if(motor_ptr != nullptr)
             {
-                robot_motors.emplace_back(mp.first, motor_ptr, mp.second);
+                robot_motors.emplace(mp.first, motor_ptr);
             }
             else
             {
@@ -91,30 +111,16 @@ public:
 
 	int32_t send_target_degrees(std::vector<std::pair<uint32_t, double>> getMotorDegrees)
 	{
-		int32_t servo_number = 0;
-		webots::Motor * target_motor;
-		std::string name_of_motors;
-		//server.hpp側から与えられたサーボIDとdegをwebotsのものに並び替える
-		std::sort(getMotorDegrees.begin(), getMotorDegrees.end());
 
-		/*
-		[実装できなかったこと]
-
-		与えられたgetMotorDegreesのpairのvectorから角度データ(deg)を抜き取って、
-		下のfor文のsetPositionにデータ入れたい。
-
-		*/
-
-		for(auto &mp : robot_motors)
+		for(auto& [id, deg] : getMotorDegrees)
 		{
-			std::tie(servo_number, target_motor, name_of_motors) = mp;
-			if(reverse_motors.find(name_of_motors) != reverse_motors.end())
+			if(reverse_motors.find(id) != reverse_motors.end())
 			{
-				(target_motor)->setPosition((xv_ref.d[servo_number]) * (M_PI / 180.0));
+				robot_motors.at(id)->setPosition(deg * (M_PI / 180.0));
 			}
 			else
 			{
-				(target_motor)->setPosition((-xv_ref.d[servo_number] + (M_PI / 180.0)));
+				robot_motors.at(id)->setPosition(-deg * (M_PI / 180.0));
 			}
 		}
 		return 0;
