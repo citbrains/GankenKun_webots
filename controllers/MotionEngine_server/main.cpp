@@ -13,7 +13,7 @@ int main(int argc, char const *argv[])
     {
         wb_gankenkun.send_target_degrees(MotionEngine_webots.getMotorDegrees());
 
-        if(count_time_l > 100)
+        // if(count_time_l > 100)
         {
             MotionEngine_webots.sendIMUData(wb_gankenkun.get_gyro_values(), wb_gankenkun.get_acc_values());
         }

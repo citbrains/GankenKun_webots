@@ -10,27 +10,68 @@
 #include <map>
 #include <cmath>
 
+// enum {
+// 	FOOT_ROLL_R 	= 	0,
+// 	LEG_PITCH_R 	= 	1,
+// 	KNEE_R1		 	= 	2,
+// 	KNEE_R2 		= 	3,
+// 	LEG_ROLL_R	 	= 	4,
+// 	LEG_YAW_R 		= 	5,
+
+// 	ARM_PITCH_R		= 	6,
+// 	ARM_ROLL_R		= 	7,
+// 	ELBOW_PITCH_R	= 	8,
+
+// 	FOOT_ROLL_L 	= 	9,
+// 	LEG_PITCH_L 	= 	10,
+// 	KNEE_L1 		= 	11,
+// 	KNEE_L2 		= 	12,
+// 	LEG_ROLL_L	 	= 	13,
+// 	LEG_YAW_L 		= 	14,
+
+// 	ARM_PITCH_L		= 	15,
+// 	ARM_ROLL_L		= 	16,
+// 	ELBOW_PITCH_L	= 	17,
+
+// 	HEAD_YAW		= 	18,
+// 	HEAD_PITCH		= 	19,
+// 	SPARE12			= 	20,
+// 	SPARE13			= 	21,
+// 	SPARE17			= 	22,
+// 	SPARE21			= 	23,
+// 	SPARE24			= 	24,
+// 	SPARE25			= 	25,
+// 	SPARE26			= 	26,
+// 	SPARE27			= 	27,
+// 	SPARE28			= 	28
+// };
 enum {
-	FOOT_ROLL_R 	= 	0,
-	LEG_PITCH_R 	= 	1,
-	KNEE_R1		 	= 	2,
-	KNEE_R2 		= 	3,
-	LEG_ROLL_R	 	= 	4,
-	LEG_YAW_R 		= 	5,
-	ARM_PITCH_R		= 	6,
-	ARM_ROLL_R		= 	7,
-	ELBOW_PITCH_R	= 	8,
-	FOOT_ROLL_L 	= 	9,
-	LEG_PITCH_L 	= 	10,
-	KNEE_L1 		= 	11,
-	KNEE_L2 		= 	12,
-	LEG_ROLL_L	 	= 	13,
-	LEG_YAW_L 		= 	14,
-	ARM_PITCH_L		= 	15,
-	ARM_ROLL_L		= 	16,
-	ELBOW_PITCH_L	= 	17,
-	HEAD_YAW		= 	18,
+	FOOT_ROLL_L 	= 	0,			//! 左足首のロール軸
+	KNEE_L1 	= 	1,			//! 左足膝下ピッチ軸（平行リンク）
+	KNEE_L2 	= 	2,			//! 左足膝上ピッチ軸（平行リンク）
+	LEG_PITCH_L 	= 	3,			//! 左股のピッチ軸（シリアルリンク，股のピッチ軸と合わせて足首の向きを変更）
+	LEG_ROLL_L	= 	4,			//! 左股のロール軸
+	LEG_YAW_L 	= 	5,			//! 左股のヨー軸
+	FOOT_ROLL_R 	= 	6,			//! 右足首のロール軸
+	KNEE_R1		= 	7,			//! 右足膝下ピッチ軸（平行リンク）
+	KNEE_R2 	= 	8,			//! 右足膝上ピッチ軸（平行リンク）
+	LEG_PITCH_R 	= 	9,			//! 右股のピッチ軸（シリアルリンク，股のピッチ軸と合わせて足首の向きを変更）
+	LEG_ROLL_R	= 	10,			//! 右股のロール軸
+	LEG_YAW_R 	= 	11,			//! 右股のヨー軸 
+	// 12 13
+	ARM_PITCH_L	= 	14,			//! 左腕のピッチ軸
+	ARM_ROLL_L	= 	15,			//! 左腕のロール軸
+	ELBOW_PITCH_L = 16,
+	// 16 17
+	ARM_PITCH_R	= 	18,			//! 右腕のピッチ軸
+	ARM_ROLL_R	= 	19,			//! 右腕のロール軸
+	ELBOW_PITCH_R = 20,
+	HEAD_YAW	= 	22,			//! 首のヨー軸
+	HEAD_PITCH	= 	23,			//! 首のピッチ軸（Acceliteは無い）
+	JOINT_NUM
 };
+
+
 class webots_motor_control
 {
 
@@ -70,10 +111,21 @@ public:
 
 		reverse_motors.emplace(KNEE_R1);
 		reverse_motors.emplace(KNEE_R2);
-		reverse_motors.emplace(KNEE_L1);
-		reverse_motors.emplace(KNEE_L2);
+
 		reverse_motors.emplace(ARM_ROLL_R);
 		reverse_motors.emplace(ARM_ROLL_L);
+		reverse_motors.emplace(ELBOW_PITCH_R);
+		reverse_motors.emplace(ARM_PITCH_R);
+
+		
+		reverse_motors.emplace(KNEE_L1);
+		reverse_motors.emplace(KNEE_L2);
+		reverse_motors.emplace(LEG_ROLL_L);
+		reverse_motors.emplace(FOOT_ROLL_L);
+		reverse_motors.emplace(LEG_PITCH_L);
+		reverse_motors.emplace(LEG_YAW_L);
+		
+		// reverse_motors.emplace(LEG_ROLL_R);
 
         for(auto &mp : motors_info)
         {
@@ -103,7 +155,7 @@ public:
 			std::terminate();
 		}
 
-        mTimeStep = 8; // timestepは8固定
+        mTimeStep = 10; // timestepは8固定
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
@@ -112,15 +164,15 @@ public:
 	int32_t send_target_degrees(std::vector<std::pair<uint32_t, double>> getMotorDegrees)
 	{
 
-		for(auto& [id, deg] : getMotorDegrees)
+		for(auto& [id, rad] : getMotorDegrees)
 		{
 			if(reverse_motors.find(id) != reverse_motors.end())
 			{
-				robot_motors.at(id)->setPosition(deg * (M_PI / 180.0));
+				robot_motors.at(id)->setPosition(rad);
 			}
 			else
 			{
-				robot_motors.at(id)->setPosition(-deg * (M_PI / 180.0));
+				robot_motors.at(id)->setPosition(-rad);
 			}
 		}
 		return 0;

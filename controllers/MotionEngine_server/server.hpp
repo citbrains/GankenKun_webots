@@ -29,12 +29,14 @@ public:
         auto buf = zmq::buffer(data.data(), data.size());
         reply_.recv(buf);
         webotsMotionEngine::degrees deg;
-        std::string s(reinterpret_cast<const char *>(buf.data()));
+        std::string s(reinterpret_cast<const char *>(buf.data()),buf.size());
         deg.ParseFromString(s);
+        std::cout << deg.DebugString();
         std::vector<std::pair<uint32_t, double>> return_val;
         for (size_t i = 0; i < std::min(deg.motor_number_size(), deg.motor_degs_size()); ++i)
         {
             return_val.emplace_back(std::make_pair<uint32_t, double>(deg.motor_number(i), deg.motor_degs(i)));
+            std::cout << deg.motor_number(i) << " deg ::" << deg.motor_degs(i) << std::endl;
         }
         return return_val;
     };
@@ -63,5 +65,5 @@ public:
 private:
     zmq::context_t ctx_;
     zmq::socket_t reply_;
-    inline static constexpr size_t buf_size_ = 1024;
+    inline static constexpr size_t buf_size_ = 2048;
 };
