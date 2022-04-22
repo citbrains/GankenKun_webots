@@ -23,6 +23,24 @@ print("hasRecognitionSegmentation(): " + str(camera.hasRecognitionSegmentation()
 cv2.startWindowThread()
 cv2.namedWindow("preview")
 
+color_dict = { \
+    "ball_color"    :(0.0, 0.0, 1.0), \
+    "colorHead"     :(1.0, 1.0, 1.0), \
+    "colorNeck"     :(0.5, 0.5, 0.5), \
+    "colorShoulderL":(0.0, 0.5, 0.0), \
+    "colorShoulderR":(0.5, 0.0, 0.0), \
+    "colorElbowL"   :(0.0, 0.6, 0.0), \
+    "colorElbowR"   :(0.6, 0.0, 0.0), \
+    "colorWristL"   :(0.0, 0.7, 0.0), \
+    "colorWristR"   :(0.7, 0.0, 0.0), \
+    "colorHipL"     :(0.0, 0.8, 0.0), \
+    "colorHipR"     :(0.8, 0.0, 0.0), \
+    "colorKneeL"    :(0.0, 0.899, 0.0), \
+    "colorKneeR"    :(0.899, 0.0, 0.0), \
+    "colorAnkleL"   :(0.0, 1.0, 0.0), \
+    "colorAnkleR"   :(1.0, 0.0, 0.0) \
+}
+
 ball_color   = (  0, 0  , 255, 255)
 enemy1_color = (255,   0,   0, 255)
 enemy2_color = (255*0.9-1,   0,   0, 255)
@@ -39,22 +57,13 @@ while supervisor.step(timestep) != -1:
     number += 1
     seg_img = camera.getRecognitionSegmentationImage()
     img = np.frombuffer(seg_img, np.uint8).reshape((camera.getHeight(), camera.getWidth(), 4))
-    #ball = cv2.inRange(img, ball_color, ball_color)
-    #x, y, width, height = cv2.boundingRect(ball)
-    #cv2.rectangle(img, (x, y), (x + width, y + height), color=detect_color, thickness=2)
-    #print("ball x: " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
-    #enemy1 = cv2.inRange(img, enemy1_color, enemy1_color)
-    #x, y, width, height = cv2.boundingRect(enemy1)
-    #cv2.rectangle(img, (x, y), (x + width, y + height), color=detect_color, thickness=2)
-    #print("enemy1 x: " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
-    #enemy2 = cv2.inRange(img, enemy2_color, enemy2_color)
-    #x, y, width, height = cv2.boundingRect(enemy2)
-    #cv2.rectangle(img, (x, y), (x + width, y + height), color=detect_color, thickness=2)
-    #print("enemy2 x: " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
-    #enemy3 = cv2.inRange(img, enemy3_color, enemy3_color)
-    #x, y, width, height = cv2.boundingRect(enemy3)
-    #cv2.rectangle(img, (x, y), (x + width, y + height), color=detect_color, thickness=2)
-    #print("enemy3 x: " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
+    
+    for key, val in color_dict.items():
+        color = (val[0]*255, val[1]*255, val[2]*255, 255)
+        area = cv2.inRange(img, color, color)
+        x, y, width, height = cv2.boundingRect(area)
+        cv2.rectangle(img, (x, y), (x + width, y + height), color=color, thickness=2)
+        print(key + ": " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
 
     cv2.imshow("preview", img)
     cv2.waitKey(timestep)

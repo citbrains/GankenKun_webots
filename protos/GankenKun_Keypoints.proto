@@ -987,7 +987,7 @@ PROTO GankenKun_Keypoints [
                                                   }
                                                 }
                                                 geometry Sphere {
-                                                  radius 0.03
+                                                  radius 0.05
                                                 }
                                               }
                                             ]
@@ -1661,7 +1661,7 @@ PROTO GankenKun_Keypoints [
                                                   }
                                                 }
                                                 geometry Sphere {
-                                                  radius 0.03
+                                                  radius 0.05
                                                 }
                                               }
                                             ]
