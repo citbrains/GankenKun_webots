@@ -40,12 +40,22 @@ color_dict = { \
     "colorAnkleL"   :(0.0, 1.0, 0.0), \
     "colorAnkleR"   :(1.0, 0.0, 0.0) \
 }
-
-ball_color   = (  0, 0  , 255, 255)
-enemy1_color = (255,   0,   0, 255)
-enemy2_color = (255*0.9-1,   0,   0, 255)
-enemy3_color = (255*0.8,   0,   0, 255)
-detect_color = (255, 255, 255, 255)
+pos_dict = dict()
+lines = [
+  ["colorHead"     , "colorNeck"     ],
+  ["colorNeck"     , "colorShoulderL"],
+  ["colorShoulderL", "colorElbowL"   ],
+  ["colorElbowL"   , "colorWristL"   ],
+  ["colorNeck"     , "colorShoulderR"],
+  ["colorShoulderR", "colorElbowR"   ],
+  ["colorElbowR"   , "colorWristR"   ],
+  ["colorNeck"     , "colorHipL"     ],
+  ["colorHipL"     , "colorKneeL"    ],
+  ["colorKneeL"    , "colorAnkleL"   ],
+  ["colorNeck"     , "colorHipR"     ],
+  ["colorHipR"     , "colorKneeR"    ],
+  ["colorKneeR"    , "colorAnkleR"   ]
+]
 
 while supervisor.step(timestep) != -1:
     supervisor.getFromDef('BALL').getField('translation').setSFVec3f([random.uniform(0.0, 4.0), random.uniform(-1.0, 1.0), 0.1])
@@ -62,8 +72,15 @@ while supervisor.step(timestep) != -1:
         color = (val[0]*255, val[1]*255, val[2]*255, 255)
         area = cv2.inRange(img, color, color)
         x, y, width, height = cv2.boundingRect(area)
-        cv2.rectangle(img, (x, y), (x + width, y + height), color=color, thickness=2)
+        #cv2.rectangle(img, (x, y), (x + width, y + height), color=color, thickness=2)
+        pos_dict[key] = (x + width / 2, y + height / 2)
         print(key + ": " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
+
+    for line in lines:
+        x0, y0 = int(pos_dict[line[0]][0]), int(pos_dict[line[0]][1])
+        x1, y1 = int(pos_dict[line[1]][0]), int(pos_dict[line[1]][1])
+        print("x0: "+str(x0)+", y0: "+str(y0)+", x1: "+str(x1)+", y1: "+str(y1)+"\r\n")
+        cv2.line(img, (x0, y0), (x1, y1), color=(255, 255, 255, 255), thickness=2)
 
     cv2.imshow("preview", img)
     cv2.waitKey(timestep)
