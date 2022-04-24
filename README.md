@@ -68,3 +68,4 @@ cd ~/GankenKun_webots/worlds
 webots --batch collect_keypoints.wbt
 ```
 
+[![IMAGE](http://img.youtube.com/vi/kidIe4T4D5M/0.jpg)](https://youtu.be/kidIe4T4D5M)
