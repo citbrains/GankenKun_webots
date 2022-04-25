@@ -37,7 +37,7 @@ Install
 - webots R2021b https://www.cyberbotics.com/
 ```
 sudo apt install python3-pip
-pip3 install numpy, transforms3d, scipy control
+pip3 install numpy transforms3d scipy control
 git clone https://github.com/citbrains/GankenKun_webots
 ```
 
@@ -49,3 +49,24 @@ webots --batch walking.wbt
 
 
 [![video](http://img.youtube.com/vi/lQauhJC1u4o/0.jpg)](https://www.youtube.com/watch?v=lQauhJC1u4o)
+
+# collect_keypoints
+
+Automatic annotation system for collecting key point images for posture estimation
+
+Install
+- webots R2021b https://github.com/cyberbotics/webots/releases/tag/R2021b
+```
+sudo apt install python3-pip
+pip3 install -U pip
+pip3 install numpy transforms3d scipy opencv-python
+git clone https://github.com/citbrains/GankenKun_webots
+```
+
+Execute
+```
+cd ~/GankenKun_webots/worlds
+webots --batch collect_keypoints.wbt
+```
+
+[![IMAGE](http://img.youtube.com/vi/kidIe4T4D5M/0.jpg)](https://youtu.be/kidIe4T4D5M)

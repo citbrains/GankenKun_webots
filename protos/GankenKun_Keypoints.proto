@@ -4,14 +4,14 @@
 # This is a proto file for Webots for the GankenKun
 # Extracted from: gankenkun_simple.urdf
 
-PROTO GankenKun [
+PROTO GankenKun_Keypoints [
   field  SFVec3f     translation     0 0 0
   field  SFRotation  rotation        0 1 0 0
   field  SFString    name            "GankenKun"  # Is `Robot.name`.
   field  SFString    controller      "void"       # Is `Robot.controller`.
   field  MFString    controllerArgs  []           # Is `Robot.controllerArgs`.
   field  SFString    customData      ""           # Is `Robot.customData`.
-  field  SFBool      supervisor      TRUE        # Is `Robot.supervisor`.
+  field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
   field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
   field  SFInt32     cameraWidth     640          # Is `Camera.width`.
@@ -19,7 +19,20 @@ PROTO GankenKun [
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
   field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
-  field  MFColor     recognitionColors [0.0 0.0 1.0]
+  field  MFColor     colorHead       [1.0 1.0 1.0]
+  field  MFColor     colorNeck       [0.5 0.5 0.5]
+  field  MFColor     colorShoulderL  [0.0 0.5 0.0]
+  field  MFColor     colorShoulderR  [0.0 0.0 0.5]
+  field  MFColor     colorElbowL     [0.0 0.6 0.0]
+  field  MFColor     colorElbowR     [0.0 0.0 0.6]
+  field  MFColor     colorWristL     [0.0 0.7 0.0]
+  field  MFColor     colorWristR     [0.0 0.0 0.7]
+  field  MFColor     colorHipL       [0.0 0.8 0.0]
+  field  MFColor     colorHipR       [0.0 0.0 0.8]
+  field  MFColor     colorKneeL      [0.0 0.9 0.0]
+  field  MFColor     colorKneeR      [0.0 0.0 0.9]
+  field  MFColor     colorAnkleL     [0.0 1.0 0.0]
+  field  MFColor     colorAnkleR     [0.0 0.0 1.0]
 ]
 {
   %{
@@ -43,6 +56,23 @@ PROTO GankenKun [
     translation IS translation
     rotation IS rotation
     children [
+      DEF keypoint_neck_link Solid {
+        translation 0.000000 0.000000 0.072000
+        children [
+          Shape {
+            appearance Appearance {
+              material Material {
+                transparency 1.0
+              }
+            }
+            geometry Sphere {
+              radius 0.05
+            }
+          }
+        ]
+        name "keypoint_neck_link"
+        recognitionColors IS colorNeck
+      }
       Transform {
         translation 0.000000 0.000000 0.000000
         rotation -0.577350 -0.577350 0.577350 2.094395
@@ -187,6 +217,23 @@ PROTO GankenKun [
               ]
               name "camera_link"
             }
+            DEF keypoint_head_link Solid {
+              translation 0.036495 0.000000 0.063504
+              children [
+                Shape {
+                  appearance Appearance {
+                    material Material {
+                      transparency 1.0
+                    }
+                  }
+                  geometry Sphere {
+                    radius 0.05
+                  }
+                }
+              ]
+              name "keypoint_head_link"
+              recognitionColors IS colorHead
+            }
           ]
           name "head_yaw_link"
           boundingObject Transform {
@@ -207,7 +254,7 @@ PROTO GankenKun [
               9.572310000e-07 -7.715580000e-07 2.138747600e-05
             ]
           }
-          recognitionColors IS recognitionColors
+          #recognitionColors IS colorHead
         }
       }
     %{ if enable_backlash then }%
@@ -316,6 +363,23 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                  DEF keypoint_left_shoulder_link Solid {
+                    translation 0.000000 0.000000 0.000000
+                    children [
+                      Shape {
+                        appearance Appearance {
+                          material Material {
+                            transparency 1.0
+                          }
+                        }
+                        geometry Sphere {
+                          radius 0.03
+                        }
+                      }
+                    ]
+                    name "keypoint_left_shoulder_link"
+                    recognitionColors IS colorShoulderL
+                  }
                 %{ if enable_backlash then }%
                   HingeJointWithBacklash {
                     backlash %{= backlash }%
@@ -347,6 +411,23 @@ PROTO GankenKun [
                       rotation 0.000000 -1.000000 0.000000 1.570796
                       model "left hand"
                       children [
+                        DEF keypoint_left_elbow_link Solid {
+                          translation 0.000000 0.000000 0.000000
+                          children [
+                            Shape {
+                              appearance Appearance {
+                                material Material {
+                                  transparency 1.0
+                                }
+                              }
+                              geometry Sphere {
+                                radius 0.03
+                              }
+                            }
+                          ]
+                          name "keypoint_left_elbow_link"
+                          recognitionColors IS colorElbowL
+                        }
                         Transform {
                           translation 0.000000 0.000000 0.000000
                           rotation 0.000000 0.000000 1.000000 1.570796
@@ -371,6 +452,23 @@ PROTO GankenKun [
                           translation 0.000000 0.218000 0.000000
                           rotation 0 0 1 0
                           name "left [hand]"
+                        }
+                        DEF keypoint_left_wrist_link Solid {
+                          translation 0.000000 0.218000 0.000000
+                          children [
+                            Shape {
+                              appearance Appearance {
+                                material Material {
+                                  transparency 1.0
+                                }
+                              }
+                              geometry Sphere {
+                                radius 0.03
+                              }
+                            }
+                          ]
+                          name "keypoint_left_wrist_link"
+                          recognitionColors IS colorWristL
                         }
                       ]
                       name "left lower [arm]"
@@ -414,7 +512,6 @@ PROTO GankenKun [
                     1.422700000e-08 5.110460000e-07 -1.759358000e-06
                   ]
                 }
-                recognitionColors IS recognitionColors
               }
             }
           ]
@@ -427,8 +524,7 @@ PROTO GankenKun [
               2.715985300e-05 1.484426400e-05 1.818353300e-05
               -4.000000000e-12 0.000000000e+00 4.000000000e-12
             ]
-           }
-           recognitionColors IS recognitionColors
+          }
         }
       }
     %{ if enable_backlash then }%
@@ -511,6 +607,23 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                  DEF keypoint_right_shoulder_link Solid {
+                    translation 0.000000 0.000000 0.000000
+                    children [
+                      Shape {
+                        appearance Appearance {
+                          material Material {
+                            transparency 1.0
+                          }
+                        }
+                        geometry Sphere {
+                          radius 0.03
+                        }
+                      }
+                    ]
+                    name "keypoint_right_shoulder_link"
+                    recognitionColors IS colorShoulderR
+                  }
                 %{ if enable_backlash then }%
                   HingeJointWithBacklash {
                     backlash %{= backlash }%
@@ -542,6 +655,23 @@ PROTO GankenKun [
                       rotation 0.000000 -1.000000 0.000000 1.570796
                       model "right hand"
                       children [
+                        DEF keypoint_right_elbow_link Solid {
+                          translation 0.000000 0.000000 0.000000
+                          children [
+                            Shape {
+                              appearance Appearance {
+                                material Material {
+                                  transparency 1.0
+                                }
+                              }
+                              geometry Sphere {
+                                radius 0.03
+                              }
+                            }
+                          ]
+                          name "keypoint_right_elbow_link"
+                          recognitionColors IS colorElbowR
+                        }
                         Transform {
                           translation 0.000000 0.000000 0.000000
                           rotation 0.707107 0.707107 -0.000000 3.141593
@@ -556,6 +686,23 @@ PROTO GankenKun [
                           translation 0.000000 0.218000 0.000000
                           rotation 0 0 1 0
                           name "right [hand]"
+                        }
+                        DEF keypoint_right_wrist_link Solid {
+                          translation 0.000000 0.218000 0.000000
+                          children [
+                            Shape {
+                              appearance Appearance {
+                                material Material {
+                                  transparency 1.0
+                                }
+                              }
+                              geometry Sphere {
+                                radius 0.03
+                              }
+                            }
+                          ]
+                          name "keypoint_right_wrist_link"
+                          recognitionColors IS colorWristR
                         }
                       ]
                       name "right lower [arm]"
@@ -577,7 +724,7 @@ PROTO GankenKun [
                           -2.211750500e-05 5.000000000e-12 3.000000000e-12
                         ]
                       }
-                      recognitionColors IS recognitionColors
+                      #recognitionColors IS recognitionColors
                     }
                   }
                 ]
@@ -600,7 +747,7 @@ PROTO GankenKun [
                     1.422700000e-08 5.110460000e-07 -1.759358000e-06
                   ]
                 }
-                recognitionColors IS recognitionColors
+                #recognitionColors IS recognitionColors
               }
             }
           ]
@@ -614,7 +761,7 @@ PROTO GankenKun [
               -4.000000000e-12 0.000000000e+00 4.000000000e-12
             ]
           }
-          recognitionColors IS recognitionColors
+          #recognitionColors IS recognitionColors
         }
       }
     %{ if enable_backlash then }%
@@ -717,6 +864,23 @@ PROTO GankenKun [
                       }
                     ]
                   }
+                  DEF keypoint_left_hip_link Solid {
+                    translation 0.000000 0.000000 -0.025000
+                    children [
+                      Shape {
+                        appearance Appearance {
+                          material Material {
+                            transparency 1.0
+                          }
+                        }
+                        geometry Sphere {
+                          radius 0.03
+                        }
+                      }
+                    ]
+                    name "keypoint_left_hip_link"
+                    recognitionColors IS colorHipL
+                  }
                   HingeJoint {
                     jointParameters HingeJointParameters {
                       axis 0.000000 1.000000 0.000000
@@ -755,6 +919,23 @@ PROTO GankenKun [
                             translation 0.100000 0.000000 0.000000
                             rotation 0.000000 1.000000 0.000000 0.000000
                             children [
+                              DEF keypoint_left_knee_link Solid {
+                                translation 0.028500 0.000000 0.000000
+                                children [
+                                  Shape {
+                                    appearance Appearance {
+                                      material Material {
+                                        transparency 1.0
+                                      }
+                                    }
+                                    geometry Sphere {
+                                      radius 0.03
+                                    }
+                                  }
+                                ]
+                                name "keypoint_left_knee_link"
+                                recognitionColors IS colorKneeL
+                              }
                               Transform {
                                 translation 0.000000 0.000000 0.000000
                                 rotation -0.000000 1.000000 -0.000000 3.141593
@@ -813,6 +994,23 @@ PROTO GankenKun [
                                         translation 0.100000 0.000000 0.000000
                                         rotation 0.000000 1.000000 0.000000 0.000000
                                         children [
+                                          DEF keypoint_left_ankle_link Solid {
+                                            translation 0.000000 0.000000 0.000000
+                                            children [
+                                              Shape {
+                                                appearance Appearance {
+                                                  material Material {
+                                                    transparency 1.0
+                                                  }
+                                                }
+                                                geometry Sphere {
+                                                  radius 0.05
+                                                }
+                                              }
+                                            ]
+                                            name "keypoint_left_ankle_link"
+                                            recognitionColors IS colorAnkleL
+                                          }
                                           Transform {
                                             translation 0.000000 0.000000 0.000000
                                             rotation -0.000000 0.707107 0.707107 3.141593
@@ -976,7 +1174,7 @@ PROTO GankenKun [
                                                         -6.696554000e-06 5.561296000e-06 5.548109000e-06
                                                       ]
                                                     }
-                                                    recognitionColors IS recognitionColors
+                                                    #recognitionColors IS recognitionColors
                                                   }
                                                 }
                                               ]
@@ -990,7 +1188,7 @@ PROTO GankenKun [
                                                   -2.439140000e-07 3.079813500e-05 -3.878150000e-07
                                                 ]
                                               }
-                                              recognitionColors IS recognitionColors
+                                              #recognitionColors IS recognitionColors
                                             }
                                           }
                                         ]
@@ -1004,7 +1202,7 @@ PROTO GankenKun [
                                             0.000000000 0.000000000 0.000000000
                                           ]
                                         }
-                                        recognitionColors IS recognitionColors
+                                        #recognitionColors IS recognitionColors
                                       }
                                     }
                                   ]
@@ -1027,7 +1225,7 @@ PROTO GankenKun [
                                       -1.228580000e-07 -7.002346000e-06 -4.585110000e-07
                                     ]
                                   }
-                                  recognitionColors IS recognitionColors
+                                  #recognitionColors IS recognitionColors
                                 }
                               }
                               HingeJoint {
@@ -1109,7 +1307,7 @@ PROTO GankenKun [
                                       -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
                                     ]
                                   }
-                                  recognitionColors IS recognitionColors
+                                  #recognitionColors IS recognitionColors
                                 }
                               }
                             ]
@@ -1123,7 +1321,7 @@ PROTO GankenKun [
                                 4.339110000e-07 9.292810000e-06 1.173013000e-06
                               ]
                             }
-                            recognitionColors IS recognitionColors
+                            #recognitionColors IS recognitionColors
                           }
                         }
                       ]
@@ -1146,7 +1344,7 @@ PROTO GankenKun [
                            -1.228580000e-07 6.529856000e-06 4.585110000e-07
                         ]
                       }
-                      recognitionColors IS recognitionColors
+                      #recognitionColors IS recognitionColors
                     }
                   }
                   HingeJoint {
@@ -1228,7 +1426,7 @@ PROTO GankenKun [
                           6.507700000e-08 5.340292000e-06 -2.428710000e-07
                         ]
                       }
-                      recognitionColors IS recognitionColors
+                      #recognitionColors IS recognitionColors
                     }
                   }
                 ]
@@ -1242,7 +1440,7 @@ PROTO GankenKun [
                     1.635109000e-06 3.745413700e-05 -2.377456000e-06
                   ]
                 }
-                recognitionColors IS recognitionColors
+                #recognitionColors IS recognitionColors
               }
             }
           ]
@@ -1265,7 +1463,7 @@ PROTO GankenKun [
               0.000000000e+00 0.000000000e+00 9.499173000e-06
             ]
           }
-          recognitionColors IS recognitionColors
+          #recognitionColors IS recognitionColors
         }
       }
     %{ if enable_backlash then }%
@@ -1338,6 +1536,23 @@ PROTO GankenKun [
                 translation 0.024975 0.000000 -0.055000
                 rotation 0.000000 1.000000 0.000000 1.570796
                 children [
+                  DEF keypoint_right_hip_link Solid {
+                    translation 0.000000 0.000000 -0.025000
+                    children [
+                      Shape {
+                        appearance Appearance {
+                          material Material {
+                            transparency 1.0
+                          }
+                        }
+                        geometry Sphere {
+                          radius 0.03
+                        }
+                      }
+                    ]
+                    name "keypoint_right_hip_link"
+                    recognitionColors IS colorHipR
+                  }
                   Transform {
                     translation 0.000000 0.000000 0.000000
                     rotation -0.577350 -0.577350 -0.577350 2.094395
@@ -1388,6 +1603,23 @@ PROTO GankenKun [
                             translation 0.100000 0.000000 0.000000
                             rotation 0.000000 1.000000 0.000000 0.000000
                             children [
+                              DEF keypoint_right_knee_link Solid {
+                                translation 0.028500 0.000000 0.000000
+                                children [
+                                  Shape {
+                                    appearance Appearance {
+                                      material Material {
+                                        transparency 1.0
+                                      }
+                                    }
+                                    geometry Sphere {
+                                      radius 0.03
+                                    }
+                                  }
+                                ]
+                                name "keypoint_right_knee_link"
+                                recognitionColors IS colorKneeR
+                              }
                               Transform {
                                 translation 0.000000 0.000000 0.000000
                                 rotation -0.000000 -0.000000 -1.000000 3.141593
@@ -1436,6 +1668,23 @@ PROTO GankenKun [
                                         translation 0.100000 0.000000 0.000000
                                         rotation 0.000000 1.000000 0.000000 0.000000
                                         children [
+                                          DEF keypoint_right_ankle_link Solid {
+                                            translation 0.000000 0.000000 0.000000
+                                            children [
+                                              Shape {
+                                                appearance Appearance {
+                                                  material Material {
+                                                    transparency 1.0
+                                                  }
+                                                }
+                                                geometry Sphere {
+                                                  radius 0.05
+                                                }
+                                              }
+                                            ]
+                                            name "keypoint_right_ankle_link"
+                                            recognitionColors IS colorAnkleR
+                                          }
                                           Transform {
                                             translation 0.000000 0.000000 0.000000
                                             rotation -0.000000 0.707107 0.707107 3.141593
@@ -1589,7 +1838,7 @@ PROTO GankenKun [
                                                         -6.696554000e-06 5.561296000e-06 5.548109000e-06
                                                       ]
                                                     }
-                                                    recognitionColors IS recognitionColors
+                                                    #recognitionColors IS recognitionColors
                                                   }
                                                 }
                                               ]
@@ -1603,7 +1852,7 @@ PROTO GankenKun [
                                                   -2.439140000e-07 3.079813500e-05 -3.878150000e-07
                                                 ]
                                               }
-                                              recognitionColors IS recognitionColors
+                                              #recognitionColors IS recognitionColors
                                             }
                                           }
                                         ]
@@ -1617,7 +1866,7 @@ PROTO GankenKun [
                                             0.000000000 0.000000000 0.000000000
                                           ]
                                         }
-                                        recognitionColors IS recognitionColors
+                                        #recognitionColors IS recognitionColors
                                       }
                                     }
                                   ]
@@ -1640,7 +1889,7 @@ PROTO GankenKun [
                                       -1.228580000e-07 -7.002346000e-06 -4.585110000e-07
                                     ]
                                   }
-                                  recognitionColors IS recognitionColors
+                                  #recognitionColors IS recognitionColors
                                 }
                               }
                               HingeJoint {
@@ -1712,7 +1961,7 @@ PROTO GankenKun [
                                       -6.507700000e-08 -5.399560000e-06 -2.428710000e-07
                                     ]
                                   }
-                                  recognitionColors IS recognitionColors
+                                  #recognitionColors IS recognitionColors
                                 }
                               }
                             ]
@@ -1726,7 +1975,7 @@ PROTO GankenKun [
                                 4.339110000e-07 9.292810000e-06 1.173013000e-06
                               ]
                             }
-                            recognitionColors IS recognitionColors
+                            #recognitionColors IS recognitionColors
                           }
                         }
                       ]
@@ -1749,7 +1998,7 @@ PROTO GankenKun [
                           -1.228580000e-07 6.529856000e-06 4.585110000e-07
                         ]
                       }
-                      recognitionColors IS recognitionColors
+                      #recognitionColors IS recognitionColors
                     }
                   }
                   HingeJoint {
@@ -1821,7 +2070,7 @@ PROTO GankenKun [
                           6.507700000e-08 5.340292000e-06 -2.428710000e-07
                         ]
                       }
-                      recognitionColors IS recognitionColors
+                      #recognitionColors IS recognitionColors
                     }
                   }
                 ]
@@ -1835,7 +2084,7 @@ PROTO GankenKun [
                     1.635109000e-06 3.745413700e-05 -2.377456000e-06
                   ]
                 }
-                recognitionColors IS recognitionColors
+                #recognitionColors IS recognitionColors
               }
             }
           ]
@@ -1858,7 +2107,7 @@ PROTO GankenKun [
               0.000000000e+00 0.000000000e+00 9.499173000e-06
             ]
           }
-          recognitionColors IS recognitionColors
+          #recognitionColors IS recognitionColors
         }
       }
       Accelerometer {
@@ -1893,7 +2142,7 @@ PROTO GankenKun [
         0.000000e+00 0.000000e+00 0.000000e+00
       ]
     }
-    recognitionColors IS recognitionColors
+    #recognitionColors IS recognitionColors
     controller IS controller
     controllerArgs IS controllerArgs
     customData IS customData
