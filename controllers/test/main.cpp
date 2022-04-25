@@ -33,7 +33,7 @@ int main() {
   // s << std::setw(2) << std::setfill('0') << localTime->tm_sec;
   // fs::create_directory(s.str());
 
-  while(robot->step(32) != -1){
+  while(robot->step(8) != -1){
     static int i = 0;
     //mTimeStep = (int)robot->getBasicTimeStep();
     //camera->enable(mTimeStep * 13);
@@ -56,7 +56,7 @@ int main() {
     cv::imwrite( "/home/kanbe/GankenKun_webots/controllers/test/images/image_" + oss.str() + ".png", img );
     // cv::imwrite( s.str() + "/" + "output_" + oss.str() + ".jpg", img );
 
-    cv::imshow( "image", img );
+    // cv::imshow( "image", img );
     cv::waitKey(1);
     // imagewriter.saveCapturedImage(img);
   }

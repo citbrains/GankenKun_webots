@@ -13,6 +13,7 @@
 # limitations under the License.
 
 #from gamestate import GameState
+from importlib import import_module
 from turtle import left
 from field import Field
 #from forceful_contact_matrix import ForcefulContactMatrix
@@ -38,6 +39,7 @@ import csv
 from scipy.spatial import ConvexHull
 
 from types import SimpleNamespace
+import datetime
 
 def append_solid(solid, solids):  # we list only the hands and feet
     if solid.getField('name'):
@@ -80,92 +82,6 @@ player = supervisor.getFromDef('PLAYER')
 solids = []
 read_val = [0]*14
 append_solid(player, solids)
-# print(len(solids))
-
-# for solid in solids:
-#     if str(solid.getField('name').getSFString()) == "camera_sensor":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[0] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "left_shoulder_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         # shoulder = solid.getPosition()
-#         read_val[1] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "left upper [arm]":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         # left_arm = float(solid.getPosition())
-#         read_val[3] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "left lower [arm]":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         # left_arm += float(solid.getPosition())
-#         read_val[3] +=solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "left [hand]":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[5] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right_shoulder_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         # shoulder += solid.getPosition()
-#         read_val[2] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right upper [arm]":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         # right_arm = float(solid.getPosition())
-#         read_val[4] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right lower [arm]":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         # right_arm += float(solid.getPosition())
-#         read_val[4] +=solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right [hand]":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[6] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "left_waist_pitch_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[7] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "left_knee_pitch_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[9] =solid.getPosition()
-#     if str(solid.getField('name').getSFString()) == "left_ankle_pitch_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[11] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right_waist_pitch_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[8] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right_knee_pitch_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[10] =solid.getPosition()
-#
-#     if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
-#         print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-#         read_val[12] =solid.getPosition()
-
-# left_arm = left_arm/2
-# right_arm = right_arm/2
-
-# f_list = list(map(float, read_val))
-#
-# f_list[3] /= 2
-# f_list[4] /= 2
-
-# print(read_val)
-# read_val[3] = left_arm
-# read_val[4] = right_arm
-#
-# print(shoulder)
-# shoulder = calculation_of_waypoints(shoulder)
-# print(shoulder)
-# print(left_arm)
-# print(right_arm)
-# print(read_val)
 
 ball = supervisor.getFromDef('BALL')
 player_translation = supervisor.getFromDef('PLAYER').getField('translation')
@@ -278,7 +194,9 @@ try:
                     print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
                     read_val[14] = solid.getPosition()
 
+            # ut = datetime.datetime.now()
             with open('test_file.txt', 'a') as f:
+                # f.write("%s" % ut)
                 for d in read_val:
                     f.write("%s\n" % d)
 
