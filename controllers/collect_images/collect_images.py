@@ -13,6 +13,7 @@ camera.enable(timestep)
 
 try:
     for x in np.arange(-4.3, 4.3, 0.2):
+        supervisor.simulationReset()
         for y in np.arange(-3, 3, 0.2):
             for the in np.arange(-1.57, 1.57, 3.14/10):
                 supervisor.getFromDef('PLAYER').getField('translation').setSFVec3f([x, y, 0.450])
