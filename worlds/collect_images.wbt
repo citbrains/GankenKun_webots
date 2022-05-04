@@ -43,7 +43,15 @@ TexturedBackground {
 TexturedBackgroundLight {
   texture "stadium_dry"
 }
-Robot {
-  supervisor TRUE
+RobocupSoccerField {
+  size "kid"
+}
+DEF PLAYER GankenKun {
+  translation -0.3 0 0.450
+  rotation 0 0 1 0
+  name "blue player 2"
+  jerseyTexture "textures/GankenKun_blue2.png"
+  jerseyColor 0, 0, 1
   controller "collect_images"
+  supervisor TRUE
 }
