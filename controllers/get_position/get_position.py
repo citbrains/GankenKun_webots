@@ -76,17 +76,17 @@ field = Field("kid")
 children = supervisor.getRoot().getField('children')
 children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "kid" }}')
 children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.1 size 1 }}')
-children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+children.importMFNodeFromString(-1, f'DEF ENEMY1 RoboCup_GankenKun {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 # children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-player = supervisor.getFromDef('PLAYER')
+player = supervisor.getFromDef('ENEMY1')
 solids = []
 read_val = [0]*14
 append_solid(player, solids)
 
 ball = supervisor.getFromDef('BALL')
-player_translation = supervisor.getFromDef('PLAYER').getField('translation')
-player_rotation = supervisor.getFromDef('PLAYER').getField('rotation')
-player_controller = supervisor.getFromDef('PLAYER').getField('controller')
+player_translation = supervisor.getFromDef('ENEMY1').getField('translation')
+player_rotation = supervisor.getFromDef('ENEMY1').getField('rotation')
+player_controller = supervisor.getFromDef('ENEMY1').getField('controller')
 ball_translation = supervisor.getFromDef('BALL').getField('translation')
 ball_rotation = supervisor.getFromDef('BALL').getField('rotation')
 ram = 0
@@ -98,29 +98,29 @@ try:
 
         # ram = random.randrange(5)
         if ram == 0:
-            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 RoboCup_GankenKun {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             ram += 1
         elif ram == 1:
-            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 RoboCup_GankenKun {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             ram += 1
         elif ram == 2:
-            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.8 0.14 0.4467 rotation 0.0006 -0.0066 -0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 RoboCup_GankenKun {{translation 2.8 0.14 0.4467 rotation 0.0006 -0.0066 -0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             ram += 1
         elif ram == 3:
-            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.807 -0.028 0.446 rotation 0.001 -0.007 0.999 0.523 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 RoboCup_GankenKun {{translation 2.807 -0.028 0.446 rotation 0.001 -0.007 0.999 0.523 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             ram += 1
         elif ram == 4:
-            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation 2.8845 0.1461 0.4470 rotation -0.0045 0.0058 0.999 -0.5242 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 RoboCup_GankenKun {{translation 2.8845 0.1461 0.4470 rotation -0.0045 0.0058 0.999 -0.5242 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             ram = 0
 
-        player = supervisor.getFromDef('PLAYER')
+        player = supervisor.getFromDef('ENEMY1')
         ball.resetPhysics()
         ball_translation.setSFVec3f([3, 0, 0.1])
         ball_rotation.setSFRotation([0, 0, 1, 0])
         while supervisor.step(time_step) != -1:
             count += 1
 
-            player = supervisor.getFromDef('PLAYER')
+            player = supervisor.getFromDef('ENEMY1')
             solids = []
             read_val = [0]*15
             append_solid(player, solids)

@@ -58,8 +58,8 @@ lines = [
 ]
 
 while supervisor.step(timestep) != -1:
-    supervisor.getFromDef('BALL').getField('translation').setSFVec3f([random.uniform(0.0, 4.0), random.uniform(-1.0, 1.0), 0.1])
-    supervisor.getFromDef('ENEMY1').getField('rotation').setSFRotation([0, 0, 1, random.uniform(-1.0, 1.0)+3.14])
+    # supervisor.getFromDef('BALL').getField('translation').setSFVec3f([random.uniform(0.0, 4.0), random.uniform(-1.0, 1.0), 0.1])
+    # supervisor.getFromDef('ENEMY1').getField('rotation').setSFRotation([0, 0, 1, random.uniform(-1.0, 1.0)+3.14])
     for i in range(10):
         supervisor.step(timestep)
     camera.saveImage(deviceImagePath + '/images/image' + str(number) + '.jpg', 80)
