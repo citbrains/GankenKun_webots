@@ -3,7 +3,9 @@ import csv
 import math
 import sys
 
-file_name = "./motion.csv"
+#file_name = "./motion.csv"
+file_name = "./raise_foot.csv"
+
 if len(sys.argv) > 1:
     file_name = sys.argv[1]
 csv_file = open(file_name, "r")
@@ -51,7 +53,10 @@ while True:
             index += 1
             if index >= len(data):
                 break
-            delta_angles = [(float(data[index][i+1]) - angles[i])/(float(data[index][0])*0.008) for i in range(len(motors))]
+            try:
+                delta_angles = [(float(data[index][i+1]) - angles[i])/(float(data[index][0])*0.008) for i in range(len(motors))]
+            except ZeroDivisionError:
+                break
             tm += float(data[index][0]) * 0.008
         for i in range(len(motors)):
             angles[i] += delta_angles[i] * 0.008

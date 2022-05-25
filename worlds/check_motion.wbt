@@ -1,0 +1,49 @@
+#VRML_SIM R2021b utf8
+WorldInfo {
+  info [
+    "GANKENKUN robot."
+    "The GANKENKUN robot simulation model"
+  ]
+  title "GANKENKUN"
+  basicTimeStep 8
+  optimalThreadCount 1
+  physicsDisableTime 0.1
+  physicsDisableLinearThreshold 0.1
+  physicsDisableAngularThreshold 0.1
+  contactProperties [
+    ContactProperties {
+      material1 "grass"
+      coulombFriction [
+        0.5
+      ]
+      softCFM 0.03
+    }
+    ContactProperties {
+      material1 "grass"
+      material2 "robocup soccer ball"
+      coulombFriction [
+        0.5
+      ]
+      bounce 0.76
+      softCFM 0.05
+    }
+    ContactProperties {
+      material2 "robocup soccer ball"
+      bounce 0.76
+    }
+  ]
+}
+Viewpoint {
+  orientation 0 1 0 0
+  position 0.573 0.288 7.07
+}
+TexturedBackground {
+  texture "stadium_dry"
+}
+TexturedBackgroundLight {
+  texture "stadium_dry"
+}
+Robot {
+  supervisor TRUE
+  controller "check_motion"
+}
