@@ -118,8 +118,8 @@ public:
 
 		// reverse_motors.emplace(ARM_ROLL_L);
 		
-		// reverse_motors.emplace(KNEE_L1);
-		// reverse_motors.emplace(KNEE_L2);
+		reverse_motors.emplace(KNEE_L1);
+		reverse_motors.emplace(KNEE_L2);
 		// reverse_motors.emplace(LEG_ROLL_L);
 		// reverse_motors.emplace(FOOT_ROLL_L);
 		// reverse_motors.emplace(LEG_PITCH_L);

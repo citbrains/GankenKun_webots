@@ -24,8 +24,8 @@ public:
      */
     std::vector<std::pair<uint32_t, double>> getMotorDegrees()
     {
-        std::array<std::byte, buf_size_> data;
-        data.fill(static_cast<std::byte>(0));
+        std::array<char, buf_size_> data;
+        data.fill(static_cast<char>(0));
         auto buf = zmq::buffer(data.data(), data.size());
         reply_.recv(buf);
         webotsMotionEngine::degrees deg;
@@ -57,7 +57,8 @@ public:
         {
             sensor.add_accelerometer(itm);
         }
-        std::string_view data(sensor.SerializeAsString().c_str());
+        std::string data(sensor.SerializeAsString());
+        std::cout << sensor.DebugString();
         auto buf = zmq::buffer(data);
         reply_.send(buf);
     }
