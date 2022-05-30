@@ -45,6 +45,20 @@ TexturedBackgroundLight {
 Robot {
   controller "get_position"
   supervisor TRUE
+  colorHead       [0 0 0]
+  colorNeck       [0 0 0]
+  colorShoulderL  [0 0 0]
+  colorShoulderR  [0 0 0]
+  colorElbowL     [0 0 0]
+  colorElbowR     [0 0 0]
+  colorWristL     [0 0 0]
+  colorWristR     [0 0 0]
+  colorHipL       [0 0 0]
+  colorHipR       [0 0 0]
+  colorKneeL      [0 0 0]
+  colorKneeR      [0 0 0]
+  colorAnkleL     [0 0 0]
+  colorAnkleR     [0 0 0]
 }
 RobocupSoccerField {
   size "kid"
