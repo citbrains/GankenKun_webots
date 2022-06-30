@@ -38,6 +38,8 @@
 #include <webots/Gyro.hpp>
 #include <webots/Keyboard.hpp>
 #include <webots/Camera.hpp>
+#include <webots/Supervisor.hpp>
+#include <webots/Node.hpp>
 #include <cmath>
 #include <set>
 #include <exception>
@@ -317,7 +319,8 @@ class webots_motor_control
 
 private:
 	std::vector<std::pair<int32_t, std::string>> motors_info;
-	webots::Robot *robot;
+	webots::Supervisor *robot;
+	//webots::Robot *robot;
 	std::vector<std::tuple<int32_t, webots::Motor *, std::string>> robot_motors;
 	webots::Gyro *robot_gyro;
 	webots::Accelerometer *robot_accelerometer;
@@ -331,12 +334,19 @@ private:
 	//ここの大きさはreceive側と同じにする必要がある
 	const int32_t message_len;
 	uint32_t highest_priority;
+	//webots::Supervisor *super_visor;
+	webots::Node *node;
+	webots::Field *field;
+	bool is_position;
 
 public:
 	webots_motor_control() : mTimeStep(0), current_key(0), // forced_wait(waitForCreateQueue()),
-							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 5, 1000), message_len(700 * 480 * 4), highest_priority(0)
+							 msgq(boost::interprocess::open_or_create, "WEBOTS_PICTURE_COMMUNICATION", 5, 1000), message_len(700 * 480 * 4), highest_priority(0), is_position(true)
 	{
-		robot = new webots::Robot();
+		std::cout << "construct in ---------------" << std::endl;
+		//robot = new webots::Robot();
+		robot = new webots::Supervisor();
+		//super_visor = new webots::Supervisor();
 		motors_info.push_back({FOOT_ROLL_R, "right_ankle_roll_joint"});
 		motors_info.push_back({LEG_PITCH_R, "right_ankle_pitch_joint"});
 		// motors_info.push_back({KNEE_R1, "right_ankle_pitch_mimic_joint"});
@@ -375,6 +385,15 @@ public:
 		reverse_motors.emplace("left_waist_pitch_joint");
 		reverse_motors.emplace("right_shoulder_roll_joint");
 		reverse_motors.emplace("left_shoulder_roll_joint");
+		std::cout << "getFromDef before ---------------" << std::endl;
+		//node = robot->getFromDef("head_yaw_joint");
+		init_supervisor();
+		if(node == NULL){
+			std::cerr << "get from def differ" << std::endl;
+			is_position = false;
+		}
+		//is_position = false;//add
+		std::cout << "getFromDef after ---------------" << std::endl;
 		for (auto &mp : motors_info)
 		{
 			auto motor_ptr = robot->getMotor(mp.second);
@@ -681,6 +700,39 @@ public:
 	{
 		return mTimeStep;
 	}
+	
+	/*
+	const double *getPosition()
+	{
+		return node->getPosition();
+	}
+	*/
+
+	bool isPosition()
+	{
+		return is_position;
+	}
+
+	void init_supervisor()
+	{
+		node = robot->getRoot();
+		field = node->getField("children");
+		const int n = field->getCount();
+		for(int i=0;i<n;i++){
+			node = field->getMFNode(i);
+			std::cout << "-> " << node->getTypeName() << std::endl;
+		}
+
+		std::cout << "children n = " << n << std::endl;
+		std::cout << "name = " << field->getName() << std::endl;
+	}
+
+	const double *getPosition()
+	{
+		node = field->getMFNode(5);
+		return node->getPosition();
+	}
+
 };
 
 /*--------------------------------------*/
@@ -699,6 +751,8 @@ int main(int argc, char *argv[])
 
 	OrientationEstimator orientationEst((double)(FRAME_RATE) / 1000.0, 0.1);
 
+	const double *position;
+	
 #endif
 	if (argc > 1)
 	{
@@ -720,6 +774,10 @@ int main(int argc, char *argv[])
 	// loop start
 	for (count_time_l = 0; wb_ganken.step(); count_time_l++)
 	{
+		if(wb_ganken.isPosition()){
+			position = wb_ganken.getPosition();
+			std::cout << "position = " << position[0] << "," << position[1] << "," << position[2] << std::endl;
+		}
 		bool cmd_accept = false;
 		{
 			// accept command

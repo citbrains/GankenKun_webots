@@ -11,7 +11,7 @@ PROTO GankenKun [
   field  SFString    controller      "void"       # Is `Robot.controller`.
   field  MFString    controllerArgs  []           # Is `Robot.controllerArgs`.
   field  SFString    customData      ""           # Is `Robot.customData`.
-  field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
+  field  SFBool      supervisor      TRUE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
   field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
   field  SFInt32     cameraWidth     640          # Is `Camera.width`.
