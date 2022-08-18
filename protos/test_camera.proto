@@ -3,7 +3,7 @@ field SFVec3f    translation 4 0.35 0.063504
 field SFRotation rotation       1 0 0 0
 field SFInt32    cameraWidth     640          # Is `Camera.width`.
 field SFInt32    cameraHeight    480          # Is `Camera.height`.
-field SFString   controller     "test"
+field SFString   controller     "annotation_keypoints"
 ]
 {
 Robot {

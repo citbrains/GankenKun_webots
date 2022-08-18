@@ -10,7 +10,7 @@ import numpy as np
 deviceImagePath = os.getcwd()
 #robot = Robot()
 supervisor = Supervisor()
-timestep = int(supervisor.getBasicTimeStep()*10)
+timestep = int(supervisor.getBasicTimeStep()*4)
 camera = supervisor.getDevice('camera_sensor')
 camera.enable(timestep)
 camera.recognitionEnable(timestep)
