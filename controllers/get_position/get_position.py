@@ -76,11 +76,12 @@ field = Field("kid")
 children = supervisor.getRoot().getField('children')
 children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "kid" }}')
 children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.1 size 1 }}')
-children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+# children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
 # children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 player = supervisor.getFromDef('ENEMY1')
 solids = []
-read_val = [0]*14
+read_val = [0]*13
 append_solid(player, solids)
 
 ball = supervisor.getFromDef('BALL')
@@ -96,31 +97,33 @@ try:
         count = 0
         player.remove()
 
-        children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+        # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
         #ram = random.randrange(5)
-        # if ram == 0:
-        #     print("000000000000000000000000000")
+        if ram == 0:
+            print("000000000000000000000000000")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0642 0.446 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
         #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             #children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            # ram += 1
-        # elif ram == 1:
-        #     print("11111111111111111111111")
-        #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-        #     ram += 1
-        # elif ram == 2:
-        #     print("2222222222222222222222222")
-        #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.8 0.14 0.4467 rotation 0.0006 -0.0066 -0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-        #     ram += 1
-        # elif ram == 3:
-        #     print("333333333333333333333333333333333")
-        #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.807 -0.028 0.446 rotation 0.001 -0.007 0.999 0.523 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-        #     ram += 1
-        # elif ram == 4:
-        #     print("44444444444444444444444444444")
-        #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.8845 0.1461 0.4470 rotation -0.0045 0.0058 0.999 -0.5242 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-        #     ram = 0
+            ram += 1
+        elif ram == 1:
+            print("11111111111111111111111")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            ram += 1
+        elif ram == 2:
+            print("2222222222222222222222222")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.85 0.11 0.446 rotation 0.0006 -0.0066 -0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            ram += 1
+        elif ram == 3:
+            print("333333333333333333333333333333333")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.87 0.136 0.446 rotation -0.0157 0.00652 1 -0.523 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            ram += 1
+        elif ram == 4:
+            print("44444444444444444444444444444")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.82 -0.0281 0.445 rotation 0.0103 -0.0134 1 0.525 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            ram = 0
 
         player = supervisor.getFromDef('ENEMY1')
         ball.resetPhysics()
@@ -131,77 +134,77 @@ try:
 
             player = supervisor.getFromDef('ENEMY1')
             solids = []
-            read_val = [0]*15
+            read_val = [0]*13
             append_solid(player, solids)
             # print(len(solids))
 
             for solid in solids:
                 if str(solid.getField('name').getSFString()) == "camera_sensor":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    # read_val[0] = solid.getPosition()
-                    read_val[0] = [0,0,0]
+                    read_val[0] = solid.getPosition()
+                    #read_val[0] = [0,0,0]
 
-                if str(solid.getField('name').getSFString()) == "left_shoulder_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[1] = solid.getPosition()
+                # if str(solid.getField('name').getSFString()) == "left_shoulder_link":
+                #     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                #     read_val[1] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "left upper [arm]":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
                     # left_arm = float(solid.getPosition())
                     # left_test[0] = solid.getPosition()
-                    read_val[3] = solid.getPosition()
+                    read_val[1] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "left lower [arm]":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
                     # left_arm += float(solid.getPosition())
                     # left_test[1] = solid.getPosition()
-                    read_val[4] = solid.getPosition()
+                    read_val[3] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "left [hand]":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[7] = solid.getPosition()
+                    read_val[5] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right_shoulder_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[2] = solid.getPosition()
+                # if str(solid.getField('name').getSFString()) == "right_shoulder_link":
+                #     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                #     read_val[2] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "right upper [arm]":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
                     # right_arm = float(solid.getPosition())
-                    read_val[5] = solid.getPosition()
+                    read_val[2] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "right lower [arm]":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
                     # right_arm += float(solid.getPosition())
-                    read_val[6] = solid.getPosition()
+                    read_val[4] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "right [hand]":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[8] = solid.getPosition()
+                    read_val[6] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "left_waist_pitch_link":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[9] = solid.getPosition()
+                    read_val[7] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "left_knee_pitch_link":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[11] = solid.getPosition()
+                    read_val[9] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "left_ankle_pitch_link":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[13] = solid.getPosition()
+                    read_val[11] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "right_waist_pitch_link":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[10] = solid.getPosition()
+                    read_val[8] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "right_knee_pitch_link":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[12] = solid.getPosition()
+                    read_val[10] = solid.getPosition()
 
                 if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
                     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[14] = solid.getPosition()
+                    read_val[12] = solid.getPosition()
 
             # ut = datetime.datetime.now()
             with open('test_file.txt', 'a') as f:
@@ -209,7 +212,7 @@ try:
                 for d in read_val:
                     f.write("%s\n" % d)
 
-            if count > 400:
+            if count > 300:
                 break
             #if count > 800 - 1:
                 #pos = ball_translation.getSFVec3f()

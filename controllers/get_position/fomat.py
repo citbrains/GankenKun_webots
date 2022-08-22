@@ -1,4 +1,5 @@
 import shutil
+from unittest import mock
 file_name = "test_file.txt"
 back_name = file_name + ".bak"
 shutil.copy(file_name, back_name)
@@ -24,7 +25,7 @@ cnt = -1	  # どこのキーポイントか計測する用
 with open(file_name, 'r', encoding='utf-8') as fin:  # ファイルを開く
 	for line in fin.readlines():  # 行をすべて読み込んで1行ずつfor文で回
 		cnt += 1
-		if cnt == 14:
+		if cnt == 12:
 			cnt = -1
 
 		row = []  # 行のデータを保存するリスト
@@ -38,21 +39,41 @@ with open(file_name, 'r', encoding='utf-8') as fin:  # ファイルを開く
 
 			row.append(num)  # 行に保存
 
-		if cnt == 3 or cnt == 5:
-			memo1 = row
+		row[0] = 4.5 - row[0] 
 
-		if cnt == 4 or cnt ==6:
-			memo2 = row
-			ans[0] = memo1[0] + memo2[0]
-			ans[1] = memo1[1] + memo2[1]
-			ans[2] = memo1[2] + memo2[2]
+		if cnt == 1:
+			memo = row
+
+		if cnt == 2:
+			memo0 = row 
+			ans[0] = memo[0] + memo0[0]
+			ans[1] = memo[1] + memo0[1]
+			ans[2] = memo[2] + memo0[2]
 			ans[0] /= 2
 			ans[1] /= 2
 			ans[2] /= 2
 			row = ans
-			# print(row)
+			mat.append(row)
+			mat.append(memo0)
+			continue
+
+		# if cnt == 3 or cnt == 5:
+		# 	memo1 = row
+		# 	continue  # スキップ
+                #
+		# if cnt == 4 or cnt ==6:
+		# 	memo2 = row
+		# 	ans[0] = memo1[0] + memo2[0]
+		# 	ans[1] = memo1[1] + memo2[1]
+		# 	ans[2] = memo1[2] + memo2[2]
+		# 	ans[0] /= 2
+		# 	ans[1] /= 2
+		# 	ans[2] /= 2
+		# 	row = ans
+		# 	print(row)
 
 		mat.append(row)  # 行をnumsに保存
+
 with open('comp_file.txt', 'a') as f:
 	for d in mat:
 		f.write("%s\n" % d)
