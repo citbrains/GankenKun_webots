@@ -76,8 +76,7 @@ field = Field("kid")
 children = supervisor.getRoot().getField('children')
 children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "kid" }}')
 children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.1 size 1 }}')
-# children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0648 0.446 rotation -0.957 0.228 -0.181 -0.0133 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
 # children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 player = supervisor.getFromDef('ENEMY1')
 solids = []
@@ -100,29 +99,21 @@ try:
         # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
         #ram = random.randrange(5)
         if ram == 0:
-            print("000000000000000000000000000")
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0642 0.446 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-        #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            #children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.8 0.15 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            ram += 1
+            print("front ")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0648 0.446 rotation -0.957 0.228 -0.181 -0.0133 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0642 0.446 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            # ram += 1
         elif ram == 1:
-            print("11111111111111111111111")
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.783 0.015 0.4465 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+        #     print("left near")
+        #     children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.024 0.4457 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+        #     ram += 1
+        # elif ram == 2:
+            print("left")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.82 -0.0281 0.445 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
             ram += 1
         elif ram == 2:
-            print("2222222222222222222222222")
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.85 0.11 0.446 rotation 0.0006 -0.0066 -0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            ram += 1
-        elif ram == 3:
-            print("333333333333333333333333333333333")
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.87 0.136 0.446 rotation -0.0157 0.00652 1 -0.523 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-            ram += 1
-        elif ram == 4:
-            print("44444444444444444444444444444")
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.82 -0.0281 0.445 rotation 0.0103 -0.0134 1 0.525 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
+            print("right")
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.86 0.15 0.445 rotation 0.0386 0.0185 0.999 -0.518 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
             ram = 0
 
         player = supervisor.getFromDef('ENEMY1')
@@ -131,10 +122,11 @@ try:
         ball_rotation.setSFRotation([0, 0, 1, 0])
         while supervisor.step(time_step) != -1:
             count += 1
+            # print(count)
 
             player = supervisor.getFromDef('ENEMY1')
             solids = []
-            read_val = [0]*13
+            read_val = [0]*14
             append_solid(player, solids)
             # print(len(solids))
 
@@ -207,12 +199,13 @@ try:
                     read_val[12] = solid.getPosition()
 
             # ut = datetime.datetime.now()
+            read_val[13] = ball.getPosition()
             with open('test_file.txt', 'a') as f:
                 # f.write("%s" % ut)
                 for d in read_val:
                     f.write("%s\n" % d)
 
-            if count > 300:
+            if count > 250:
                 break
             #if count > 800 - 1:
                 #pos = ball_translation.getSFVec3f()
