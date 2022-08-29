@@ -14,6 +14,7 @@
 
 #from gamestate import GameState
 from importlib import import_module
+from re import S
 from turtle import left
 from field import Field
 #from forceful_contact_matrix import ForcefulContactMatrix
@@ -58,16 +59,6 @@ def append_solid(solid, solids):  # we list only the hands and feet
                 continue
             append_solid(solid, solids)  # active tag is reset after a joint
 
-def calculation_of_waypoints(test):
-    list = [0,0,0]
-    x = (test[0] +test[3]) / 2
-    y = (test[1] +test[4]) / 2
-    z = (test[2] +test[5]) / 2
-    list[0] = x
-    list[1] = y
-    list[2] = z
-    return list
-
 # start the webots supervisor
 supervisor = Supervisor()
 time_step = int(supervisor.getBasicTimeStep())
@@ -75,12 +66,13 @@ time_step = int(supervisor.getBasicTimeStep())
 field = Field("kid")
 children = supervisor.getRoot().getField('children')
 children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "kid" }}')
-children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.1 size 1 }}')
+children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 3 0 0.08 size 1 }}')
 children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.86 0.0883 0.445 rotation 0.979 -0.186 0.0884 0.0217 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
 # children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 player = supervisor.getFromDef('ENEMY1')
 solids = []
 read_val = [0]*13
+memo_ball = [3,0,0.08]
 append_solid(player, solids)
 
 ball = supervisor.getFromDef('BALL')
@@ -101,11 +93,6 @@ try:
         if ram == 0:
             print("front ")
             children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.86 0.0627 0.444 rotation 0.966 -0.168 0.195 0.0461 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0854 0.445 rotation -0.512 0.0707 -0.856 0.00899 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0753 0.445 rotation -0.831 0.311 -0.462 0.0122 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0555 0.445 rotation 0.911 -0.339 0.233 -0.0194 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0648 0.446 rotation -0.957 0.228 -0.181 -0.0133 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
-            # children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.83 0.0642 0.446 rotation 0.0039 -0.012 0.9999 0.2618 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
             # ram += 1
         elif ram == 1:
         #     print("left near")
@@ -122,7 +109,7 @@ try:
 
         player = supervisor.getFromDef('ENEMY1')
         ball.resetPhysics()
-        ball_translation.setSFVec3f([3, 0, 0.1])
+        ball_translation.setSFVec3f([3,0,0.08])
         ball_rotation.setSFRotation([0, 0, 1, 0])
         while supervisor.step(time_step) != -1:
             count += 1
@@ -130,86 +117,94 @@ try:
 
             player = supervisor.getFromDef('ENEMY1')
             solids = []
-            read_val = [0]*14
+            read_val = [0]*13
             append_solid(player, solids)
             # print(len(solids))
 
-            for solid in solids:
-                if str(solid.getField('name').getSFString()) == "camera_sensor":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[0] = solid.getPosition()
-                    #read_val[0] = [0,0,0]
+            memo_ball= ball.getPosition()
+            if memo_ball[0] <= 3:
 
-                # if str(solid.getField('name').getSFString()) == "left_shoulder_link":
-                #     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                #     read_val[1] = solid.getPosition()
+                for solid in solids:
+                    if str(solid.getField('name').getSFString()) == "camera_sensor":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[0] = solid.getPosition()
+                        #read_val[0] = [0,0,0]
 
-                if str(solid.getField('name').getSFString()) == "left upper [arm]":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    # left_arm = float(solid.getPosition())
-                    # left_test[0] = solid.getPosition()
-                    read_val[1] = solid.getPosition()
+                    # if str(solid.getField('name').getSFString()) == "left_shoulder_link":
+                    #     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                    #     read_val[1] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "left lower [arm]":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    # left_arm += float(solid.getPosition())
-                    # left_test[1] = solid.getPosition()
-                    read_val[3] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "left upper [arm]":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        # left_arm = float(solid.getPosition())
+                        # left_test[0] = solid.getPosition()
+                        read_val[1] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "left [hand]":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[5] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "left lower [arm]":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        # left_arm += float(solid.getPosition())
+                        # left_test[1] = solid.getPosition()
+                        read_val[3] = solid.getPosition()
 
-                # if str(solid.getField('name').getSFString()) == "right_shoulder_link":
-                #     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                #     read_val[2] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "left [hand]":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[5] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right upper [arm]":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    # right_arm = float(solid.getPosition())
-                    read_val[2] = solid.getPosition()
+                    # if str(solid.getField('name').getSFString()) == "right_shoulder_link":
+                    #     # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                    #     read_val[2] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right lower [arm]":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    # right_arm += float(solid.getPosition())
-                    read_val[4] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "right upper [arm]":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        # right_arm = float(solid.getPosition())
+                        read_val[2] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right [hand]":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[6] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "right lower [arm]":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        # right_arm += float(solid.getPosition())
+                        read_val[4] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "left_waist_pitch_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[7] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "right [hand]":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[6] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "left_knee_pitch_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[9] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "left_waist_pitch_link":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[7] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "left_ankle_pitch_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[11] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "left_knee_pitch_link":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[9] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right_waist_pitch_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[8] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "left_ankle_pitch_link":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[11] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right_knee_pitch_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[10] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "right_waist_pitch_link":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[8] = solid.getPosition()
 
-                if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
-                    # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
-                    read_val[12] = solid.getPosition()
+                    if str(solid.getField('name').getSFString()) == "right_knee_pitch_link":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[10] = solid.getPosition()
+
+                    if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
+                        # print(str(solid.getField('name').getSFString())+": "+str(solid.getPosition()))
+                        read_val[12] = solid.getPosition()
 
             # ut = datetime.datetime.now()
-            read_val[13] = ball.getPosition()
-            with open('test_file.txt', 'a') as f:
+            # read_val[13] = ball.getPosition()
+                with open('test_file.txt', 'a') as f:
                 # f.write("%s" % ut)
-                for d in read_val:
-                    f.write("%s\n" % d)
+                    for d in read_val:
+                        f.write("%s\n" % d)
 
-            if count > 300:
+
+            if count > 300 or memo_ball[0] >= 4.5:
+                print(memo_ball)
+                memo = str(memo_ball)
+                with open('test_file.txt', 'a') as f:
+                    f.write(memo)
                 break
             #if count > 800 - 1:
                 #pos = ball_translation.getSFVec3f()
