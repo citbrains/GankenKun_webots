@@ -683,10 +683,10 @@ PROTO GankenKun [
               device [
                 RotationalMotor {
                   name "left_waist_roll_joint [hip]"
-                  maxVelocity %{= b3msc1170_maxVelo }%
+                  maxVelocity %{= b3msc1170_maxVelo / 2.0 }%
                   minPosition -5.58505360638185
                   maxPosition  5.58505360638185
-                  maxTorque %{= b3msc1170_torque }%
+                  maxTorque %{= b3msc1170_torque * 2.0 }%
                 }
                 PositionSensor {
                   name "left_waist_roll_joint [hip]_sensor"
@@ -1324,10 +1324,10 @@ PROTO GankenKun [
               device [
                 RotationalMotor {
                   name "right_waist_roll_joint [hip]"
-                  maxVelocity %{= b3msc1170_maxVelo }%
+                  maxVelocity %{= b3msc1170_maxVelo / 2.0 }%
                   minPosition -5.58505360638185
                   maxPosition  5.58505360638185
-                  maxTorque %{= b3msc1170_torque }%
+                  maxTorque %{= b3msc1170_torque * 2.0 }%
                 }
                 PositionSensor {
                   name "right_waist_roll_joint [hip]_sensor"
