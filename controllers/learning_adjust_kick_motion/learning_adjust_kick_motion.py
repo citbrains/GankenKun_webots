@@ -1,4 +1,3 @@
-from email import header
 from controller import Supervisor
 import math
 import csv
@@ -52,6 +51,11 @@ motor_sensor_names = [
 ]
 
 direction = [-1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1]
+sensor_data_max = 65535
+sensor_data_min = 0
+sc_max = 1
+sc_min = -1
+
 
 def read_file():
     # file_name = "./kick_motion.csv""  # 正常のキック動作を再生する場合は有効化する
@@ -65,20 +69,26 @@ def read_file():
     
 
 def create_file():
-    header = ['acc x', 'acc y', 'acc z', 'gyro x', 'gyro y', 'gyro z']
+    header = ['acc x', 'acc y', 'acc z', 'gyro x', 'gyro y', 'gyro z', 'rot x', 'rot y', 'rot z', 'rot angle']
     with open('sensor_data.csv', 'w', newline='') as df:
         writer = csv.writer(df)
         writer.writerow(header)
         
-def update_file(acc_data, gyro_data):
-    listdata = [acc_data[0], acc_data[1], acc_data[2], gyro_data[0], gyro_data[1], gyro_data[2]]
+def update_file(acc_data, gyro_data, robot_rot):
+    listdata = [acc_data[0], acc_data[1], acc_data[2], gyro_data[0], gyro_data[1], gyro_data[2], robot_rot[0], robot_rot[1], robot_rot[2], robot_rot[3]]
     with open('sensor_data.csv', 'a', newline='') as df:
         writer = csv.writer(df)
         writer.writerow(listdata)
 
+def Normalization(data):
+    return (data - sensor_data_min) / (sensor_data_max - sensor_data_min) * (sc_max - sc_min) + sc_min
+    
+
 def main():
     supervisor = Supervisor()
     time_step = int(supervisor.getBasicTimeStep())
+    player = supervisor.getFromDef('PLAYER')
+    player_rotation = supervisor.getFromDef('PLAYER').getField('rotation')
     data = read_file()
     motors = [supervisor.getDevice(i) for i in motor_names] # センサーと異なり.enableはいらない
     motor_sensors = [supervisor.getDevice(i) for i in motor_sensor_names]
@@ -102,9 +112,15 @@ def main():
         while supervisor.step(time_step) != -1:
             acc_data = accelerometer.getValues()
             gyro_data = gyro.getValues()
-            update_file(acc_data, gyro_data)
-            print("acc_data = {}".format(acc_data))
-            print("gyro_data = {}".format(gyro_data))
+            
+            acc_data = list(map(Normalization, acc_data))
+            gyro_data = list(map(Normalization, gyro_data))
+            robot_rot = player_rotation.getSFRotation()
+            update_file(acc_data, gyro_data, robot_rot)
+            
+            # print("robot_rot = {}".format(robot_rot))
+            # print("acc_data = {}".format(acc_data))
+            # print("gyro_data = {}".format(gyro_data))
             if t >= tm:
                 index += 1
                 if index >= len(data):
