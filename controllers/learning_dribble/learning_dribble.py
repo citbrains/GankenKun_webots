@@ -38,7 +38,7 @@ motorNames = [
 ]
 
 class OpenAIGymEnvironment(Supervisor, gym.Env):
-    def __init__(self, max_episode_steps=1000):
+    def __init__(self, max_episode_steps=300):
         super().__init__()
 
         self.time_step = 0        
@@ -89,6 +89,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
 
     def reset(self):
         # Reset the simulation
+        self.time_step = 0
         x_goal, y_goal, th_goal = 0.0, 0.0, 0.0
         self.foot_step = self.walk.setGoalPos([x_goal, y_goal, th_goal])
         super().step(self.__timestep)
@@ -102,10 +103,12 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.simulationReset()
         super().step(self.__timestep)
 
+        init_x = 0.0
+        init_y = 0.0
         obs_x_list = [random.uniform(1.0, 2.0), random.uniform(2.5, 3.5), random.uniform(2.5, 3.5)]
         obs_y_list = [random.uniform(-0.25, 0.25), random.uniform(-1.8, -0.25), random.uniform(0.25, 1.8)]
-        self.getSelf().getField('translation').setSFVec3f([0.0, 0.0, 0.450])
-        self.getFromDef('BALL').getField('translation').setSFVec3f([0.2, 0.0, 0.1])
+        self.getSelf().getField('translation').setSFVec3f([init_x, init_y, 0.450])
+        self.getFromDef('BALL').getField('translation').setSFVec3f([init_x+0.2, init_y, 0.1])
         self.getFromDef('ENEMY1').getField('translation').setSFVec3f([obs_x_list[0], obs_y_list[0],0.450])
         self.getFromDef('ENEMY2').getField('translation').setSFVec3f([obs_x_list[1], obs_y_list[1],0.450])
         self.getFromDef('ENEMY3').getField('translation').setSFVec3f([obs_x_list[2], obs_y_list[2],0.450])
@@ -192,6 +195,8 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
             dist_ball_obs_list.append(dist_ball_obs)
         num = np.argmin(dist_ball_obs_list)
         ball_obs_distance = dist_ball_obs_list[num]
+
+        self.time_step+=1
 
         done = bool(
                 abs(x) > self.x_threshold

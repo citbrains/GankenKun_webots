@@ -38,10 +38,11 @@ motorNames = [
 ]
 
 class OpenAIGymEnvironment(Supervisor, gym.Env):
-    def __init__(self, max_episode_steps=1000):
+    def __init__(self, max_episode_steps=300):
         super().__init__()
 
-        self.time_step = 0        
+        self.time_step = 0
+        self.max_episode_steps = max_episode_steps
         self.num_successes = 0
         self.goal_pos = [4.5, 0]
         self.goal_rightpole = self.goal_pos[1] + 1.3
@@ -89,6 +90,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
 
     def reset(self):
         # Reset the simulation
+        self.time_step = 0
         x_goal, y_goal, th_goal = 0.0, 0.0, 0.0
         self.foot_step = self.walk.setGoalPos([x_goal, y_goal, th_goal])
         super().step(self.__timestep)
@@ -114,6 +116,9 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.__motors = []
         for name in motorNames:
             self.__motors.append(self.getDevice(name))
+        
+        # Internals
+        super().step(self.__timestep)
 
         # Open AI Gym generic
         return np.array(self.state, dtype=np.float32)
@@ -193,6 +198,8 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         num = np.argmin(dist_ball_obs_list)
         ball_obs_distance = dist_ball_obs_list[num]
 
+        self.time_step += 1
+
         done = bool(
                 abs(x) > self.x_threshold
                 or abs(y) > self.y_threshold
@@ -202,6 +209,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 or abs(ball_direction_deg) > self.direction_deg_threshold
                 or obs_distance < self.obs_dist_threshold
                 or ball_obs_distance < self.obs_dist_threshold
+                or self.time_step > self.max_episode_steps
         )
         reward = 0
         if not done:
@@ -233,6 +241,8 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
             elif ball_distance > self.dist_threshold or abs(ball_direction_deg) > self.direction_deg_threshold:
                 #print('ball lost...')
                 reward = math.floor(-100.0 * ball_goal_distance)
+            elif self.time_step > self.max_episode_steps:
+                reward = 0
             else:
                 #print('else')
                 reward = -500
@@ -243,12 +253,12 @@ if __name__ == '__main__':
     env = OpenAIGymEnvironment()
     env = DummyVecEnv([lambda: env])
     try:
-        print("Transfer learning based on sample.zip")
         model = PPO2.load('sample')
         model.set_env(env)
+        print("Transfer learning based on sample.zip")
     except:
-        print("Start learning")
         model = PPO2('MlpPolicy', env, verbose=1, tensorboard_log="./dribble_tensorboard/")
-
-    model.learn(total_timesteps=10000, log_interval=1000)
+        print("Start learning")
+    
+    model.learn(total_timesteps=50000, log_interval=1000)
     model.save("model")
