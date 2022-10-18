@@ -1,4 +1,4 @@
-from controller import Supervisor
+from controller import Supervisor, Node
 import math
 import csv
 import math
@@ -56,6 +56,21 @@ sensor_data_min = 0
 sc_max = 1
 sc_min = -1
 
+def append_solid(solid, solids):  # we list only the hands and feet
+    if solid.getField('name'):
+        solids.append(solid)
+    children = solid.getProtoField('children') if solid.isProto() else solid.getField('children')
+    for i in range(children.getCount()):
+        child = children.getMFNode(i)
+        if child.getType() in [Node.ROBOT, Node.SOLID, Node.GROUP, Node.TRANSFORM, Node.ACCELEROMETER, Node.CAMERA, Node.GYRO, Node.TOUCH_SENSOR]:
+            append_solid(child, solids)
+            continue
+        if child.getType() in [Node.HINGE_JOINT, Node.HINGE_2_JOINT, Node.SLIDER_JOINT, Node.BALL_JOINT]:
+            endPoint = child.getProtoField('endPoint') if child.isProto() else child.getField('endPoint')
+            solid = endPoint.getSFNode()
+            if solid.getType() == Node.NO_NODE or solid.getType() == Node.SOLID_REFERENCE:
+                continue
+            append_solid(solid, solids)  # active tag is reset after a joint
 
 def read_file():
     # file_name = "./kick_motion.csv""  # 正常のキック動作を再生する場合は有効化する
@@ -69,13 +84,13 @@ def read_file():
     
 
 def create_file():
-    header = ['acc x', 'acc y', 'acc z', 'gyro x', 'gyro y', 'gyro z', 'rot x', 'rot y', 'rot z', 'rot angle']
+    header = ['acc x', 'acc y', 'acc z', 'gyro x', 'gyro y', 'gyro z', 'rot x', 'rot y', 'rot z', 'rot angle', 'foot pos x', 'foot pos y', 'foot pos z', 'foot speed x', 'foot speed y', 'foot speed z']
     with open('sensor_data.csv', 'w', newline='') as df:
         writer = csv.writer(df)
         writer.writerow(header)
         
-def update_file(acc_data, gyro_data, robot_rot):
-    listdata = [acc_data[0], acc_data[1], acc_data[2], gyro_data[0], gyro_data[1], gyro_data[2], robot_rot[0], robot_rot[1], robot_rot[2], robot_rot[3]]
+def update_file(acc_data, gyro_data, robot_rot, foot_pos, foot_speed):
+    listdata = [acc_data[0], acc_data[1], acc_data[2], gyro_data[0], gyro_data[1], gyro_data[2], robot_rot[0], robot_rot[1], robot_rot[2], robot_rot[3],  foot_pos[0],  foot_pos[1],  foot_pos[2], foot_speed[0], foot_speed[1], foot_speed[2]]
     with open('sensor_data.csv', 'a', newline='') as df:
         writer = csv.writer(df)
         writer.writerow(listdata)
@@ -89,11 +104,15 @@ def main():
     time_step = int(supervisor.getBasicTimeStep())
     player = supervisor.getFromDef('PLAYER')
     player_rotation = supervisor.getFromDef('PLAYER').getField('rotation')
-    data = read_file()
+    solids = []
+    append_solid(player, solids)    
+    
     motors = [supervisor.getDevice(i) for i in motor_names] # センサーと異なり.enableはいらない
     motor_sensors = [supervisor.getDevice(i) for i in motor_sensor_names]
     accelerometer = supervisor.getDevice('accelerometer')
     gyro = supervisor.getDevice('gyro')
+    
+    data = read_file()
     create_file()
 
     for i in range (len(motor_sensor_names)):
@@ -110,17 +129,19 @@ def main():
         delta_angles = [0.0] * len(motors)
 
         while supervisor.step(time_step) != -1:
-            acc_data = accelerometer.getValues()
-            gyro_data = gyro.getValues()
-            
+            acc_data = accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
+            gyro_data = gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[]
             acc_data = list(map(Normalization, acc_data))
             gyro_data = list(map(Normalization, gyro_data))
-            robot_rot = player_rotation.getSFRotation()
-            update_file(acc_data, gyro_data, robot_rot)
+            robot_rot = player_rotation.getSFRotation()     #取得情報は対象の姿勢 軸角度表現で表せる  単位は[]
             
-            # print("robot_rot = {}".format(robot_rot))
-            # print("acc_data = {}".format(acc_data))
-            # print("gyro_data = {}".format(gyro_data))
+            for solid in solids:
+                if str(solid.getField('name').getSFString()) == "right [foot]":
+                    foot_pos = solid.getPosition()         #取得情報は対象のx, y, zの座標 単位は[]
+                    foot_speed = solid.getVelocity()    #取得情報は対象のx, y, zの線形速度と角速度の計6つ 単位は[]
+
+            update_file(acc_data, gyro_data, robot_rot, foot_pos, foot_speed)
+            
             if t >= tm:
                 index += 1
                 if index >= len(data):
