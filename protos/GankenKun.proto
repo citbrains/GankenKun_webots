@@ -4,6 +4,8 @@
 # This is a proto file for Webots for the GankenKun
 # Extracted from: gankenkun_simple.urdf
 
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/joints/protos/HingeJointWithBacklash.proto"
+
 PROTO GankenKun [
   field  SFVec3f     translation     0 0 0
   field  SFRotation  rotation        0 1 0 0

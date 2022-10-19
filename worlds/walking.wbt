@@ -1,4 +1,8 @@
 #VRML_SIM R2021b utf8
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+IMPORTABLE EXTERNPROTO "../protos/RobocupSoccerField.proto"
+IMPORTABLE EXTERNPROTO "../protos/RoboCup_GankenKun.proto"
 WorldInfo {
   info [
     "GANKENKUN robot."

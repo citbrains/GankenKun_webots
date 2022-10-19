@@ -8,6 +8,8 @@
 # translation, rotation, name and controllerArgs fields, so that they can
 # be properly inserted into Robocup games.
 
+EXTERNPROTO "../protos/GankenKun.proto"
+
 PROTO RoboCup_GankenKun [
   field SFVec3f                 translation    0 0 0   # Is `Transform.translation`.
   field SFRotation              rotation       0 0 1 0 # Is `Transform.rotation`.

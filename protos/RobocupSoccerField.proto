@@ -3,6 +3,9 @@
 # license url: http://www.apache.org/licenses/LICENSE-2.0
 # Official soccer field for the Robocup Humanoid League 2021.
 
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Grass.proto"
+EXTERNPROTO "../protos/RobocupGoal.proto"
+
 PROTO RobocupSoccerField [
   field SFVec3f                     translation 0 0 0
   field SFRotation                  rotation    0 1 0 0
