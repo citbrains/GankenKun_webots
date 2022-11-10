@@ -112,9 +112,9 @@ ram = 0
 x_list=[]
 y_list=[]
 
-for x in frange(2.85,2.88,0.01):
+for x in frange(2.85,2.90,0.01):
     x_list.append(x)
-for y in frange(0.015,0.119,0.001):
+for y in frange(0.015,0.125,0.001):
     y_list.append(y)
 
 try:
@@ -141,8 +141,8 @@ try:
 
                     memo_ball= ball.getPosition()
                     # print("memo ball : ",memo_ball)
-                    if memo_ball[0] <= 3:
-
+                    #if memo_ball[0] <= 3:
+                    if count < 72:
                         for solid in solids:
                             if str(solid.getField('name').getSFString()) == "camera_sensor":
                                 read_val[0] = solid.getPosition()
@@ -183,35 +183,41 @@ try:
                             if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
                                 read_val[12] = solid.getPosition()
 
-                        with open('test_file.txt', 'a') as f:
+                        with open('test_file_front.txt', 'a') as f:
                             for d in read_val:
                                 f.write("%s\n" % d)
+                    elif fg == False:
+                        fg = True
+                        cnt_memo = count
 
-                    print(count)
-                    if count > 300 or memo_ball[0] >= 4.4:
+                    #print(count)
+                    if count > 250 or memo_ball[0] >= 4.4:
                         print(memo_ball)
                         memo = str(memo_ball)
-                        cnt = str(count)
-                        with open('ball_pos.txt', 'a') as f:
+                        cnt = str(cnt_memo)
+                        with open('ball_pos_front.txt', 'a') as f:
                             f.write(memo)
                             f.write("\n")
-                            f.write(cnt)
-                            f.write("\n")
+                            #f.write(cnt)
+                            #f.write("\n")
                         break
 
         for r in frange(0.010,0.060,0.001):
             count = 0
             player.remove()
             pos_list = getXY(r,30)
-            print(pos_list)
+            #print(pos_list)
 
             children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.86+pos_list[0]} {0.065+pos_list[1]} 0.446 rotation 0 0 1 -0.524 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            pos_list[0] = pos_list[0] + 2.86
+            pos_list[1] = pos_list[1] + 0.065
             print("x : ",pos_list[0], "y : ",pos_list[1])
             player = supervisor.getFromDef('ENEMY1')
             ball.resetPhysics()
             ball_translation.setSFVec3f([3,0,0.08])
             ball_rotation.setSFRotation([0, 0, 1, 0])
-                
+            fg = False
+
             while supervisor.step(time_step) != -1:
                 count += 1
 
@@ -222,7 +228,7 @@ try:
 
                 memo_ball= ball.getPosition()
                 # print("memo ball : ",memo_ball)
-                if memo_ball[0] <= 3:
+                if count < 72:
                     for solid in solids:
                         if str(solid.getField('name').getSFString()) == "camera_sensor":
                             read_val[0] = solid.getPosition()
@@ -263,20 +269,22 @@ try:
                         if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
                             read_val[12] = solid.getPosition()
 
-                    with open('test_file.txt', 'a') as f:
+                    with open('test_file_left.txt', 'a') as f:
                         for d in read_val:
                             f.write("%s\n" % d)
+                elif fg == False:
+                    fg = True
+                    cnt_memo = count
 
-                print(count)
-                if count > 300 or memo_ball[0] >= 4.4:
+                if count > 250 or memo_ball[0] >= 4.4:
                     print(memo_ball)
                     memo = str(memo_ball)
-                    cnt = str(count)
-                    with open('ball_pos.txt', 'a') as f:
+                    cnt = str(cnt_memo)
+                    with open('ball_pos_left.txt', 'a') as f:
                         f.write(memo)
                         f.write("\n")
-                        f.write(cnt)
-                        f.write("\n")
+                        #f.write(cnt)
+                        #f.write("\n")
                     break
         
 
@@ -284,15 +292,17 @@ try:
             count = 0
             player.remove()
             pos_list = getXY(r,-30)
-            print(pos_list)
 
             children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.81+pos_list[0]} {0.015+pos_list[1]} 0.446 rotation 0 0 1 0.524 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            pos_list[0] = pos_list[0] + 2.81
+            pos_list[1] = pos_list[1] + 0.015
             print("x : ",pos_list[0], "y : ",pos_list[1])
             player = supervisor.getFromDef('ENEMY1')
             ball.resetPhysics()
             ball_translation.setSFVec3f([3,0,0.08])
             ball_rotation.setSFRotation([0, 0, 1, 0])
-                
+            fg = False
+
             while supervisor.step(time_step) != -1:
                 count += 1
 
@@ -303,7 +313,7 @@ try:
 
                 memo_ball= ball.getPosition()
                 # print("memo ball : ",memo_ball)
-                if memo_ball[0] <= 3:
+                if count < 72:
                     for solid in solids:
                         if str(solid.getField('name').getSFString()) == "camera_sensor":
                             read_val[0] = solid.getPosition()
@@ -344,21 +354,24 @@ try:
                         if str(solid.getField('name').getSFString()) == "right_ankle_pitch_link":
                             read_val[12] = solid.getPosition()
 
-                    with open('test_file.txt', 'a') as f:
+                    with open('test_file_right.txt', 'a') as f:
                         for d in read_val:
                             f.write("%s\n" % d)
+                elif fg == False:
+                    fg = True
+                    cnt_memo = left
 
-                print(count)
-                if count > 300 or memo_ball[0] >= 4.4:
+                if count > 250 or memo_ball[0] >= 4.4:
                     print(memo_ball)
                     memo = str(memo_ball)
-                    cnt = str(count)
-                    with open('ball_pos.txt', 'a') as f:
+                    cnt = str(cnt_memo)
+                    with open('ball_pos_right.txt', 'a') as f:
                         f.write(memo)
                         f.write("\n")
-                        f.write(cnt)
-                        f.write("\n")
+                        #f.write(cnt)
+                        #f.write("\n")
                     break
+        break
 
 except Exception:
     error(f"Unexpected exception in main referee loop: {traceback.format_exc()}", fatal=True)
