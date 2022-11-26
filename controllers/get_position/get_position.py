@@ -94,7 +94,7 @@ field = Field("kid")
 children = supervisor.getRoot().getField('children')
 # children.importMFNodeFromString(-1, f'RobocupSoccerField {{ size "kid" }}')
 children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 3 0 0.08 size 1 }}')
-children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.018 0.446 rotation 0 1 0 0 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation 2.81 0.018 0.446 rotation 0 1 0 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 # children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation -0.3 0 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
 player = supervisor.getFromDef('ENEMY1')
 solids = []
@@ -124,7 +124,7 @@ try:
                 count = 0
                 player.remove()
 
-                children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {x_list[x]} {y_list[y]} 0.446 rotation 0 1 0 0 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+                children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {x_list[x]} {y_list[y]} 0.446 rotation 0 1 0 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
                 print("x : ",x_list[x], "y : ",y_list[y])
                 player = supervisor.getFromDef('ENEMY1')
                 ball.resetPhysics()
@@ -209,7 +209,7 @@ try:
             pos_list = getXY(r,30)
             #print(pos_list)
 
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.86+pos_list[0]} {0.065+pos_list[1]} 0.446 rotation 0 0 1 -0.524 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.86+pos_list[0]} {0.065+pos_list[1]} 0.446 rotation 0 0 1 -0.524 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             pos_list[0] = pos_list[0] + 2.86
             pos_list[1] = pos_list[1] + 0.065
             print("x : ",pos_list[0], "y : ",pos_list[1])
@@ -294,7 +294,7 @@ try:
             player.remove()
             pos_list = getXY(r,-30)
 
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.81+pos_list[0]} {0.015+pos_list[1]} 0.446 rotation 0 0 1 0.524 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.81+pos_list[0]} {0.015+pos_list[1]} 0.446 rotation 0 0 1 0.524 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             pos_list[0] = pos_list[0] + 2.81
             pos_list[1] = pos_list[1] + 0.015
             print("x : ",pos_list[0], "y : ",pos_list[1])
@@ -378,7 +378,7 @@ try:
             player.remove()
             pos_list = getXY(r,15)
 
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.85+pos_list[0]} {0.0457+pos_list[1]} 0.446 rotation 0 0 1 -0.262 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.85+pos_list[0]} {0.0457+pos_list[1]} 0.446 rotation 0 0 1 -0.262 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             pos_list[0] = pos_list[0] + 2.85
             pos_list[1] = pos_list[1] + 0.0475
             print("x : ",pos_list[0], "y : ",pos_list[1])
@@ -462,7 +462,7 @@ try:
             player.remove()
             pos_list = getXY(r,15)
 
-            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.80+pos_list[0]} {0.0343+pos_list[1]} 0.446 rotation 0 0 1 0.262 controller "play_motion" controllerArgs "./kick_motion1.csv"}}')
+            children.importMFNodeFromString(-1, f'DEF ENEMY1 GankenKun_Keypoints {{translation {2.80+pos_list[0]} {0.0343+pos_list[1]} 0.446 rotation 0 0 1 0.262 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
             pos_list[0] = pos_list[0] + 2.80
             pos_list[1] = pos_list[1] + 0.0343
             print("x : ",pos_list[0], "y : ",pos_list[1])
