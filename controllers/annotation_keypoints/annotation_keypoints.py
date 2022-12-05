@@ -26,7 +26,7 @@ print("hasRecognitionSegmentation(): " + str(camera.hasRecognitionSegmentation()
 color_dict = { \
 #    "ball_color"    :(0.0, 0.0, 1.0), \
     "colorHead"     :(1.0, 1.0, 1.0), \
-    "colorNeck"     :(0.5, 0.5, 0.5), \
+#    "colorNeck"     :(0.5, 0.5, 0.5), \
     "colorShoulderL":(0.0, 0.5, 0.0), \
     "colorShoulderR":(0.5, 0.0, 0.0), \
     "colorElbowL"   :(0.0, 0.6, 0.0), \
@@ -42,8 +42,9 @@ color_dict = { \
 }
 pos_dict = dict()
 lines = [
-    ["colorHead"     , "colorNeck"     ],
-    ["colorNeck"     , "colorShoulderL"],
+#    ["colorHead"     , "colorNeck"     ],
+#    ["colorNeck"     , "colorShoulderL"],
+    ["colorHead"     , "colorShoulderL"],
     ["colorShoulderL", "colorElbowL"   ],
     ["colorElbowL"   , "colorWristL"   ],
     ["colorNeck"     , "colorShoulderR"],
