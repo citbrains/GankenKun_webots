@@ -57,17 +57,22 @@ lines = [
     ["colorKneeR"    , "colorAnkleR"   ]
 ]
 
+cnt = -1
+
 while supervisor.step(timestep) != -1:
     # supervisor.getFromDef('BALL').getField('translation').setSFVec3f([random.uniform(0.0, 4.0), random.uniform(-1.0, 1.0), 0.1])
     # supervisor.getFromDef('ENEMY1').getField('rotation').setSFRotation([0, 0, 1, random.uniform(-1.0, 1.0)+3.14])
     for i in range(10):
         supervisor.step(timestep)
     camera.saveImage(deviceImagePath + '/images/image' + str(number) + '.jpg', 80)
-    camera.saveRecognitionSegmentationImage(deviceImagePath + '/images/segmentation_image' + str(number) + '.jpg', 80)
+    #camera.saveRecognitionSegmentationImage(deviceImagePath + '/images/segmentation_image' + str(number) + '.jpg', 80)
     number += 1
     seg_img = camera.getRecognitionSegmentationImage()
     img = np.frombuffer(seg_img, np.uint8).reshape((camera.getHeight(), camera.getWidth(), 4))
     
+    cnt +=1
+    file_path = 'txt/image' + str(cnt) + '.txt'
+
     for key, val in color_dict.items():
         color = (val[0]*255, val[1]*255, val[2]*255, 255)
         area = cv2.inRange(img, color, color)
@@ -75,10 +80,14 @@ while supervisor.step(timestep) != -1:
         #cv2.rectangle(img, (x, y), (x + width, y + height), color=color, thickness=2)
         pos_dict[key] = (x + width / 2, y + height / 2)
         print(key + ": " + str(x) + ", y: " + str(y) + ", with: " + str(width) + ", height: " + str(height))
-        with open('test_file.txt', 'a') as f:
+        with open(file_path, 'a') as f:
             f.write("%s" % x)
             f.write(',')
-            f.write("%s\n" % y)
+            f.write("%s" % y)
+            if x!=0 or y!=0:
+                f.write(',2\n')
+            else:
+                f.write(',0\n')
 
     # for line in lines:
     #     x0, y0 = int(pos_dict[line[0]][0]), int(pos_dict[line[0]][1])
