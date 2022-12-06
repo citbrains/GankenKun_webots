@@ -42,8 +42,8 @@ color_dict = { \
 }
 pos_dict = dict()
 lines = [
-#    ["colorHead"     , "colorNeck"     ],
-#    ["colorNeck"     , "colorShoulderL"],
+    ["colorHead"     , "colorNeck"     ],
+    ["colorNeck"     , "colorShoulderL"],
     ["colorHead"     , "colorShoulderL"],
     ["colorShoulderL", "colorElbowL"   ],
     ["colorElbowL"   , "colorWristL"   ],
