@@ -122,8 +122,8 @@ class OpenAIGymEnvironment(Supervisor):
                 OpenAIGymEnvironment.append_solid(solid, solids)  # active tag is reset after a joint
 
     def read_file(self):
-        # file_name = "./kick_motion.csv""  # 正常のキック動作を再生する場合は有効化する
-        file_name = "./falldown_kick.csv"   # キック後に転倒する動作を再生する場合は有効化する
+        file_name = "./kick_motion.csv"  #正常のキック動作を再生する場合は有効化する
+        # file_name = "./falldown_kick.csv"   # キック後に転倒する動作を再生する場合は有効化する
         if len(sys.argv) > 1:
             file_name = sys.argv[1]
         csv_file = open(file_name, "r")
@@ -143,29 +143,23 @@ class OpenAIGymEnvironment(Supervisor):
         with open('sensor_data.csv', 'a', newline='') as df:
             writer = csv.writer(df)
             writer.writerow(listdata)
-
-    def Normalization(self, data):
+    
+    def Normalization(data):
         return (data - sensor_data_min) / (sensor_data_max - sensor_data_min) * (sc_max - sc_min) + sc_min
     
     def step(self, data):
-        
-        # while super().step(self.__timestep) != -1:
-            # acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
-            # gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[]
-            # print(self.t)            
-            # acc_data = list(map(Normalization, acc_data))
-            # gyro_data = list(map(Normalization, gyro_data))
-            
-            # player_rotation_data = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 軸角度表現で表せる  単位は[]
-            
-            # for solid in solids:
-            #     if str(solid.getField('name').getSFString()) == "right [foot]":
-            #         foot_pos = solid.getPosition()         #取得情報は対象のx, y, zの座標 単位は[]
-            #         foot_speed = solid.getVelocity()    #取得情報は対象のx, y, zの線形速度と角速度の計6つ 単位は[]
-
-            # update_file(acc_data, gyro_data, robot_rot, foot_pos, foot_speed)
         while True:
-            while super().step(self.__timestep) != -1:  
+            while super().step(self.__timestep) != -1: 
+                acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
+                gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
+                acc_data = list(map(OpenAIGymEnvironment.Normalization, acc_data))
+                gyro_data = list(map(OpenAIGymEnvironment.Normalization, gyro_data))
+                player_rotation_data = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 軸角度表現で表せる  単位は[]
+                for solid in self.__robot_body_solids:
+                    if str(solid.getField('name').getSFString()) == "right [foot]":
+                        foot_pos = solid.getPosition()         #取得情報は対象のx, y, zの座標 単位は[]
+                        foot_speed = solid.getVelocity()    #取得情報は対象のx, y, zの線形速度と角速度の計6つ 単位は[]
+                                
                 if self.t >= self.tm:
                     self.index += 1
                     if self.index >= len(data):
@@ -184,15 +178,11 @@ class OpenAIGymEnvironment(Supervisor):
                 self.t += self.__timestep / 1000.0
             break
         
-        
-
 def main():
     env = OpenAIGymEnvironment()
     env.reset()
     data = env.read_file()
     env.step(data)
-    
-    
-        
+
 if __name__ == "__main__":
     main()
