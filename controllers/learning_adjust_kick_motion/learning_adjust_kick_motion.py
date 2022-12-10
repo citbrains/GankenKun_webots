@@ -59,12 +59,81 @@ sensor_data_min = 0
 sc_max = 1
 sc_min = -1
 
-class OpenAIGymEnvironment(Supervisor):
+class OpenAIGymEnvironment(Supervisor, gym.Env):
     
-    def __init__(self) :
+    def __init__(self, max_episode_steps=1000) :
         super().__init__()
         
-        # Environment specific
+        action_space_high = np.array(
+            [ 
+                #修正する角度量[deg]
+                # right_ankle_roll,
+                # left_ankle_roll,
+                # right_ankle_pitch, 
+                # left_ankle_pitch, 
+                # right_waist_roll, 
+                # left_waist_roll
+                30,
+                30,
+                30,
+                30,
+                30,
+                30,
+            ], dtype=np.float32
+        )
+        
+        observation_space_high = np.array(
+            [
+                #加速度 x, y, x
+                1.0,
+                1.0,
+                1.0,
+                #ジャイロ x, y, z
+                1.0,
+                1.0,
+                1.0,
+                #エージェントの姿勢 x, y, z, deg
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                #各関節の目標関節角度 
+                # right_ankle_roll,
+                # left_ankle_roll,
+                # right_ankle_pitch, 
+                # left_ankle_pitch, 
+                # right_waist_roll, 
+                # left_waist_roll
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                #各関節の現在の関節角度 ＊対象は上と同じ
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+                180.0,
+            ], dtype=np.float32
+        )
+        
+        # OpenAIGym_environmental_preference 
+        self.action_spaces = gym.spaces.Box(-action_space_high, action_space_high, dtype=np.float32)
+        self.observation_space = gym.spaces.Box(-observation_space_high, observation_space_high, dtype=np.float32)
+        self.state = np.array([
+                                0, 0, 0, # 加速度 x, y, x
+                                0, 0, 0, # ジャイロ x, y, z
+                                0, 0, 0, 0, # エージェントの姿勢 x, y, z, deg
+                                0, 0, 0, 0, 0, 0,  # 各関節の目標関節角度 
+                                0, 0, 0, 0, 0, 0,  # 各関節の現在の関節角度 
+                                ], dtype=np.float32)
+        self.spec = gym.envs.registration.EnvSpec(id='GankenKun_Operation_Modifying_Env-v0', max_episode_steps=max_episode_steps)
+        
+        
+        # Webots_environmental_preference
         self.__timestep = int(self.getBasicTimeStep())
         self.__motors = []
         self.__motor_angle_sensors = []
@@ -131,29 +200,20 @@ class OpenAIGymEnvironment(Supervisor):
         data = [row for row in f]
         return data
     
-
-    def create_file(self):
-        header = ['acc x', 'acc y', 'acc z', 'gyro x', 'gyro y', 'gyro z', 'rot x', 'rot y', 'rot z', 'rot angle', 'foot pos x', 'foot pos y', 'foot pos z', 'foot speed x', 'foot speed y', 'foot speed z']
-        with open('sensor_data.csv', 'w', newline='') as df:
-            writer = csv.writer(df)
-            writer.writerow(header)
-        
-    def update_file(acc_data, gyro_data, robot_rot, foot_pos, foot_speed):
-        listdata = [acc_data[0], acc_data[1], acc_data[2], gyro_data[0], gyro_data[1], gyro_data[2], robot_rot[0], robot_rot[1], robot_rot[2], robot_rot[3],  foot_pos[0],  foot_pos[1],  foot_pos[2], foot_speed[0], foot_speed[1], foot_speed[2]]
-        with open('sensor_data.csv', 'a', newline='') as df:
-            writer = csv.writer(df)
-            writer.writerow(listdata)
-    
     def Normalization(data):
         return (data - sensor_data_min) / (sensor_data_max - sensor_data_min) * (sc_max - sc_min) + sc_min
     
     def step(self, data):
         while True:
             while super().step(self.__timestep) != -1: 
+                
+                
+                # Observation
                 acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
-                gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
                 acc_data = list(map(OpenAIGymEnvironment.Normalization, acc_data))
+                gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
                 gyro_data = list(map(OpenAIGymEnvironment.Normalization, gyro_data))
+                
                 player_rotation_data = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 軸角度表現で表せる  単位は[]
                 for solid in self.__robot_body_solids:
                     if str(solid.getField('name').getSFString()) == "right [foot]":
