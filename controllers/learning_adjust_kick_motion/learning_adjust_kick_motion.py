@@ -54,85 +54,23 @@ MOTOR_SENSOR_NAMES = [
 ]
 
 direction = [-1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1]
-learning_target_joint = [1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ]
 sensor_data_max = 65535
 sensor_data_min = 0
 sc_max = 1
 sc_min = -1
+
+# learning_parameter
+learning_target_joint = [1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ]
+learning_target_joint_num = 6
+learning_target_motion_frame_num = 8
+learning_action_angle_range = 30
 
 class OpenAIGymEnvironment(Supervisor, gym.Env):
     
     def __init__(self, max_episode_steps=1000) :
         super().__init__()
         
-        action_space_high = np.array(
-            [ 
-                #修正する角度量[deg]
-                # right_ankle_roll,
-                # left_ankle_roll,
-                # right_ankle_pitch, 
-                # left_ankle_pitch, 
-                # right_waist_roll, 
-                # left_waist_roll
-                
-                # frame 1
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 2
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 3
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 4
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 5
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 6
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 7
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-                # frame 8
-                30,
-                30,
-                30,
-                30,
-                30,
-                30,
-            ], dtype=np.float32
-        )
+        action_space_high = np.full(learning_target_joint_num * learning_target_motion_frame_num, learning_action_angle_range, dtype=np.float32)
         
         observation_space_high = np.array(
             [
@@ -182,10 +120,11 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                                 0, 0, 0, 0, 0, 0,  # 各関節の目標関節角度 
                                 0, 0, 0, 0, 0, 0,  # 各関節の現在の関節角度 
                                 ], dtype=np.float32)
+        self.reward_range = (0, 1)
         self.spec = gym.envs.registration.EnvSpec(id='GankenKun_Operation_Modifying_Env-v0', max_episode_steps=max_episode_steps)
         
         # Webots_environmental_preference
-        self.__timestep = int(self.getBasicTimeStep())
+        self.__timestep = int(self.getBasicTimeStep()) #シミュレータ内部の仮想時間 10mm sec = 0.01sec
         self.__motors = []
         self.__motor_angle_sensors = []
         self.__robot_body_solids = []
@@ -224,8 +163,13 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.t = 0.0 
         self.tm = 0.0
         self.index = -1
-        self.angles = [0.0] * len(MOTOR_NAMES)
-        self.delta_angles = [0.0] * len(MOTOR_NAMES)
+        self.angles = [0.0] * len(MOTOR_NAMES)                  #モータの目標角度
+        self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
+        
+        self.error_flag = False
+        
+        return np.array(self.state, dtype=np.float32) # return 初期状態
+        
     
     def append_solid(solid, solids):  # we list only the hands and feet
         if solid.getField('name'):
@@ -253,20 +197,17 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         data = [row for row in f]
         return data
     
-    def Normalization(data):
-        return (data - sensor_data_min) / (sensor_data_max - sensor_data_min) * (sc_max - sc_min) + sc_min
+    def Normalization(sensor_data):
+        return (sensor_data - sensor_data_min) / (sensor_data_max - sensor_data_min) * (sc_max - sc_min) + sc_min
     
     def step(self, data):
         while True:
             while super().step(self.__timestep) != -1: 
-                
                 # Observation
                 acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
                 acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data))
-                # print("acc = {}", acc_data)
                 gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
                 gyro_x, gyro_y, gyro_z = list(map(OpenAIGymEnvironment.Normalization, gyro_data))
-                # print("gyro = {}", gyro_data)
                 rot_x, rot_y, rot_z, rot_deg = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 x, y, z, deg 軸角度表現で表せる  単位は[]          
                 for solid in self.__robot_body_solids:
                     if str(solid.getField('name').getSFString()) == "right [foot]":
@@ -275,36 +216,45 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                                                                                 
                 if self.t >= self.tm:
                     self.index += 1 #モーションのフレーム数
-                    print(self.index)
+                    
                     if self.index >= len(data):
                         break
                     try:
-                        self.delta_angles = [(float(data[self.index][i+1]) - self.angles[i])/(float(data[self.index][0])*0.01) for i in range(len(MOTOR_NAMES))]
+                        for i in range(len(MOTOR_NAMES)):
+                            self.delta_angles[i] = (float(data[self.index][i+1]) - self.angles[i]) / (float(data[self.index][0])*0.01)
                     except ZeroDivisionError:
+                        print("ZeroDivisionError")
+                        print("The frame of the motion file contains 0.")
+                        self.error_flag = True
                         break
-                    self.tm += float(data[self.index][0]) * 0.01
+                    self.tm += float(data[self.index][0]) * 0.01 # tm = モーションファイルの書くフレームごとの時間 ÷ webotsのtimestep[sec]
                 for i in range(len(MOTOR_NAMES)):
                     self.angles[i] += self.delta_angles[i] * 0.01
-                    if learning_target_joint[i] == 1:
+                    if learning_target_joint[i] == 1: #学習対象の関節角度の条件分岐
                         self.__motor_angle_sensors_data.append(math.degrees(self.__motor_angle_sensors[i].getValue()))
                         self.__target_joint_angle_data.append(direction[i] * float(self.angles[i]))
                         
-                    # print("ID = {0} {1} : {2} deg". format(i+1, motor_names[i], angles[i]*direction[i]))   
-                    # print("sensor ID = {0} {1} : {2} deg". format(i+1, motor_sensor_names[i], motor_sensor_data))
                 self.state = (acc_x, acc_y, acc_z, gyro_x,gyro_y, gyro_z, rot_x, rot_y, rot_z, rot_deg, self.__target_joint_angle_data, self.__motor_angle_sensors_data)
-                # print("sensor_angles = {}".format(self.__motor_angle_sensors_data))
-                # print("target_angles = {}".format(self.__target_joint_angle_data))
-                # print(end='\n')
                 self.__motor_angle_sensors_data.clear()
                 self.__target_joint_angle_data.clear()
-                
                 [motor.setPosition(math.radians(direction[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]        
                 self.t += self.__timestep / 1000.0
+            
+            if(self.error_flag == False):
+                done = True
+                print("Episode successfully")
+            else:
+                done = False
+                print("Episode failed")
+                
             break
+        
+        # return np.array(self.state, dtype=np.float32), reward, done, {}  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
+
         
 def main():
     env = OpenAIGymEnvironment()
-    env.reset()
+    state = env.reset()
     data = env.read_motion_file()
     env.step(data)
 
