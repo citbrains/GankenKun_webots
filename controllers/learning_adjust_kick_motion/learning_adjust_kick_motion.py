@@ -53,24 +53,23 @@ MOTOR_SENSOR_NAMES = [
     "head_yaw_joint_sensor"                         # ID19
 ]
 
-direction = [-1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1]
-sensor_data_max = 65535
-sensor_data_min = 0
-sc_max = 1
-sc_min = -1
-
+DIRECTION = [-1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1]
+SENSOR_DATA_MAX = 65535
+SENSOR_DATA_MIN = 0
+SC_MAX = 1
+SC_MIN = -1
 # learning_parameter
-learning_target_joint = [1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ]
-learning_target_joint_num = 6
-learning_target_motion_frame_num = 8
-learning_action_angle_range = 30
+LEARNING_TARGET_JOINT = [1, 1, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0 ]
+LEARNING_TARGET_JOINT_NUM = 6
+LEARNING_TARGET_MOTION_FRAME_NUM = 8
+LEARNING_ACTION_ANGLE_RANGE = 30
 
 class OpenAIGymEnvironment(Supervisor, gym.Env):
     
     def __init__(self, max_episode_steps=1000) :
         super().__init__()
         
-        action_space_high = np.full(learning_target_joint_num * learning_target_motion_frame_num, learning_action_angle_range, dtype=np.float32)
+        action_space_high = np.full(LEARNING_TARGET_JOINT_NUM * LEARNING_TARGET_MOTION_FRAME_NUM, LEARNING_ACTION_ANGLE_RANGE, dtype=np.float32)
         
         observation_space_high = np.array(
             [
@@ -167,6 +166,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
         
         self.error_flag = False
+        self.falldown_flag = False
         
         return np.array(self.state, dtype=np.float32) # return 初期状態
         
@@ -187,9 +187,9 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     continue
                 OpenAIGymEnvironment.append_solid(solid, solids)  # active tag is reset after a joint
 
-    def read_motion_file(self):
-        file_name = "./leg_up_motion.csv"  #正常のキック動作を再生する場合は有効化する
-        # file_name = "./falldown_kick.csv"   # キック後に転倒する動作を再生する場合は有効化する
+    def read_motion_file():
+        # file_name = "./leg_up_motion.csv"  #正常のキック動作を再生する場合は有効化する
+        file_name = "./falldown_kick.csv"   # キック後に転倒する動作を再生する場合は有効化する
         if len(sys.argv) > 1:
             file_name = sys.argv[1]
         csv_file = open(file_name, "r")
@@ -198,25 +198,18 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         return data
     
     def Normalization(sensor_data):
-        return (sensor_data - sensor_data_min) / (sensor_data_max - sensor_data_min) * (sc_max - sc_min) + sc_min
+        return (sensor_data - SENSOR_DATA_MIN) / (SENSOR_DATA_MAX - SENSOR_DATA_MIN) * (SC_MAX - SC_MIN) + SC_MIN
     
-    def step(self, data):
+    def step(self):
+        
+        data = OpenAIGymEnvironment.read_motion_file()
+        
         while True:
             while super().step(self.__timestep) != -1: 
-                # Observation
-                acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
-                acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data))
-                gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
-                gyro_x, gyro_y, gyro_z = list(map(OpenAIGymEnvironment.Normalization, gyro_data))
-                rot_x, rot_y, rot_z, rot_deg = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 x, y, z, deg 軸角度表現で表せる  単位は[]          
-                for solid in self.__robot_body_solids:
-                    if str(solid.getField('name').getSFString()) == "right [foot]":
-                        foot_pos = solid.getPosition()         #取得情報は対象のx, y, zの座標 単位は[]
-                        foot_vel_x, foot_vel_y, foot_vel_z,  _, _, _ = solid.getVelocity()    #取得情報は対象のx, y, zの線形速度と角速度の計6つ 単位は[]
-                                                                                
+                
+                # action
                 if self.t >= self.tm:
                     self.index += 1 #モーションのフレーム数
-                    
                     if self.index >= len(data):
                         break
                     try:
@@ -230,33 +223,63 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     self.tm += float(data[self.index][0]) * 0.01 # tm = モーションファイルの書くフレームごとの時間 ÷ webotsのtimestep[sec]
                 for i in range(len(MOTOR_NAMES)):
                     self.angles[i] += self.delta_angles[i] * 0.01
-                    if learning_target_joint[i] == 1: #学習対象の関節角度の条件分岐
+                    if LEARNING_TARGET_JOINT[i] == 1: #学習対象の関節角度の条件分岐
                         self.__motor_angle_sensors_data.append(math.degrees(self.__motor_angle_sensors[i].getValue()))
-                        self.__target_joint_angle_data.append(direction[i] * float(self.angles[i]))
+                        self.__target_joint_angle_data.append(DIRECTION[i] * float(self.angles[i]))
                         
+                [motor.setPosition(math.radians(DIRECTION[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]        
+                self.t += self.__timestep / 1000.0
+            
+                # Observation
+                acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
+                acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data))
+                gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
+                gyro_x, gyro_y, gyro_z = list(map(OpenAIGymEnvironment.Normalization, gyro_data))
+                rot_x, rot_y, rot_z, rot_deg = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 x, y, z, deg 軸角度表現で表せる  単位は[]          
+
                 self.state = (acc_x, acc_y, acc_z, gyro_x,gyro_y, gyro_z, rot_x, rot_y, rot_z, rot_deg, self.__target_joint_angle_data, self.__motor_angle_sensors_data)
                 self.__motor_angle_sensors_data.clear()
                 self.__target_joint_angle_data.clear()
-                [motor.setPosition(math.radians(direction[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]        
-                self.t += self.__timestep / 1000.0
-            
-            if(self.error_flag == False):
-                done = True
-                print("Episode successfully")
-            else:
-                done = False
-                print("Episode failed")
                 
+                # reward        
+                reward = 0
+                if abs(rot_deg) >= 1.0: #各軸度表現の角度を利用して転倒判定を行う
+                    self.falldown_flag = True
+                    
+                for solid in self.__robot_body_solids:
+                    if str(solid.getField('name').getSFString()) == "right [foot]":
+                        foot_pos = solid.getPosition()         #取得情報は対象のx, y, zの座標 単位は[]
+                        foot_vel_x, foot_vel_y, foot_vel_z,  _, _, _ = solid.getVelocity()    #取得情報は対象のx, y, zの線形速度と角速度の計6つ 単位は[]
+
+
             break
         
-        # return np.array(self.state, dtype=np.float32), reward, done, {}  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
+        if self.falldown_flag == True:
+            print("drop out!!!!!!!!!!!!!!")
+            reward = 0
+        else:
+            print("standing!!!!")
+            reward = 1
 
         
+        # done 
+        if(self.error_flag == False):
+            done = True
+            print("Episode successfully")
+        else:
+            done = False
+            reward = 0
+            print("Episode failed")
+        
+        info = {} # 使用していない                
+        print("reward = {}".format(reward))
+        
+        return self.state, reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
+
 def main():
     env = OpenAIGymEnvironment()
     state = env.reset()
-    data = env.read_motion_file()
-    env.step(data)
+    env.step()
 
 if __name__ == "__main__":
     main()
