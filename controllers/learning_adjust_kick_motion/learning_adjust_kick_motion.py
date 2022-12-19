@@ -79,25 +79,25 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 # left_ankle_pitch, 
                 # right_waist_roll, 
                 # left_waist_roll
-                30, 
-                30, 
-                30, 
-                30, 
-                30,                
-                30, 
-                30, 
-                30, 
-                30, 
-                30,
-                30, 
-                30, 
-                30, 
-                30, 
-                30, 
-                30, 
-                30, 
-                30, 
-                30, 
+                10, 
+                10, 
+                10, 
+                10, 
+                10,                
+                10, 
+                10, 
+                10, 
+                10, 
+                10,
+                10, 
+                10, 
+                10, 
+                10, 
+                10, 
+                10, 
+                10, 
+                10, 
+                10, 
             ], dtype=np.float32)
         
         observation_space_high = np.array(
@@ -139,7 +139,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         )
         
         # OpenAIGym_environmental_preference 
-        self.action_spaces = gym.spaces.Box(-action_space_high, action_space_high, dtype=np.float32)
+        self.action_space = gym.spaces.Box(-action_space_high, action_space_high, dtype=np.float32)
         self.observation_space = gym.spaces.Box(-observation_space_high, observation_space_high, dtype=np.float32)
         self.state = np.array([
                                 0, 0, 0, # 加速度 x, y, x
@@ -187,8 +187,11 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.motion_total_time = 0.0
         self.angles = [0.0] * len(MOTOR_NAMES)                  #モータの目標角度
         self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
+        self.data = OpenAIGymEnvironment.read_motion_file(self)
+        
         #ob
         self.falldown_flag = False
+        
         
         return np.array(self.state, dtype=np.float32) # return 初期状態
         
@@ -226,10 +229,15 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
     def Normalization(sensor_data):
         return (sensor_data - SENSOR_DATA_MIN) / (SENSOR_DATA_MAX - SENSOR_DATA_MIN) * (SC_MAX - SC_MIN) + SC_MIN
     
-    def step(self, data):    
-        self.tm += float(data[0]) * 0.01 # tm = モーションファイルの書くフレームごとの時間 ÷ webotsのtime step[sec]
+    def step(self, action):
+        # print("motion_frame = {}".format(self.motion_frame_num))
+        motion_frame_data = self.data[self.motion_frame_num][0]
+        motor_target_angle_data = self.data[self.motion_frame_num][1:20]
+        for i in range(len(MOTOR_NAMES)):
+            motor_target_angle_data[i] = float(motor_target_angle_data[i]) + action[i]
+        
+        self.tm += float(self.data[self.motion_frame_num][0]) * 0.01 # tm = モーションファイルの書くフレームごとの時間 ÷ webotsのtime step[sec]
         motor_angle_sensor_data = [0]*len(MOTOR_SENSOR_NAMES)
-        motor_target_angle_data = data[1:20]
         frame_end_flag = False
         reward = 1
         
@@ -240,6 +248,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
             while super().step(self.__timestep) != -1:
                 if self.t >= self.tm:
                     frame_end_flag = True #1フレーム終了のフラグ
+                    self.motion_frame_num += 1
                     # Observation
                     acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
                     acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data))
@@ -269,7 +278,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     self.t += self.__timestep / 1000.0
                     try:
                         for i in range(len(MOTOR_NAMES)):
-                            self.delta_angles[i] = (float(data[i+1]) - self.angles[i]) / (float(data[0])*0.01)
+                            self.delta_angles[i] = (float(motor_target_angle_data[i]) - self.angles[i]) / (float(motion_frame_data) * 0.01)
                     except ZeroDivisionError:
                         print("ZeroDivisionError")
                         print("The frame of the motion file contains 0.")
@@ -286,8 +295,8 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
 
 def main():
     env = OpenAIGymEnvironment()
-    # model = SAC(MlpPolicy, env, verbose=1)
-    # model.learn(total_timesteps=50000, log_interval=10)
+    model = SAC(MlpPolicy, env, verbose=1)
+    model.learn(total_timesteps=50000, log_interval=10)
     
     for episode in range(3):
         print("------------------")
@@ -296,14 +305,13 @@ def main():
         data = env.read_motion_file()
         
         for i in range(len(data)):
-            # print("frame = {}".format(i))
-            # action, _ = model.predict(state)
+            action, _ = model.predict(state)
             # action = env.action_space.sample()
-            state, reward, done, info = env.step(data[i])
-            print("state = {}".format(state))
-            print("reward = {}".format(reward))
-            print("done = {}".format(done))
-            print("info = {}".format(info))
+            state, reward, done, info = env.step(action)
+            # print("state = {}".format(state))
+            # print("reward = {}".format(reward))
+            # print("done = {}".format(done))
+            # print("info = {}".format(info))
             if done:
                 break
     env.close()
