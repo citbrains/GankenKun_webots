@@ -150,7 +150,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                                 ], dtype=np.float32)
         self.reward_range = (0, 1)
         self.spec = gym.envs.registration.EnvSpec(id='GankenKun_motion_fix_Env-v0', max_episode_steps=max_episode_steps)
-        
         # Webots_environmental_preference
         self.__timestep = int(self.getBasicTimeStep()) #シミュレータ内部の仮想時間 10mm sec = 0.01sec
         self.__motors = []
@@ -165,35 +164,31 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.player_rotation = self.getFromDef('PLAYER').getField('rotation')
         OpenAIGymEnvironment.append_solid(self.player, self.__robot_body_solids )
         
-        self.__target_joint_angle_data = [0.0] * len(MOTOR_SENSOR_NAMES)
-        self.__motor_angle_sensors_data = [0.0] * len(MOTOR_SENSOR_NAMES)
-        
         #motor 
         self.__motors = []
         for name in MOTOR_NAMES:
             self.__motors.append(self.getDevice(name))
-        
         #motor sensor
         self.__motor_angle_sensors = []
         for name in MOTOR_SENSOR_NAMES:
             self.__motor_angle_sensors.append(self.getDevice(name)) 
-        
         for name in range (len(MOTOR_SENSOR_NAMES)):
             self.__motor_angle_sensors[name].enable(self.__timestep)
         #accelerometer
         self.accelerometer = self.getDevice('accelerometer')
         self.accelerometer.enable(self.__timestep)
-        
         #gyro
         self.gyro = self.getDevice('gyro')
         self.gyro.enable(self.__timestep)
-                    
         # motion parameter
         self.t = 0.0
         self.tm = 0.0
+        self.motion_frame_num = 0
         self.motion_total_time = 0.0
         self.angles = [0.0] * len(MOTOR_NAMES)                  #モータの目標角度
         self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
+        #ob
+        self.falldown_flag = False
         
         return np.array(self.state, dtype=np.float32) # return 初期状態
         
@@ -231,11 +226,12 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
     def Normalization(sensor_data):
         return (sensor_data - SENSOR_DATA_MIN) / (SENSOR_DATA_MAX - SENSOR_DATA_MIN) * (SC_MAX - SC_MIN) + SC_MIN
     
-    def step(self, data, ):
+    def step(self, data):    
         self.tm += float(data[0]) * 0.01 # tm = モーションファイルの書くフレームごとの時間 ÷ webotsのtime step[sec]
         motor_angle_sensor_data = [0]*len(MOTOR_SENSOR_NAMES)
         motor_target_angle_data = data[1:20]
         frame_end_flag = False
+        reward = 1
         
         while True:
             if frame_end_flag == True:
@@ -244,7 +240,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
             while super().step(self.__timestep) != -1:
                 if self.t >= self.tm:
                     frame_end_flag = True #1フレーム終了のフラグ
-                    
                     # Observation
                     acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
                     acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data))
@@ -261,20 +256,14 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                             self.falldown_flag = True
 
                     # # done 
-                    if self.t >= self.motion_total_time:
-                        done = True
-                    else:
-                        done = False
-                        reward = 0
+                    done = bool(
+                        self.t >= self.motion_total_time
+                    )
                         
                     if done:
-                        if self.falldown_flag == True:
-                            reward = 1
-                        else:
+                        if self.falldown_flag == True: #転倒すると報酬0になる
                             reward = 0
-                        
-                    
-                    
+
                     break
                 else:
                     self.t += self.__timestep / 1000.0
@@ -290,26 +279,31 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     [motor.setPosition(math.radians(DIRECTION[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]
                     
                     
-                    info = {} #使用しない
-                    
-                    return self.state, reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
+            info = {} #使用しない        
+            return self.state, reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
+                    # return  done  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
                     
 
 def main():
     env = OpenAIGymEnvironment()
-    model = SAC(MlpPolicy, env, verbose=1)
-    model.learn(total_timesteps=50000, log_interval=10)
+    # model = SAC(MlpPolicy, env, verbose=1)
+    # model.learn(total_timesteps=50000, log_interval=10)
     
-    for episode in range(2):
+    for episode in range(3):
         print("------------------")
         print("{}episode...".format(episode))
         state = env.reset()
         data = env.read_motion_file()
         
         for i in range(len(data)):
-            action, _ = model.predict(state)
+            # print("frame = {}".format(i))
+            # action, _ = model.predict(state)
             # action = env.action_space.sample()
-            state, rewards, done, info = env.step(action)
+            state, reward, done, info = env.step(data[i])
+            print("state = {}".format(state))
+            print("reward = {}".format(reward))
+            print("done = {}".format(done))
+            print("info = {}".format(info))
             if done:
                 break
     env.close()
