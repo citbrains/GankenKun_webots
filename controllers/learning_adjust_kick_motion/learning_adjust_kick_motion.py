@@ -177,8 +177,9 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.angles = [0.0] * len(MOTOR_NAMES)                  #モータの目標角度
         self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
         self.data = OpenAIGymEnvironment.read_motion_file(self)
-        #ob
-        self.falldown_flag = False
+        # learning_parameter
+        self.reward = 0
+        
         return np.array(self.state, dtype=np.float32) # return 初期状態
         
     
@@ -199,8 +200,8 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 OpenAIGymEnvironment.append_solid(solid, solids)  # active tag is reset after a joint
 
     def read_motion_file(self):
-        file_name = "./leg_up_motion.csv"  #正常のキック動作を再生する場合は有効化する
-        # file_name = "./falldown_kick.csv"   # キック後に転倒する動作を再生する場合は有効化する
+        # file_name = "./leg_up_motion.csv"  #正常のキック動作を再生する場合は有効化する
+        file_name = "./falldown_kick.csv"   # キック後に転倒する動作を再生する場合は有効化する
         if len(sys.argv) > 1:
             file_name = sys.argv[1]
         csv_file = open(file_name, "r")
@@ -227,7 +228,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         motor_angle_sensor_data = []
         observe_angle_data = []
         frame_end_flag = False
-        reward = 1
         
         while True:
             if frame_end_flag == True:
@@ -253,14 +253,14 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     self.state += motor_angle_sensor_data
 
                     if abs(rot_deg) >= 1.0: #各軸度表現の角度を利用して転倒判定を行う
-                            self.falldown_flag = True
+                        self.reward -= 1
+                    else:
+                        self.reward += 1
                     # # done 
                     done = bool(
                         self.t >= self.motion_total_time
                     )
-                    if done:
-                        if self.falldown_flag == True: #転倒すると報酬0になる
-                            reward = 0
+
                     break
                 
                 else:
@@ -277,7 +277,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     [motor.setPosition(math.radians(DIRECTION[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]
                     
             info = {} #使用しない        
-            return np.array(self.state, dtype=np.float32), reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
+            return np.array(self.state, dtype=np.float32), self.reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
                     # return  done  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
                     
 
@@ -286,7 +286,7 @@ def main():
     print("environment comp")
     model = SAC(MlpPolicy, env, verbose=1, tensorboard_log=log_dir)
     print("model comp")
-    model.learn(total_timesteps=800, log_interval=10)
+    model.learn(total_timesteps=1000000, log_interval=10)
     print("learn comp")
     model.save("sac_motion_fix_model")
     print("model save")
