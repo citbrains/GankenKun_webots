@@ -34,12 +34,12 @@ public:
         webotsMotionEngine::degrees deg;
         std::string s(reinterpret_cast<const char *>(buf.data()),buf.size());
         deg.ParseFromString(s);
-        std::cout << deg.DebugString();
+        // std::cout << deg.DebugString();
         std::vector<std::pair<uint32_t, double>> return_val;
         for (size_t i = 0; i < std::min(deg.motor_number_size(), deg.motor_degs_size()); ++i)
         {
             return_val.emplace_back(std::make_pair<uint32_t, double>(deg.motor_number(i), deg.motor_degs(i)));
-            std::cout << deg.motor_number(i) << " deg ::" << deg.motor_degs(i) << std::endl;
+            // std::cout << deg.motor_number(i) << " deg ::" << deg.motor_degs(i) << std::endl;
         }
         return return_val;
     };
@@ -61,7 +61,7 @@ public:
             sensor.add_accelerometer(itm);
         }
         std::string data(sensor.SerializeAsString());
-        std::cout << sensor.DebugString();
+        // std::cout << sensor.DebugString();
         auto buf = zmq::buffer(data);
         reply_.send(buf);
     }
@@ -72,8 +72,16 @@ public:
         camera_data.set_width(data.width);
         camera_data.set_current_total_timestep(data.current_total_timestep);
         camera_data.set_raw_data(std::move(data.raw_data));
-        auto buf = zmq::buffer(camera_data.SerializeAsString());
-        publish_.send(buf,zmq::send_flags::dontwait);
+        std::string s(camera_data.SerializeAsString());
+        auto buf = zmq::buffer(s);
+        try
+        {
+            auto err = publish_.send(buf,zmq::send_flags::dontwait);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
         return;
     }
 

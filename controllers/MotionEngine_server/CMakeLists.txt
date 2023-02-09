@@ -10,7 +10,7 @@ endif()
 find_package(Protobuf REQUIRED)
 find_package(cppzmq)
 
-option(USE_CAMERA_SENSOR "Use camera sensor" OFF)
+option(USE_CAMERA_SENSOR "Use camera sensor. " OFF)
 IF(USE_CAMERA_SENSOR)
 	add_definitions(-DCAMERA_ENABLE)
 ENDIF(USE_CAMERA_SENSOR)
