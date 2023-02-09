@@ -167,7 +167,7 @@ public:
 			std::terminate();
 		}
 #ifdef CAMERA_ENABLE
-		robot_camera = robot->getCamera("camera");
+		robot_camera = robot->getCamera("camera_sensor");
 		if (robot_camera == nullptr)
 		{
 			std::cerr << " getCamera memory allocation error !!" << std::endl;
