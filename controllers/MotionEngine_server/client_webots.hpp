@@ -226,7 +226,7 @@ public:
 		camera_sensor_data return_data;
 		return_data.width = robot_camera->getWidth();
 		return_data.height = robot_camera->getHeight();
-		size_t data_size = return_data.width * return_data.height;
+		size_t data_size = return_data.width * return_data.height * 4;
 		std::string data(reinterpret_cast<const char*>(robot_camera->getImage()),data_size);
 		return_data.raw_data = std::move(data);
 		return_data.current_total_timestep = gettotal_TimeStep();
