@@ -7,15 +7,18 @@
 #include <vector>
 #include <utility>
 #include <string_view>
+#include "client_webots.hpp"
 #include "message.pb.h"
 static const std::string adress("ipc:///tmp/WebotsMotionEngine");
+static const std::string adress_camera("ipc:///tmp/WebotsMotionEngine_Camera");
 
 class MotionEngineCom
 {
 public:
-    MotionEngineCom() : ctx_(), reply_(ctx_, zmq::socket_type::rep)
+    MotionEngineCom() : ctx_(), reply_(ctx_, zmq::socket_type::rep),publish_(ctx_,zmq::socket_type::pub)
     {
         reply_.bind(adress);
+        publish_.bind(adress_camera);
     }
     /**
      * @brief モーターの角度指令値を受け取る.
@@ -63,8 +66,20 @@ public:
         reply_.send(buf);
     }
 
+    void sendCameraData(const camera_sensor_data& data){
+        webotsMotionEngine::cameraData camera_data;
+        camera_data.set_height(data.height);
+        camera_data.set_width(data.width);
+        camera_data.set_current_total_timestep(data.current_total_timestep);
+        camera_data.set_raw_data(std::move(data.raw_data));
+        auto buf = zmq::buffer(camera_data.SerializeAsString());
+        publish_.send(buf,zmq::send_flags::dontwait);
+        return;
+    }
+
 private:
     zmq::context_t ctx_;
     zmq::socket_t reply_;
+    zmq::socket_t publish_;
     inline static constexpr size_t buf_size_ = 2048;
 };

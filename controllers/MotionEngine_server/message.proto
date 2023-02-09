@@ -16,5 +16,5 @@ message cameraData{
     uint32 height = 1;
     uint32 width = 2;
     string raw_data = 3;
-    uint64 timeStep = 4;
+    uint64 current_total_timeStep = 4;
 }
