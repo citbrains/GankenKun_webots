@@ -1,11 +1,11 @@
 import shutil
 from unittest import mock
 import math
-file_name = "test_file_left.txt"
-file_name_end = "test_file_left_final.txt"
+file_name = "Front_3d_poseX.txt"
+file_name_end = "Front_finalX.txt"
 back_name = file_name + ".bak"
 
-ball_file = "ball_pos_left.txt"
+ball_file = "Ball_frontx.txt"
 back_ball = ball_file + ".bak"
 
 
@@ -221,11 +221,14 @@ with open(file_name_end,"w") as o:
 	with open(file_name, 'r', encoding='utf-8') as fin:  # ファイルを開く
 		for line in fin.readlines():  # 行をすべて読み込んで1行ずつfor文で回
 			line_cnt +=1
-			if line_cnt == 70 and n < 49:
+			if line_cnt == 185 and n < 1000:
 				n+=1
 				line_cnt=-1
 			# print(n)
+			tmp = 185-line_cnt
 			o.write("%s" % mat[n])
+			o.write(", ")
+			o.write("%s" % tmp)
 			o.write(", ")
 			o.write("%s" % line)
 				# print(mat[m][0], sep=",", file=o)

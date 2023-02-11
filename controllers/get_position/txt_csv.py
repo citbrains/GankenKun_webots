@@ -1,6 +1,6 @@
 import pandas as pd
 
-file_name = "test_file_right4.txt"
+file_name = "Front_finalX.txt"
 
 with open(file_name) as reader:
 	s = reader.read()
@@ -25,5 +25,5 @@ with open(file_name, mode="w", encoding="cp932") as f:
 #\n')
 
 
-read_text_file = pd.read_csv (r"test_file_right4.txt")
-read_text_file.to_csv (r"test_file_right.csv", index=None)
+read_text_file = pd.read_csv (r"Front_finalX.txt")
+read_text_file.to_csv (r"Front_fileX.csv", index=None)

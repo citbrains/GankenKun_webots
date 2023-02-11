@@ -57,29 +57,32 @@ lines = [
     ["colorKneeR"    , "colorAnkleR"   ]
 ]
 
-cnt = -1
 
 memomemo_x = 0
 memomemo_y = 0
 memo_x = 0
 memo_y = 0
+cnt_2 = -1 
 
 while supervisor.step(timestep) != -1:
     # supervisor.getFromDef('BALL').getField('translation').setSFVec3f([random.uniform(0.0, 4.0), random.uniform(-1.0, 1.0), 0.1])
     # supervisor.getFromDef('ENEMY1').getField('rotation').setSFRotation([0, 0, 1, random.uniform(-1.0, 1.0)+3.14])
 #    for i in range(10):
 #        supervisor.step(timestep)
-    camera.saveImage(deviceImagePath + '/images/image' + str(number) + '.jpg', 80)
+    camera.saveImage(deviceImagePath + '/images_new/image' + str(number) + '.jpg', 80)
     #camera.saveRecognitionSegmentationImage(deviceImagePath + '/images/segmentation_image' + str(number) + '.jpg', 80)
     number += 1
     seg_img = camera.getRecognitionSegmentationImage()
     img = np.frombuffer(seg_img, np.uint8).reshape((camera.getHeight(), camera.getWidth(), 4))
     
-    cnt +=1
-    file_path = 'txt/image' + str(cnt) + '.txt'
+    cnt = -1
+    file_path_2d = 'txt_2d_use/image' + str(cnt_2) + '.txt'
+    file_path_3d = 'image_txt.txt'
 
 
     for key, val in color_dict.items():
+        cnt +=1
+        cnt_2 +=1
         color = (val[0]*255, val[1]*255, val[2]*255, 255)
         area = cv2.inRange(img, color, color)
         x, y, w, h = cv2.boundingRect(area)
@@ -89,17 +92,28 @@ while supervisor.step(timestep) != -1:
         #print(key + ": " + str(x) + ", y: " + str(y))
         x = x + (w-1)/2
         y = y + (h-1)/2
-        if x == 0 or y ==0: 
+        if x == -0.5 and y == -0.5: 
             x = memomemo_x 
             y = memomemo_y
             y += 20
 
-        with open(file_path, 'a') as f:
+        with open(file_path_2d, 'a') as f:
             f.write("%s" % int(x))
             f.write(',')
             f.write("%s" % int(y))
 #            if int(x)!=0 or int(y)!=0:
             f.write(',2\n')
+
+        with open(file_path_3d, 'a') as f:
+            f.write("%s" % int(x))
+            f.write(',')
+            f.write("%s" % int(y))
+            if cnt < 12:  
+                f.write(',')
+            else:
+                f.write('\n')
+
+#            if int(x)!=0 or int(y)!=0:
 #            else:
 #                f.write(',0\n')
         memomemo_x = memo_x

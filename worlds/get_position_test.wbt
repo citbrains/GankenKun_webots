@@ -50,26 +50,26 @@ Robot {
 RobocupSoccerField {
   size "kid"
 }
-DEF PLAYER GankenKun_Keypoints {
-  translation 4.5 0 0.450
-  rotation 0 0 1 3.14
-  name "blue player 1"
-  jerseyTexture "textures/GankenKun_blue1.png"
-  jerseyColor 0, 0, 1
-  controller "annotation_keypoints"
-  supervisor TRUE
-  colorHead       [0 0 0]
-  colorNeck       [0 0 0]
-  colorShoulderL  [0 0 0]
-  colorShoulderR  [0 0 0]
-  colorElbowL     [0 0 0]
-  colorElbowR     [0 0 0]
-  colorWristL     [0 0 0]
-  colorWristR     [0 0 0]
-  colorHipL       [0 0 0]
-  colorHipR       [0 0 0]
-  colorKneeL      [0 0 0]
-  colorKneeR      [0 0 0]
-  colorAnkleL     [0 0 0]
-  colorAnkleR     [0 0 0]
-}
+#DEF PLAYER GankenKun_Keypoints {
+#  translation 4.5 0 0.450
+#  rotation 0 0 1 3.14
+#  name "blue player 1"
+#  jerseyTexture "textures/GankenKun_blue1.png"
+#  jerseyColor 0, 0, 1
+#  controller "annotation_keypoints"
+#  supervisor TRUE
+#  colorHead       [0 0 0]
+#  colorNeck       [0 0 0]
+#  colorShoulderL  [0 0 0]
+#  colorShoulderR  [0 0 0]
+#  colorElbowL     [0 0 0]
+#  colorElbowR     [0 0 0]
+#  colorWristL     [0 0 0]
+#  colorWristR     [0 0 0]
+#  colorHipL       [0 0 0]
+#  colorHipR       [0 0 0]
+#  colorKneeL      [0 0 0]
+#  colorKneeR      [0 0 0]
+#  colorAnkleL     [0 0 0]
+#  colorAnkleR     [0 0 0]
+#}
