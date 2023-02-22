@@ -17,6 +17,10 @@ int main(int argc, char const *argv[])
         {
             MotionEngine_webots.sendIMUData(wb_gankenkun.get_gyro_values(), wb_gankenkun.get_acc_values());
         }
+#ifdef CAMERA_ENABLE
+        auto camera_data = wb_gankenkun.get_camera_image();
+        MotionEngine_webots.sendCameraData(camera_data);
+#endif // CAMERA_ENABLE
     }
     return 0;
 }

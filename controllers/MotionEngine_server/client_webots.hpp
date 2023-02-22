@@ -1,7 +1,10 @@
+#ifndef CLIENT_WEBOTS
+#define CLIENT_WEBOTS
 #include <webots/Motor.hpp>
 #include <webots/Robot.hpp>
 #include <webots/Accelerometer.hpp>
 #include <webots/Gyro.hpp>
+#include <webots/Camera.hpp>
 #include <set>
 #include <string>
 #include <vector>
@@ -71,6 +74,13 @@ enum {
 // 	JOINT_NUM
 // };
 
+struct camera_sensor_data
+{
+	uint32_t height;
+	uint32_t width;
+	std::string raw_data;
+	uint64_t current_total_timestep;
+};
 
 class webots_motor_control
 {
@@ -78,14 +88,16 @@ class webots_motor_control
 private:
     webots::Robot *robot;
     webots::Gyro *robot_gyro;
+	webots::Camera *robot_camera;
 	webots::Accelerometer *robot_accelerometer;
 	int32_t mTimeStep;
     std::map<int32_t, std::string> motors_info;
     std::map<int32_t, webots::Motor *> robot_motors;
     std::set<int32_t> reverse_motors;
+	uint_fast64_t total_TimeStep;
 
 public:
-    webots_motor_control() : mTimeStep(0)
+    webots_motor_control() : mTimeStep(0),total_TimeStep(0)
     {
         robot = new webots::Robot();
         //enum の要素にする
@@ -154,11 +166,22 @@ public:
 			std::cerr << " getGyro memory allocation error !!" << std::endl;
 			std::terminate();
 		}
+#ifdef CAMERA_ENABLE
+		robot_camera = robot->getCamera("camera_sensor");
+		if (robot_camera == nullptr)
+		{
+			std::cerr << " getCamera memory allocation error !!" << std::endl;
+			std::terminate();
+		}
+#endif // CAMERA_ENABLE
 
         mTimeStep = 10; // timestepは8固定
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
+#ifdef CAMERA_ENABLE
+		robot_camera->enable(mTimeStep);
+#endif // CAMERA_ENABLE
     }
 
 	int32_t send_target_degrees(std::vector<std::pair<uint32_t, double>> getMotorDegrees)
@@ -198,8 +221,21 @@ public:
 		return gyro_val;
 	}
 
+	camera_sensor_data get_camera_image()
+	{
+		camera_sensor_data return_data;
+		return_data.width = robot_camera->getWidth();
+		return_data.height = robot_camera->getHeight();
+		size_t data_size = return_data.width * return_data.height * 4;
+		std::string data(reinterpret_cast<const char*>(robot_camera->getImage()),data_size);
+		return_data.raw_data = std::move(data);
+		return_data.current_total_timestep = gettotal_TimeStep();
+		return return_data;
+	}
+
 	bool step()
 	{
+		total_TimeStep += mTimeStep;
 		return robot->step(mTimeStep) != -1;
 	}
 
@@ -207,5 +243,10 @@ public:
 	{
 		return mTimeStep;
 	}
+
+	uint_fast64_t gettotal_TimeStep(){
+		return total_TimeStep;
+	}
 	
 };
+#endif // !CLIENT_WEBOTS
