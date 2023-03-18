@@ -81,6 +81,7 @@ struct camera_sensor_data
 	std::string raw_data;
 	uint64_t current_total_timestep;
 };
+constexpr int32_t TIMESTEP = 8;
 
 class webots_motor_control
 {
@@ -175,7 +176,7 @@ public:
 		}
 #endif // CAMERA_ENABLE
 
-        mTimeStep = 10; // timestepは8固定
+        mTimeStep = TIMESTEP; // timestepは8固定
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
