@@ -71,6 +71,7 @@ enum {
 // 	JOINT_NUM
 // };
 
+constexpr int32_t TIMESTEP = 8;
 
 class webots_motor_control
 {
@@ -155,7 +156,7 @@ public:
 			std::terminate();
 		}
 
-        mTimeStep = 10; // timestepは8固定
+        mTimeStep = TIMESTEP; // timestepは8固定
 		std::cout << "mTimeStep is " << mTimeStep << std::endl;
 		robot_accelerometer->enable(mTimeStep);
 		robot_gyro->enable(mTimeStep);
