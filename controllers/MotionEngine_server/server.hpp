@@ -9,8 +9,15 @@
 #include <string_view>
 #include "client_webots.hpp"
 #include "message.pb.h"
-static const std::string adress("ipc:///tmp/WebotsMotionEngine");
-static const std::string adress_camera("ipc:///tmp/WebotsMotionEngine_Camera");
+
+
+#if (defined WIN32) || (defined COMM_WITH_WINDOWS_WEBOTS) 
+    static const std::string adress("tcp://*:7650");
+    static const std::string adress_camera("tcp://*:8760");
+#else
+    static const std::string adress("ipc:///tmp/WebotsMotionEngine");
+    static const std::string adress_camera("ipc:///tmp/WebotsMotionEngine_Camera");
+#endif // DEBUG
 
 class MotionEngineCom
 {
@@ -30,19 +37,34 @@ public:
         std::array<char, buf_size_> data;
         data.fill(static_cast<char>(0));
         auto buf = zmq::buffer(data.data(), data.size());
-        reply_.recv(buf);
-        webotsMotionEngine::degrees deg;
-        std::string s(reinterpret_cast<const char *>(buf.data()),buf.size());
-        deg.ParseFromString(s);
-        // std::cout << deg.DebugString();
-        std::vector<std::pair<uint32_t, double>> return_val;
-        for (size_t i = 0; i < std::min(deg.motor_number_size(), deg.motor_degs_size()); ++i)
+        auto ret = reply_.recv(buf, zmq::recv_flags::none);
+        if(!ret.has_value()){
+            std::cout << "no value!" << std::endl;
+            return {};
+        }
+        else if(ret.value().truncated()){
+            std::cout << "truncated!" << std::endl;
+            return {};
+        }
+        std::string parse_data(reinterpret_cast<const char *>(buf.data()),buf.size());
+        webotsMotionEngine::degrees receive_degs;
+        if(!receive_degs.ParseFromString(parse_data))
         {
-            return_val.emplace_back(std::make_pair<uint32_t, double>(deg.motor_number(i), deg.motor_degs(i)));
-            // std::cout << deg.motor_number(i) << " deg ::" << deg.motor_degs(i) << std::endl;
+            // std::cout << receive_degs.DebugString() << std::endl;
+            // std::cout << "parse error..\n";
+            // return {};
+        }
+        std::vector<std::pair<uint32_t, double>> return_val;
+        return_val.reserve(receive_degs.motor_number_size());
+        // std::cout << "reserve" << receive_degs.motor_number_size() << std::endl;
+        for (size_t i = 0; i < std::min(receive_degs.motor_number_size(), receive_degs.motor_degs_size()); ++i)
+        {
+            return_val.emplace_back(std::make_pair<uint32_t, double>(receive_degs.motor_number(i), receive_degs.motor_degs(i)));
+            // std::cout << receive_degs.motor_number(i) << " receive_degs ::" << receive_degs.motor_degs(i) << std::endl;
         }
         return return_val;
     };
+    
     /**
      * @brief webotsで取得したジャイロと加速度計の値を送信する。こちらを呼び出す前には必ずgetMotorDegreesを呼ぶ.
      *
@@ -89,5 +111,5 @@ private:
     zmq::context_t ctx_;
     zmq::socket_t reply_;
     zmq::socket_t publish_;
-    inline static constexpr size_t buf_size_ = 2048;
+    inline static constexpr size_t buf_size_ = 8192;
 };
