@@ -10,6 +10,7 @@ endif(WIN32)
 
 if(DEFINED ENV{WEBOTS_HOME})
     set(WEBOTS_HOME $ENV{WEBOTS_HOME})
+    message("WEBOTS_HOME is set to $ENV{WEBOTS_HOME}")
 else()
     if(WIN32)
         set(WEBOTS_HOME "C:\Program Files\Webots")
@@ -40,6 +41,7 @@ if(WIN32)
 else(WIN32)
     link_directories(${WEBOTS_HOME}/lib/controller)
     target_compile_options(MotionEngine_server PUBLIC -O2 -Wall -pedantic -Wall)
+    target_link_directories(MotionEngine_server PRIVATE ${WEBOTS_HOME}/lib/controller)
 endif(WIN32)
 
 
