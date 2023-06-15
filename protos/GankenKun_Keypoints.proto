@@ -13,7 +13,7 @@ PROTO GankenKun_Keypoints [
   field  SFString    customData      ""           # Is `Robot.customData`.
   field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
   field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
-  field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
+  field  SFBool      selfCollision   FALSE         # Is `Robot.selfCollision`.
   field  SFInt32     cameraWidth     640          # Is `Camera.width`.
   field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
@@ -22,10 +22,10 @@ PROTO GankenKun_Keypoints [
   field  MFColor     colorHead       [1.0 1.0 1.0]
   field  MFColor     colorNeck       [0.5 0.5 0.5]
   field  MFColor     colorShoulderL  [0.0 0.5 0.0]
-  field  MFColor     colorShoulderR  [0.0 0.0 0.5]
+  field  MFColor     colorShoulderR  [0.5 0.0 0.0]
   field  MFColor     colorElbowL     [0.0 0.6 0.0]
   field  MFColor     colorElbowR     [0.0 0.0 0.6]
-  field  MFColor     colorWristL     [0.0 0.7 0.0]
+  field  MFColor     colorWristL     [1.0 0.0 0.0]
   field  MFColor     colorWristR     [0.0 0.0 0.7]
   field  MFColor     colorHipL       [0.0 0.8 0.0]
   field  MFColor     colorHipR       [0.0 0.0 0.8]
