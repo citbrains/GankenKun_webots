@@ -6,7 +6,7 @@ WorldInfo {
   ]
   title "GANKENKUN"
   basicTimeStep 8
-  optimalThreadCount 1
+  optimalThreadCount 8
   physicsDisableTime 0.1
   physicsDisableLinearThreshold 0.1
   physicsDisableAngularThreshold 0.1
@@ -50,7 +50,7 @@ DEF BLUE_PLAYER1 GankenKun_simple {
   name "blue player 1"
   jerseyTexture "textures/GankenKun_blue1.png"
   jerseyColor 0, 0, 1
-  controller "void"
+  controller "GankenKun_walking"
   supervisor TRUE
 }
 
@@ -60,7 +60,7 @@ DEF BLUE_PLAYER2 GankenKun_simple {
   name "blue player 2"
   jerseyTexture "textures/GankenKun_blue2.png"
   jerseyColor 0, 0, 1
-  controller "void"
+  controller "GankenKun_walking"
   supervisor TRUE
 }
   
@@ -70,7 +70,7 @@ DEF BLUE_PLAYER3 GankenKun_simple {
   name "blue player 3"
   jerseyTexture "textures/GankenKun_blue3.png"
   jerseyColor 0, 0, 1
-  controller "void"
+  controller "GankenKun_walking"
   supervisor TRUE
 }
   
@@ -80,7 +80,7 @@ DEF RED_PLAYER1 GankenKun_simple {
   name "red player 1"
   jerseyTexture "textures/GankenKun_red1.png"
   jerseyColor 1, 0, 0
-  controller "void"
+  controller "GankenKun_walking"
 }
 DEF RED_PLAYER2 GankenKun_simple {
   translation 2 -1 0.450
@@ -88,7 +88,7 @@ DEF RED_PLAYER2 GankenKun_simple {
   name "red player 2"
   jerseyTexture "textures/GankenKun_red2.png"
   jerseyColor 1, 0, 0
-  controller "void"
+  controller "GankenKun_walking"
 }
 DEF RED_PLAYER3 GankenKun_simple {
   translation 2 1 0.450
@@ -96,7 +96,7 @@ DEF RED_PLAYER3 GankenKun_simple {
   name "red player 3"
   jerseyTexture "textures/GankenKun_red3.png"
   jerseyColor 1, 0, 0
-  controller "void"
+  controller "GankenKun_walking"
 }
 RobocupSoccerField {
   size "kid"
