@@ -4,7 +4,7 @@
 # This is a proto file for Webots for the GankenKun
 # Extracted from: gankenkun_simple.urdf
 
-PROTO GankenKun [
+PROTO GankenKun_simple [
   field  SFVec3f     translation     0 0 0
   field  SFRotation  rotation        0 1 0 0
   field  SFString    name            "GankenKun"  # Is `Robot.name`.
