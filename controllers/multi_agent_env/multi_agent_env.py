@@ -9,6 +9,7 @@ from pettingzoo.utils import wrappers
 from pettingzoo.utils.agent_selector import agent_selector
 import numpy as np
 import math
+import random
 
 def rotation_to_euler(rotation):
     x, y, z, angle = rotation
@@ -153,7 +154,9 @@ if __name__ == "__main__":
     num = 0
     while env.supervisor.step(env.time_step) != 1:
         if num > 50:
-            env.step([1.0, 0.0, 0.0])
+            for agent in env.agents:
+                env.agent_selection = agent
+                env.step([random.random()*2-1, random.random()*2-1, random.random()*2-1])
             print(env.observe("blue1"))
             num = 0
         num += 1
