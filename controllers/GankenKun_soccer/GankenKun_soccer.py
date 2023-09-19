@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from controller import Robot, Emitter, Receiver
+from controller import Robot
 sys.path.append('./GankenKun')
 from kinematics import *
 from foot_step_planner import *
