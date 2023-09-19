@@ -9,7 +9,6 @@ from pettingzoo.utils import wrappers
 from pettingzoo.utils.agent_selector import agent_selector
 import numpy as np
 import math
-import time
 
 def rotation_to_euler(rotation):
     x, y, z, angle = rotation
@@ -94,6 +93,8 @@ class raw_env(AECEnv, EzPickle):
         self.red3_pos = self.supervisor.getFromDef('RED_PLAYER3').getField('translation')
         self.red3_rot = self.supervisor.getFromDef('RED_PLAYER3').getField('rotation')
 
+        self.agent_selection = "blue1"
+
     def observation_space(self, agent):
         return self.observation_spaces[agent]
 
@@ -121,73 +122,38 @@ class raw_env(AECEnv, EzPickle):
         return state
 
     def step(self, action):
-        if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
-            self._was_dead_step(action)
-            return
+        #if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
+        #    self._was_dead_step(action)
+        #    return
+        #self._cumulative_rewards[self.agent_selection] = 0
+        message = "walk,"+str(action[0])+","+str(action[1])+","+str(action[2])
+        message = message.encode('utf-8')
+        if self.agent_selection == "blue1":
+            self.blue1_emitter.send(message)
+        elif self.agent_selection == "blue2":
+            self.blue2_emitter.send(message)
+        elif self.agent_selection == "blue3":
+            self.blue3_emitter.send(message)
+        elif self.agent_selection == "red1":
+            self.red1_emitter.send(message)
+        elif self.agent_selection == "red2":
+            self.red2_emitter.send(message)
+        elif self.agent_selection == "red3":
+            self.red3_emitter.send(message)
+
+        #self._clear_rewards()
+        #self._accumulate_rewards()
+        #self._deads_step_first()
+    
+    def reset(self):
         pass
 
 if __name__ == "__main__":
     env = raw_env()
     num = 0
     while env.supervisor.step(env.time_step) != 1:
-        if num > 100:
+        if num > 50:
+            env.step([1.0, 0.0, 0.0])
             print(env.observe("blue1"))
             num = 0
         num += 1
-
-
-
-
-
-#num = 0
-#count = 0
-#while supervisor.step(time_step) != -1:
-#    count += 1
-#    if count > 50:
-#        if num  < 10:
-#            message = "walk,0.1,0.0,0.0".encode('utf-8')
-#            print("forward")
-#        else:
-#            message = "walk,0.0,0.1,0.0".encode('utf-8')
-#            print("side")
-#        num += 1;
-#        if num > 20:
-#            num = 0
-#        blue1_emitter.send(message)
-#        blue2_emitter.send(message)
-#        blue3_emitter.send(message)
-#        red1_emitter.send(message)
-#        red2_emitter.send(message)
-#        red3_emitter.send(message)
-#        count = 0
-
-#blue_player1 = supervisor.getFromDef('BLUE_PLAYER1')
-#ball = supervisor.getFromDef('BALL')
-#player_translation = supervisor.getFromDef('PLAYER').getField('translation')
-#player_rotation = supervisor.getFromDef('PLAYER').getField('rotation')
-#player_controller = supervisor.getFromDef('PLAYER').getField('controller')
-#ball_translation = supervisor.getFromDef('BALL').getField('translation')
-#ball_rotation = supervisor.getFromDef('BALL').getField('rotation')
-#
-#try:
-#    for x in np.arange(-0.35, -0.1, 0.01):
-#        for y in np.arange(0, 0.25, 0.01):
-#            count = 0
-#            player.remove()
-#            children.importMFNodeFromString(-1, f'DEF PLAYER RoboCup_GankenKun {{translation {x} {y} 0.450 rotation 0 0 1 0 controller "play_motion" controllerArgs "./kick_motion0.csv"}}')
-#            player = supervisor.getFromDef('PLAYER')
-#            ball.resetPhysics()
-#            ball_translation.setSFVec3f([0, 0, 0.1])
-#            ball_rotation.setSFRotation([0, 0, 1, 0])
-#            while supervisor.step(time_step) != -1:
-#                count += 1
-#                if count > 800:
-#                    break
-#                if count > 800 - 1:
-#                    pos = ball_translation.getSFVec3f()
-#                    print(str(x)+", "+str(y)+", "+str(pos[0])+", "+str(pos[1]))
-#                    with open('result.csv', 'a', newline='') as f:
-#                        writer = csv.writer(f)
-#                        writer.writerow([x, y, pos[0], pos[1]])
-#except Exception:
-#    error(f"Unexpected exception in main referee loop: {traceback.format_exc()}", fatal=True)
