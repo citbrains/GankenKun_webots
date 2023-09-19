@@ -18,7 +18,8 @@ PROTO GankenKun_simple [
   field  SFInt32     cameraHeight    480          # Is `Camera.height`.
   field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
   field  SFColor     jerseyColor     1 0 0
-  field  SFBool      enable_backlash TRUE         # Enables backlash on all joints.
+  field  SFBool      enable_backlash FALSE         # Enables backlash on all joints.
+  field  SFInt32     channel         1             # communication channel
 ]
 {
   %{
@@ -1605,6 +1606,14 @@ PROTO GankenKun_simple [
         lookupTable [-17.453      0 0,
                       17.453  65535 0 ]
         resolution 1
+      }
+      Emitter {
+        name "emitter"
+        channel IS channel
+      }
+      Receiver {
+        name "receiver"
+        channel IS channel
       }
     ]
     name IS name 

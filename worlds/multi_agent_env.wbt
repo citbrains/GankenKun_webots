@@ -44,65 +44,22 @@ TexturedBackgroundLight {
   texture "stadium_dry"
 }
 
-DEF BLUE_PLAYER1 GankenKun_simple {
-  translation -0.3 0 0.450
-  rotation 0 0 1 0
-  name "blue player 1"
-  jerseyTexture "textures/GankenKun_blue1.png"
-  jerseyColor 0, 0, 1
-  controller "GankenKun_walking"
-  supervisor TRUE
-}
-
-DEF BLUE_PLAYER2 GankenKun_simple {
-  translation -2 -1 0.450
-  rotation 0 0 1 0
-  name "blue player 2"
-  jerseyTexture "textures/GankenKun_blue2.png"
-  jerseyColor 0, 0, 1
-  controller "GankenKun_walking"
-  supervisor TRUE
-}
-  
-DEF BLUE_PLAYER3 GankenKun_simple {
-  translation -2 1 0.450
-  rotation 0 0 1 0
-  name "blue player 3"
-  jerseyTexture "textures/GankenKun_blue3.png"
-  jerseyColor 0, 0, 1
-  controller "GankenKun_walking"
-  supervisor TRUE
-}
-  
-DEF RED_PLAYER1 GankenKun_simple {
-  translation 1 0 0.450
-  rotation 0 0 1 3.14
-  name "red player 1"
-  jerseyTexture "textures/GankenKun_red1.png"
-  jerseyColor 1, 0, 0
-  controller "GankenKun_walking"
-}
-DEF RED_PLAYER2 GankenKun_simple {
-  translation 2 -1 0.450
-  rotation 0 0 1 3.14
-  name "red player 2"
-  jerseyTexture "textures/GankenKun_red2.png"
-  jerseyColor 1, 0, 0
-  controller "GankenKun_walking"
-}
-DEF RED_PLAYER3 GankenKun_simple {
-  translation 2 1 0.450
-  rotation 0 0 1 3.14
-  name "red player 3"
-  jerseyTexture "textures/GankenKun_red3.png"
-  jerseyColor 1, 0, 0
-  controller "GankenKun_walking"
-}
 RobocupSoccerField {
   size "kid"
 }
-DEF BALL RobocupSoccerBall {
-  translation 0 0 0.1
-  size 1
-}
 
+Robot {
+  supervisor TRUE
+  controller "multi_agent_env"
+  children[
+    Emitter {
+      name "emitter"
+      range 100
+      channel 1
+    }
+    Receiver {
+      name "receiver"
+      channel 1
+    }
+  ]
+}
