@@ -28,7 +28,7 @@ class foot_step_planner():
     foot_step = []
     if status == 'start':
       foot_step += [[0.0, current_x, current_y, current_th, 'both', 0]]
-      time += self.period * 2.0
+      time += self.period
     if next_support_leg == 'right':
       foot_step += [[time, current_x, -self.width+current_y, current_th, next_support_leg, -self.width]]
       next_support_leg = 'left'
@@ -69,9 +69,9 @@ class foot_step_planner():
       time += self.period
       next_support_leg = 'both'
       foot_step += [[time, next_x, next_y, next_th, next_support_leg, 0]]
-      time += 2.0
+      time += self.period
       foot_step += [[time, next_x, next_y, next_th, next_support_leg, 0]]
-      time += 100.0
+      time += 100
       foot_step += [[time, next_x, next_y, next_th, next_support_leg, 0]]
 
     return foot_step

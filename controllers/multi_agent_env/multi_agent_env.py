@@ -153,10 +153,17 @@ if __name__ == "__main__":
     env = raw_env()
     num = 0
     while env.supervisor.step(env.time_step) != 1:
-        if num > 50:
+        num += 1
+        if num > 300:
+            num = 0
+            break
+    while env.supervisor.step(env.time_step) != 1:
+        if num % 42 == 0 and num < 42 * 10:
             for agent in env.agents:
                 env.agent_selection = agent
                 env.step([random.random()*2-1, random.random()*2-1, random.random()*2-1])
-            print(env.observe("blue1"))
+        if num == 600:
             num = 0
         num += 1
+
+

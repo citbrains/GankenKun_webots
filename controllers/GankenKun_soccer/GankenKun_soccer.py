@@ -50,25 +50,20 @@ if __name__ == '__main__':
 
   foot_step = walk.setGoalPos([0.0, 0.0, 0.0])
   while robot.step(timestep) != -1:
-    if receiver.getQueueLength() > 0:
-      received_message = receiver.getData().decode('utf-8')
-      receiver.nextPacket()
+    joint_angles,lf,rf,xp,n = walk.getNextPos()
+    if n == 0:
       if receiver.getQueueLength() > 0:
-        continue
-      message_parts = received_message.split(',')
-      if message_parts[0] == "walk":
-        #print("walk")
-        x_goal = foot_step[0][1] + float(message_parts[1])
-        y_goal = foot_step[0][2] - foot_step[0][5] + float(message_parts[2])
-        th_goal = foot_step[0][3] -  + float(message_parts[3])
+        received_message = ""
+        while receiver.getQueueLength() > 0:
+          received_message = receiver.getData().decode('utf-8')
+          receiver.nextPacket()
+        message_parts = received_message.split(',')
+        if message_parts[0] == "walk":
+          x_goal = foot_step[0][1] + float(message_parts[1])
+          y_goal = foot_step[0][2] - foot_step[0][5] + float(message_parts[2])
+          th_goal = foot_step[0][3] - float(message_parts[3])
         foot_step = walk.setGoalPos([x_goal, y_goal, th_goal])
-        while robot.step(timestep) != -1:
-          joint_angles,lf,rf,xp,n = walk.getNextPos()
-          if n == 0:            
-            if foot_step[0][4] == 'left':
-              break
-            else:
-              foot_step = walk.setGoalPos([x_goal, y_goal, th_goal])
-              #print("foot_step: "+str(len(foot_step)))
-          for i in range(len(motorNames)):
-              motor[i].setPosition(joint_angles[i])
+      else:
+        foot_step = walk.setGoalPos()
+    for i in range(len(motorNames)):
+      motor[i].setPosition(joint_angles[i])

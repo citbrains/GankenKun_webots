@@ -40,16 +40,11 @@ class walking():
         del self.foot_step[0]
     else:
       if len(self.foot_step) > 2:
-        if not self.status == 'start':
-          offset_y = -0.06 if self.next_leg == 'left' else 0.06
-        else:
-          offset_y = 0.0
-        current_x, current_y, current_th = self.foot_step[1][1], self.foot_step[1][2]+offset_y, self.foot_step[1][3]
+        current_x, current_y, current_th = self.foot_step[1][1], self.foot_step[1][2]-self.foot_step[1][5], self.foot_step[1][3]
       else:
         current_x, current_y, current_th = 0, 0, 0
       self.foot_step = self.fsp.calculate(pos[0], pos[1], pos[2], current_x, current_y, current_th, self.next_leg, self.status)
       self.status = 'walking'
-#    print(str(self.foot_step)+'\n')
     t = self.foot_step[0][0]
     self.pattern, x, y = self.pc.set_param(t, self.X[:,0], self.X[:,1], self.foot_step)
     self.X = np.matrix([[x[0,0], y[0,0]], [x[1,0], y[1,0]], [x[2,0], y[2,0]]])
