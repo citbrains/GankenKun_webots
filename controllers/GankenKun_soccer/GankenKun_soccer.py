@@ -7,27 +7,29 @@ from kinematics import *
 from foot_step_planner import *
 from preview_control import *
 from walking import *
+import csv
+import math
 
 motorNames = [
-  "head_yaw_joint",                        # ID1
-  "left_shoulder_pitch_joint [shoulder]",  # ID2
-  "left_shoulder_roll_joint",              # ID3
-  "left_elbow_pitch_joint",                # ID4
-  "right_shoulder_pitch_joint [shoulder]", # ID5
-  "right_shoulder_roll_joint",             # ID6
-  "right_elbow_pitch_joint",               # ID7
-  "left_waist_yaw_joint",                  # ID8
-  "left_waist_roll_joint [hip]",           # ID9
-  "left_waist_pitch_joint",                # ID10
-  "left_knee_pitch_joint",                 # ID11
-  "left_ankle_pitch_joint",                # ID12
-  "left_ankle_roll_joint",                 # ID13
-  "right_waist_yaw_joint",                 # ID14
-  "right_waist_roll_joint [hip]",          # ID15
-  "right_waist_pitch_joint",               # ID16
-  "right_knee_pitch_joint",                # ID17
-  "right_ankle_pitch_joint",               # ID18
-  "right_ankle_roll_joint"                 # ID19
+  "right_ankle_roll_joint",                # ID1
+  "right_ankle_pitch_joint",               # ID2
+  "right_knee_pitch_joint",                # ID3
+  "right_waist_pitch_joint",               # ID4
+  "right_waist_roll_joint [hip]",          # ID5
+  "right_waist_yaw_joint",                 # ID6
+  "right_shoulder_pitch_joint [shoulder]", # ID7
+  "right_shoulder_roll_joint",             # ID8
+  "right_elbow_pitch_joint",               # ID9
+  "left_ankle_roll_joint",                 # ID10
+  "left_ankle_pitch_joint",                # ID11
+  "left_knee_pitch_joint",                 # ID12
+  "left_waist_pitch_joint",                # ID13
+  "left_waist_roll_joint [hip]",           # ID14
+  "left_waist_yaw_joint",                  # ID15
+  "left_shoulder_pitch_joint [shoulder]",  # ID16
+  "left_shoulder_roll_joint",              # ID17
+  "left_elbow_pitch_joint",                # ID18
+  "head_yaw_joint"                        # ID19
 ]
 
 if __name__ == '__main__':
@@ -49,6 +51,50 @@ if __name__ == '__main__':
   walk = walking(timestep/1000, motorNames, left_foot, right_foot, joint_angles, pc)
 
   foot_step = walk.setGoalPos([0.0, 0.0, 0.0])
+
+  file_name = "./right_kick.csv"
+  csv_file = open(file_name, "r")
+  f = csv.reader(csv_file, delimiter=",", lineterminator="\r\n")
+  motion = [row for row in f]
+  t = 0.0
+  tm = 0.0
+  index = -1
+  angles = [0.0] * len(motor)
+  delta_angle = [0.0] * len(motor)
+  direction = [-1, -1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, -1, 1]
+
+  #while True:
+  #  t = 0.0   # elapsed simulation time
+  #  tm = 0.0
+  #  index = -1
+  #  angles = [0.0] * len(motor)
+  #  delta_angles = [0.0] * len(motor)
+
+  #  while robot.step(timestep) != -1:
+  #      if t >= tm:
+  #          index += 1
+  #          if index >= len(motion):
+  #              break
+  #          delta_angles = [(float(motion[index][i+1]) - angles[i])/(float(motion[index][0])*0.008) for i in range(len(motor))]
+  #          tm += float(motion[index][0]) * 0.008
+  #      for i in range(len(motor)):
+  #          angles[i] += delta_angles[i] * 0.008
+  #      [m.setPosition(math.radians(direction[i] * float(angles[i]))) for m, i in zip(motor, range(len(motor)))]
+  #      t += timestep / 1000.0
+  #  break
+
+  #while robot.step(timestep) != -1:
+  #  if t >= tm:
+  #    index += 1
+  #    print(index)
+  #    if index >= 14:
+  #      break
+  #    delta_angles = [math.radians((float(motion[index][i+1]) - angles[i])/(float(motion[index][0])*0.008))*direction[i] for i in range(len(motor))]
+  #    tm += float(motion[index][0]) * 0.008
+  #  for i in range(len(motor)):
+  #    joint_angles[i] += delta_angles[i] * 0.008
+  #  t += timestep / 1000.0
+
   while robot.step(timestep) != -1:
     joint_angles,lf,rf,xp,n = walk.getNextPos()
     if n == 0:
