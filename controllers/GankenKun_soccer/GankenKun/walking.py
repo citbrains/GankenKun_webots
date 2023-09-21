@@ -20,7 +20,7 @@ class walking():
     self.max_stride_x = 0.10
     self.max_stride_y = 0.04
     self.max_stride_th = 0.4
-    self.fsp = foot_step_planner(self.max_stride_x, self.max_stride_y, self.max_stride_th, 0.34, 0.06)
+    self.fsp = foot_step_planner(self.max_stride_x, self.max_stride_y, self.max_stride_th,0.32, 0.06)
     self.X = np.matrix([[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]])
     self.pattern = []
     self.left_up = self.right_up = 0.0

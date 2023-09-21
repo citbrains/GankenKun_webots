@@ -158,7 +158,7 @@ if __name__ == "__main__":
             num = 0
             break
     while env.supervisor.step(env.time_step) != 1:
-        if num % 42 == 0 and num < 42 * 10:
+        if num % 40 == 0 and num < 40 * 10:
             for agent in env.agents:
                 env.agent_selection = agent
                 env.step([random.random()*2-1, random.random()*2-1, random.random()*2-1])
