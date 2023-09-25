@@ -24,7 +24,7 @@ class play_motion():
   def getNextPos(self):
     if self.t >= self.tm:
       self.index += 1
-      if self.index >= len(self.motion):
+      if self.index >= len(self.motion) - 1:
         return None
       period = float(self.motion[self.index][0]) * self.dt
       self.tm += period

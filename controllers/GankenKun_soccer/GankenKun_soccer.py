@@ -48,36 +48,55 @@ if __name__ == '__main__':
 
   pc = preview_control(timestep/1000, 1.0, 0.27)
   walk = walking(timestep/1000, motorNames, left_foot, right_foot, joint_angles, pc)
-
   foot_step = walk.setGoalPos([0.0, 0.0, 0.0])
-
   pm = play_motion(timestep/1000, motorNames)
 
-  while True:
-    pm.setMotionFile("./right_kick.csv")
+  next_mode = ""
+  mode = "walk"
+  new_walk_command = False
+  prev_foot_step_num = 0
+  is_first = False
+  while robot.step(timestep) != -1:
+    if receiver.getQueueLength() > 0:
+      while receiver.getQueueLength() > 0:
+        received_message = receiver.getData().decode('utf-8')
+        receiver.nextPacket()
+      message_parts = received_message.split(',')
+      next_mode = message_parts[0]
+      if message_parts[0] == "walk":
+        new_walk_command = True
 
-    while robot.step(timestep) != -1:
+    if mode == "":
+      mode = next_mode
+      print(mode)
+      next_mode = ""
+      is_first = True
+    else:
+      is_first = False
+
+    if mode == "walk":
+      joint_angles,lf,rf,xp,n = walk.getNextPos()
+      if n == 0:
+        if new_walk_command:
+          x_goal = foot_step[0][1] + float(message_parts[1])
+          y_goal = foot_step[0][2] - foot_step[0][5] + float(message_parts[2])
+          th_goal = foot_step[0][3] - float(message_parts[3])
+          foot_step = walk.setGoalPos([x_goal, y_goal, th_goal])
+          new_walk_command = False
+        else:
+          foot_step = walk.setGoalPos()
+          if prev_foot_step_num == 3 and len(foot_step) == 3:
+            mode = ""
+        prev_foot_step_num = len(foot_step)
+
+    elif mode == "motion":
+      if is_first:
+        pm.setMotionFile(f"./{message_parts[1]}.csv")
       joint_angles = pm.getNextPos()
       if joint_angles == None:
-        break
+        mode = ""
+        continue
+
+    if joint_angles != None:
       for i in range(len(motorNames)):
         motor[i].setPosition(joint_angles[i])
-
-  #while robot.step(timestep) != -1:
-  #  joint_angles,lf,rf,xp,n = walk.getNextPos()
-  #  if n == 0:
-  #    if receiver.getQueueLength() > 0:
-  #      received_message = ""
-  #      while receiver.getQueueLength() > 0:
-  #        received_message = receiver.getData().decode('utf-8')
-  #        receiver.nextPacket()
-  #      message_parts = received_message.split(',')
-  #      if message_parts[0] == "walk":
-  #        x_goal = foot_step[0][1] + float(message_parts[1])
-  #        y_goal = foot_step[0][2] - foot_step[0][5] + float(message_parts[2])
-  #        th_goal = foot_step[0][3] - float(message_parts[3])
-  #      foot_step = walk.setGoalPos([x_goal, y_goal, th_goal])
-  #    else:
-  #      foot_step = walk.setGoalPos()
-  #  for i in range(len(motorNames)):
-  #    motor[i].setPosition(joint_angles[i])
