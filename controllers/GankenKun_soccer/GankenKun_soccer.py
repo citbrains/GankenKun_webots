@@ -89,6 +89,7 @@ if __name__ == '__main__':
         prev_foot_step_num = len(foot_step)
 
     elif mode == "motion":
+      new_walk_command = False
       if is_first:
         pm.setMotionFile(f"./{message_parts[1]}.csv")
       joint_angles = pm.getNextPos()
