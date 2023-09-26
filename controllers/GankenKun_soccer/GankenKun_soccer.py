@@ -68,7 +68,6 @@ if __name__ == '__main__':
 
     if mode == "":
       mode = next_mode
-      print(mode)
       next_mode = ""
       is_first = True
     else:
