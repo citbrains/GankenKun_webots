@@ -67,32 +67,32 @@ class raw_env(AECEnv, EzPickle):
         children = self.supervisor.getRoot().getField('children')
         children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.1 size 1 }}')
         children.importMFNodeFromString(-1, f'DEF BLUE_PLAYER1 GankenKun_simple {{translation -0.3 0 0.450 rotation 0 0 1 0 name "blue player 1" jerseyTexture "textures/GankenKun_blue1.png" jerseyColor 0, 0, 1 channel 1 controller "GankenKun_soccer"}}')
-        #children.importMFNodeFromString(-1, f'DEF BLUE_PLAYER2 GankenKun_simple {{translation -2 -1 0.450 rotation 0 0 1 0 name "blue player 2" jerseyTexture "textures/GankenKun_blue2.png" jerseyColor 0, 0, 1 channel 2 controller "GankenKun_soccer"}}')
-        #children.importMFNodeFromString(-1, f'DEF BLUE_PLAYER3 GankenKun_simple {{translation -2 1 0.450 rotation 0 0 1 0 name "blue player 3" jerseyTexture "textures/GankenKun_blue3.png" jerseyColor 0, 0, 1 channel 3 controller "GankenKun_soccer"}}')
-        #children.importMFNodeFromString(-1, f'DEF RED_PLAYER1 GankenKun_simple {{translation 1 0 0.450 rotation 0 0 1 3.14 name "red player 1" jerseyTexture "textures/GankenKun_red1.png" jerseyColor 1, 0, 0 channel 4 controller "GankenKun_soccer"}}')
-        #children.importMFNodeFromString(-1, f'DEF RED_PLAYER2 GankenKun_simple {{translation 2 -1 0.450 rotation 0 0 1 3.14 name "red player 2" jerseyTexture "textures/GankenKun_red2.png" jerseyColor 1, 0, 0 channel 5 controller "GankenKun_soccer"}}')
-        #children.importMFNodeFromString(-1, f'DEF RED_PLAYER3 GankenKun_simple {{translation 2 1 0.450 rotation 0 0 1 3.14 name "red player 3" jerseyTexture "textures/GankenKun_red3.png" jerseyColor 1, 0, 0 channel 6 controller "GankenKun_soccer"}}')
+        children.importMFNodeFromString(-1, f'DEF BLUE_PLAYER2 GankenKun_simple {{translation -2 -1 0.450 rotation 0 0 1 0 name "blue player 2" jerseyTexture "textures/GankenKun_blue2.png" jerseyColor 0, 0, 1 channel 2 controller "GankenKun_soccer"}}')
+        children.importMFNodeFromString(-1, f'DEF BLUE_PLAYER3 GankenKun_simple {{translation -2 1 0.450 rotation 0 0 1 0 name "blue player 3" jerseyTexture "textures/GankenKun_blue3.png" jerseyColor 0, 0, 1 channel 3 controller "GankenKun_soccer"}}')
+        children.importMFNodeFromString(-1, f'DEF RED_PLAYER1 GankenKun_simple {{translation 1 0 0.450 rotation 0 0 1 3.14 name "red player 1" jerseyTexture "textures/GankenKun_red1.png" jerseyColor 1, 0, 0 channel 4 controller "GankenKun_soccer"}}')
+        children.importMFNodeFromString(-1, f'DEF RED_PLAYER2 GankenKun_simple {{translation 2 -1 0.450 rotation 0 0 1 3.14 name "red player 2" jerseyTexture "textures/GankenKun_red2.png" jerseyColor 1, 0, 0 channel 5 controller "GankenKun_soccer"}}')
+        children.importMFNodeFromString(-1, f'DEF RED_PLAYER3 GankenKun_simple {{translation 2 1 0.450 rotation 0 0 1 3.14 name "red player 3" jerseyTexture "textures/GankenKun_red3.png" jerseyColor 1, 0, 0 channel 6 controller "GankenKun_soccer"}}')
 
         self.blue1_emitter = self.supervisor.getDevice('blue1_emitter')
-        #self.blue2_emitter = self.supervisor.getDevice('blue2_emitter')
-        #self.blue3_emitter = self.supervisor.getDevice('blue3_emitter')
-        #self.red1_emitter = self.supervisor.getDevice('red1_emitter')
-        #self.red2_emitter = self.supervisor.getDevice('red2_emitter')
-        #self.red3_emitter = self.supervisor.getDevice('red3_emitter')
+        self.blue2_emitter = self.supervisor.getDevice('blue2_emitter')
+        self.blue3_emitter = self.supervisor.getDevice('blue3_emitter')
+        self.red1_emitter = self.supervisor.getDevice('red1_emitter')
+        self.red2_emitter = self.supervisor.getDevice('red2_emitter')
+        self.red3_emitter = self.supervisor.getDevice('red3_emitter')
 
         self.ball_pos = self.supervisor.getFromDef('BALL').getField('translation')
         self.blue1_pos = self.supervisor.getFromDef('BLUE_PLAYER1').getField('translation')
-        #self.blue1_rot = self.supervisor.getFromDef('BLUE_PLAYER1').getField('rotation')
-        #self.blue2_pos = self.supervisor.getFromDef('BLUE_PLAYER2').getField('translation')
-        #self.blue2_rot = self.supervisor.getFromDef('BLUE_PLAYER2').getField('rotation')
-        #self.blue3_pos = self.supervisor.getFromDef('BLUE_PLAYER3').getField('translation')
-        #self.blue3_rot = self.supervisor.getFromDef('BLUE_PLAYER3').getField('rotation')
-        #self.red1_pos = self.supervisor.getFromDef('RED_PLAYER1').getField('translation')
-        #self.red1_rot = self.supervisor.getFromDef('RED_PLAYER1').getField('rotation')
-        #self.red2_pos = self.supervisor.getFromDef('RED_PLAYER2').getField('translation')
-        #self.red2_rot = self.supervisor.getFromDef('RED_PLAYER2').getField('rotation')
-        #self.red3_pos = self.supervisor.getFromDef('RED_PLAYER3').getField('translation')
-        #self.red3_rot = self.supervisor.getFromDef('RED_PLAYER3').getField('rotation')
+        self.blue1_rot = self.supervisor.getFromDef('BLUE_PLAYER1').getField('rotation')
+        self.blue2_pos = self.supervisor.getFromDef('BLUE_PLAYER2').getField('translation')
+        self.blue2_rot = self.supervisor.getFromDef('BLUE_PLAYER2').getField('rotation')
+        self.blue3_pos = self.supervisor.getFromDef('BLUE_PLAYER3').getField('translation')
+        self.blue3_rot = self.supervisor.getFromDef('BLUE_PLAYER3').getField('rotation')
+        self.red1_pos = self.supervisor.getFromDef('RED_PLAYER1').getField('translation')
+        self.red1_rot = self.supervisor.getFromDef('RED_PLAYER1').getField('rotation')
+        self.red2_pos = self.supervisor.getFromDef('RED_PLAYER2').getField('translation')
+        self.red2_rot = self.supervisor.getFromDef('RED_PLAYER2').getField('rotation')
+        self.red3_pos = self.supervisor.getFromDef('RED_PLAYER3').getField('translation')
+        self.red3_rot = self.supervisor.getFromDef('RED_PLAYER3').getField('rotation')
 
         self.agent_selection = "blue1"
 
@@ -159,13 +159,15 @@ if __name__ == "__main__":
             break
     while env.supervisor.step(env.time_step) != 1:
         if num % 40 == 0 and num < 40 * 10:
-            #for agent in env.agents:
-            #    env.agent_selection = agent
+            for agent in env.agents:
+                env.agent_selection = agent
                 action = "walk,"+str(random.random()*2-1)+","+str(random.random()*2-1)+","+str(random.random()*2-1)
                 env.step(action)
         if num == 400:
-            action = "motion,left_kick"
-            env.step(action)
+            for agent in env.agents:
+                env.agent_selection = agent
+                action = "motion,left_kick"
+                env.step(action)
         if num == 680:
             num = 0
         num += 1
