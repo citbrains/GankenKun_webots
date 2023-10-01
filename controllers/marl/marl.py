@@ -43,9 +43,11 @@ if __name__ == "__main__":
     env.reset()
     env = ss.pettingzoo_env_to_vec_env_v1(env)
     env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
-    model = PPO(MlpPolicy, env, n_steps = 10)
-    callback = ActionRewardLogger(check_freq=10)
-    model.learn(total_timesteps=10000, callback=callback)
+    model = PPO(MlpPolicy, env, n_steps = 10, batch_size = 60)
+    #callback = ActionRewardLogger(check_freq=10)
+    #model.learn(total_timesteps=10000, callback=callback)
+    model.learn(total_timesteps=10000)
+    print("FINISH")
 
     #for agent in env.agent_iter():
     #    observation, reward, termination, truncation, info = env.last()
@@ -65,13 +67,14 @@ if __name__ == "__main__":
     #        for i in range(40):
     #            env.supervisor.step(env.time_step)
     
-    #while env.supervisor.step(env.time_step) != 1:
-    #    if num % 40 == 0 and num < 40 * 10:
-    #        for agent in env.agents:
-    #            env.step(0)
-    #    if num == 400:
-    #        for agent in env.agents:
-    #            env.step(6)
-    #    if num == 680:
+    #num = 0
+    #while True:
+    #    if num < 10:
+    #        env.step([1,1,1,0,0,0])
+    #    elif num < 15:
+    #        env.step([2,2,2,3,3,3])
+    #    elif num < 20:
+    #        env.reset()
+    #       #time.sleep(0.96)
     #        num = 0
     #    num += 1

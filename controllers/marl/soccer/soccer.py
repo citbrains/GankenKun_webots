@@ -2,6 +2,7 @@
 
 import numpy as np
 import math
+import copy
 
 from controller import Supervisor
 
@@ -34,8 +35,7 @@ class raw_env(AECEnv, EzPickle):
     
     supervisor = None
     
-    def __init__(self, max_cycles=1000, render_mode=None):
-        print("PASS init")
+    def __init__(self, max_cycles=18, render_mode=None):
         EzPickle.__init__(self, max_cycles=max_cycles, render_mode=render_mode)
         if self.supervisor == None:
             print(self.supervisor)
@@ -50,8 +50,10 @@ class raw_env(AECEnv, EzPickle):
         self.out_agent = []
         self.agent_name_mapping = {}
         self.agent_dict = {}
+        self.kill_list = []
         self.agent_list = []
         self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
+        self.dead_agents = []
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
@@ -61,7 +63,9 @@ class raw_env(AECEnv, EzPickle):
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
 
-        self.possible_agents = self.agents
+        self.possible_agents = copy.deepcopy(self.agents)
+        print("self.possible_agents")
+        print(self.possible_agents)
         self._agent_selector = agent_selector(self.agents)
 
         self.reinit()
@@ -101,12 +105,16 @@ class raw_env(AECEnv, EzPickle):
         
         i = self.agent_name_mapping[self.agent_selection]
         if self.agent_list[i].is_fall:
-            self.agent_list[i].reset(self.init_pos[i])
+            agent.alive = False
+            self.kill_list.append(agent.name)
+            #self.agent_list[i].reset(self.init_pos[i])
         else:
+            #agent.alive = True
             message = self.actions[action].encode('utf-8')
             agent.send(message)
 
         if self._agent_selector.is_last():
+            print("last: "+str(self.agent_selection))
             self.frames += 1
             for i in range(40):
                 self.supervisor.step(self.time_step)
@@ -115,6 +123,15 @@ class raw_env(AECEnv, EzPickle):
         truncate = self.frames >= self.max_cycles
         self.terminations = {a: terminate for a in self.agents}
         self.truncations = {a: truncate for a in self.agents}
+        
+        #if self._agent_selector.is_last():
+        #    _live_agents = self.agents[:]
+        #    for k in self.kill_list:
+        #        _live_agents.remove(k)
+        #        self.terminations[k] = True
+        #        self.dead_agents.append(k)
+        #    self.kill_list = []
+        #    self._agent_selector.reinit(_live_agents)
         
         if len(self._agent_selector.agent_order):
             self.agent_selection = self._agent_selector.next()
@@ -150,11 +167,12 @@ class raw_env(AECEnv, EzPickle):
         self.init_pos = [[-0.3, 0, 0], [-2, -1, 0], [-2, 1, 0], [1, 0, 3.14], [2, -1, 3.14], [2, 1, 3.14]]
         for i in range(len(self.agent_list)):
             self.agent_list[i].reset(self.init_pos[i])
+        self.frames = 0
 
     def reset(self, seed = None, options = None):
         if seed is not None:
             self._seed(seed=seed)
-        self.agents = self.possible_agents
+        self.agents = copy.deepcopy(self.possible_agents)
         self._agent_selector.reinit(self.agents)
         self.agent_selection = self._agent_selector.next()
         self.rewards = dict(zip(self.agents, [0 for _ in self.agents]))
