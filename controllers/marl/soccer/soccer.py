@@ -35,12 +35,10 @@ class raw_env(AECEnv, EzPickle):
     
     supervisor = None
     
-    def __init__(self, max_cycles=18, render_mode=None):
+    def __init__(self, max_cycles=100, render_mode=None):
         EzPickle.__init__(self, max_cycles=max_cycles, render_mode=render_mode)
         if self.supervisor == None:
-            print(self.supervisor)
             self.supervisor = Supervisor()
-        print(self.supervisor)
         self.time_step = int(self.supervisor.getBasicTimeStep())
 
         self.frames = 0
@@ -57,15 +55,13 @@ class raw_env(AECEnv, EzPickle):
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
-        obs_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
+        obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(6) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
 
         self.possible_agents = copy.deepcopy(self.agents)
-        print("self.possible_agents")
-        print(self.possible_agents)
         self._agent_selector = agent_selector(self.agents)
 
         self.reinit()
@@ -83,7 +79,28 @@ class raw_env(AECEnv, EzPickle):
         self.np_random, seed = seeding.np_random(seed)
 
     def observe(self, agent):
-        return self.state()
+        i = self.agent_name_mapping[agent]
+        state = self.state()
+        ball_x, ball_y = [state[0], state[1]]
+        bx, by, bthe = state[i*3+3], state[i*3+4],state[i*3+5]
+        s, c = math.sin(bthe), math.cos(bthe)
+        blx, bly = ball_x - bx, ball_y - by
+        x, y = blx * c + bly * s, - blx * s + bly * c
+        obs = [x, y]
+        obs += [bx, by, bthe]
+        no_agent = len(self.agents)
+        base_index = list(range(no_agent))
+        if i >= no_agent/2:
+            index = base_index[int(no_agent/2):] + base_index[:int(no_agent/2)]
+        else:
+            index = base_index
+        index.remove(i)
+        for j in index:
+            rx, ry = state[j*3+3], state[j*3+4]
+            lx, ly = rx - bx, ry - by
+            x, y = lx * c + ly * s, - lx * s + ly * c
+            obs += [x, y]
+        return obs
     
     def state(self):
         ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
@@ -114,7 +131,6 @@ class raw_env(AECEnv, EzPickle):
             agent.send(message)
 
         if self._agent_selector.is_last():
-            print("last: "+str(self.agent_selection))
             self.frames += 1
             for i in range(40):
                 self.supervisor.step(self.time_step)
