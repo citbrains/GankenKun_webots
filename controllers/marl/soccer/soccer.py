@@ -26,6 +26,13 @@ def env(**kwargs):
 
 parallel_env = parallel_wrapper_fn(env)
 
+def normalize_angle_rad(angle):
+    while angle > math.pi:
+        angle -= 2.0 * math.pi
+    while angle <= -math.pi:
+        angle += 2.0 * math.pi
+    return angle
+
 class raw_env(AECEnv, EzPickle):
     metadata = {
         "render_modes": ["human", "rgb_array"],
@@ -100,6 +107,10 @@ class raw_env(AECEnv, EzPickle):
             lx, ly = rx - bx, ry - by
             x, y = lx * c + ly * s, - lx * s + ly * c
             obs += [x, y]
+        if i >= no_agent/2:
+            obs[2] = -obs[2]
+            obs[3] = -obs[3]
+            obs[4] = normalize_angle_rad(obs[4]+math.pi)
         return obs
     
     def state(self):
