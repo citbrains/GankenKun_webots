@@ -32,6 +32,11 @@ class Player():
         self.is_fall = False
         self.waiting_time = 1
 
+    def move(self, pos = [0.0, 0.0, 0.0]):
+        self.player.resetPhysics()
+        self.player_pos.setSFVec3f([pos[0], pos[1], 0.450])
+        self.player_rot.setSFRotation([0, 0, 1, pos[2]])
+        
     def send(self, message):
         if self.waiting_time > 0:
             self.waiting_time -= 1
@@ -48,6 +53,8 @@ class Player():
         self.pos = [x, y, yaw]
         if abs(pitch) > 1.0 or abs(roll) > 1.0:
             self.is_fall = True
+        else:
+            self.is_fall = False
     
     def is_done(self):
         return not self.alive

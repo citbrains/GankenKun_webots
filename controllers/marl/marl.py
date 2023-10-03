@@ -39,7 +39,7 @@ class ActionRewardLogger(BaseCallback):
 if __name__ == "__main__":
     env = soccer_v0
     env = env.parallel_env()
-    #env = ss.black_death_v3(env)
+    env = ss.black_death_v3(env)
     env.reset()
     env = ss.pettingzoo_env_to_vec_env_v1(env)
     env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
@@ -47,7 +47,6 @@ if __name__ == "__main__":
     #callback = ActionRewardLogger(check_freq=10)
     #model.learn(total_timesteps=10000, callback=callback)
     model.learn(total_timesteps=1000000)
-    print("FINISH")
 
     #for agent in env.agent_iter():
     #    observation, reward, termination, truncation, info = env.last()

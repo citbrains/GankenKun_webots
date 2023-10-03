@@ -88,7 +88,7 @@ class raw_env(AECEnv, EzPickle):
         x, y = blx * c + bly * s, - blx * s + bly * c
         obs = [x, y]
         obs += [bx, by, bthe]
-        no_agent = len(self.agents)
+        no_agent = len(self.possible_agents)
         base_index = list(range(no_agent))
         if i >= no_agent/2:
             index = base_index[int(no_agent/2):] + base_index[:int(no_agent/2)]
@@ -122,11 +122,8 @@ class raw_env(AECEnv, EzPickle):
         
         i = self.agent_name_mapping[self.agent_selection]
         if self.agent_list[i].is_fall:
-            agent.alive = False
-            self.kill_list.append(agent.name)
-            #self.agent_list[i].reset(self.init_pos[i])
+            self.agent_list[i].move(self.init_pos[i])
         else:
-            #agent.alive = True
             message = self.actions[action].encode('utf-8')
             agent.send(message)
 
@@ -139,16 +136,16 @@ class raw_env(AECEnv, EzPickle):
         truncate = self.frames >= self.max_cycles
         self.terminations = {a: terminate for a in self.agents}
         self.truncations = {a: truncate for a in self.agents}
-        
-        #if self._agent_selector.is_last():
-        #    _live_agents = self.agents[:]
-        #    for k in self.kill_list:
-        #        _live_agents.remove(k)
-        #        self.terminations[k] = True
-        #        self.dead_agents.append(k)
-        #    self.kill_list = []
-        #    self._agent_selector.reinit(_live_agents)
-        
+                
+        if self._agent_selector.is_last():
+            _live_agents = self.agents[:]
+            for k in self.kill_list:
+                _live_agents.remove(k)
+                self.terminations[k] = True
+                self.dead_agents.append(k)
+            self.kill_list = []
+            self._agent_selector.reinit(_live_agents)
+
         if len(self._agent_selector.agent_order):
             self.agent_selection = self._agent_selector.next()
         
