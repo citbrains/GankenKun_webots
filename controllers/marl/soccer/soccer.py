@@ -154,7 +154,14 @@ class raw_env(AECEnv, EzPickle):
         agent = self.agent_list[self.agent_name_mapping[self.agent_selection]]
         x, y, the = agent.pos
         length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-        self.rewards[self.agent_selection] = 1/length
+        if length < 1.0:
+            i = self.agent_name_mapping[self.agent_selection]
+            if i < 3:
+                self.rewards[self.agent_selection] = max(self.ball.getVelocity()[0], 0)
+            else:
+                self.rewards[self.agent_selection] = max(-self.ball.getVelocity()[0],0)
+            if self.rewards[self.agent_selection] > 0.1:
+                print("reward: "+str(self.agent_selection)+" "+str(self.rewards[self.agent_selection]))
 
         self._accumulate_rewards()
         self._deads_step_first()
