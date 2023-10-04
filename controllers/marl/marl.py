@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import math
+import datetime
 
 from gymnasium.spaces import Box, Discrete, Sequence
 from gymnasium.utils import EzPickle, seeding
@@ -18,6 +19,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
 from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.logger import configure
 
 import soccer_v0
 
@@ -37,13 +39,17 @@ class ActionRewardLogger(BaseCallback):
         return True  # continue training
 
 if __name__ == "__main__":
+    now = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    log_dir = f'./logs/log_{now}/'
+    logger = configure(log_dir, ["stdout", "csv", "tensorboard"])
     env = soccer_v0
     env = env.parallel_env()
     env = ss.black_death_v3(env)
     env.reset()
     env = ss.pettingzoo_env_to_vec_env_v1(env)
     env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
-    model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 1800)
+    model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 1800, verbose = 1)
+    model.set_logger(logger)
     #callback = ActionRewardLogger(check_freq=10)
     #model.learn(total_timesteps=10000, callback=callback)
     model.learn(total_timesteps=1000000)
