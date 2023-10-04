@@ -30,6 +30,7 @@ class Player():
         self.score = 0
         self.action = 0
         self.is_fall = False
+        self.is_replace = False
         self.waiting_time = 1
 
     def move(self, pos = [0.0, 0.0, 0.0]):

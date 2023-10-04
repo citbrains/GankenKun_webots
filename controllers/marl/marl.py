@@ -43,7 +43,7 @@ if __name__ == "__main__":
     env.reset()
     env = ss.pettingzoo_env_to_vec_env_v1(env)
     env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
-    model = PPO(MlpPolicy, env, n_steps = 100, batch_size = 600)
+    model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 1800)
     #callback = ActionRewardLogger(check_freq=10)
     #model.learn(total_timesteps=10000, callback=callback)
     model.learn(total_timesteps=1000000)

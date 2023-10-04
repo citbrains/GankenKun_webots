@@ -3,6 +3,7 @@
 import numpy as np
 import math
 import copy
+import random
 
 from controller import Supervisor
 
@@ -42,7 +43,7 @@ class raw_env(AECEnv, EzPickle):
     
     supervisor = None
     
-    def __init__(self, max_cycles=100, render_mode=None):
+    def __init__(self, max_cycles=300, render_mode=None):
         EzPickle.__init__(self, max_cycles=max_cycles, render_mode=render_mode)
         if self.supervisor == None:
             self.supervisor = Supervisor()
@@ -133,21 +134,67 @@ class raw_env(AECEnv, EzPickle):
         
         i = self.agent_name_mapping[self.agent_selection]
         if self.agent_list[i].is_fall:
+            while True:
+                if self.agents[i].startswith("blue"):
+                    x, y = random.uniform(-4.0, -0.5), random.uniform(-2.5, 2.5)
+                elif self.agents[i].startswith("red"):
+                    x, y = random.uniform(4.0, 0.5), random.uniform(-2.5, 2.5)
+                near_robot = False
+                for j in range(i):
+                    robot_x, robot_y, _ = self.agent_list[i].pos
+                    length = math.sqrt((x-robot_x)**2+(y-robot_y)**2)
+                    if length < 1:
+                        near_robot = True
+                        break
+                if near_robot == False:
+                    break
+            self.init_pos[i][0], self.init_pos[i][1] = x, y
+                
+
+
             self.agent_list[i].move(self.init_pos[i])
+            self.agent_list[i].is_replace = True
         else:
             message = self.actions[action].encode('utf-8')
             agent.send(message)
 
         if self._agent_selector.is_last():
             self.frames += 1
+            self._clear_rewards()
             for i in range(40):
                 self.supervisor.step(self.time_step)
+                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+                ball_vel_x, ball_vel_y = self.ball.getVelocity()[:2]
+                for agent in self.agents:
+                    x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
+                    length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
+                    if length < 0.5:
+                        if agent.startswith("blue"):
+                            ball_dx, ball_dy = 3.5 - ball_x, 0 - ball_y
+                            ball_len = math.sqrt(ball_dx**2+ball_dy**2)
+                            ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
+                            reward = ball_vel_x * ball_dx + ball_vel_y * ball_dy
+                            self.rewards[agent] += max(reward, 0)
+                        elif agent.startswith("red"):
+                            ball_dx, ball_dy = 3.5 - ( -ball_x), 0 - (-ball_y)
+                            ball_len = math.sqrt(ball_dx**2+ball_dy**2)
+                            ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
+                            reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
+                            self.rewards[agent] += max(reward, 0)
+            for agent in self.agents:
+                self.rewards[agent] += -0.01
+                if self.rewards[agent] > 0.1:
+                    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
+                if self.agent_list[self.agent_name_mapping[agent]].is_replace:
+                    self.rewards[agent] += -1
+                    self.agent_list[self.agent_name_mapping[agent]].is_replace = False
+                    print("reward(fall): "+str(agent)+" "+str(self.rewards[agent]))
 
         terminate = False
         truncate = self.frames >= self.max_cycles
         self.terminations = {a: terminate for a in self.agents}
         self.truncations = {a: truncate for a in self.agents}
-                
+
         if self._agent_selector.is_last():
             _live_agents = self.agents[:]
             for k in self.kill_list:
@@ -160,20 +207,6 @@ class raw_env(AECEnv, EzPickle):
         if len(self._agent_selector.agent_order):
             self.agent_selection = self._agent_selector.next()
         
-        self._clear_rewards()
-        ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
-        agent = self.agent_list[self.agent_name_mapping[self.agent_selection]]
-        x, y, the = agent.pos
-        length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-        if length < 1.0:
-            i = self.agent_name_mapping[self.agent_selection]
-            if i < 3:
-                self.rewards[self.agent_selection] = max(self.ball.getVelocity()[0], 0)
-            else:
-                self.rewards[self.agent_selection] = max(-self.ball.getVelocity()[0],0)
-            if self.rewards[self.agent_selection] > 0.1:
-                print("reward: "+str(self.agent_selection)+" "+str(self.rewards[self.agent_selection]))
-
         self._accumulate_rewards()
         self._deads_step_first()
     
@@ -192,11 +225,26 @@ class raw_env(AECEnv, EzPickle):
         else:
             self.ball.remove()
 
-        children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 0 0.1 size 1 }}')
+        y = random.uniform(-2.5, 2.5)
+        children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 {y} 0.1 size 1 }}')
         self.ball = self.supervisor.getFromDef('BALL')
         self.ball_pos = self.ball.getField('translation')
         self.init_pos = [[-0.3, 0, 0], [-2, -1, 0], [-2, 1, 0], [1, 0, 3.14], [2, -1, 3.14], [2, 1, 3.14]]
         for i in range(len(self.agent_list)):
+            while True:
+                if self.agents[i].startswith("blue"):
+                    x, y = random.uniform(-4.0, -0.5), random.uniform(-2.5, 2.5)
+                elif self.agents[i].startswith("red"):
+                    x, y = random.uniform(4.0, 0.5), random.uniform(-2.5, 2.5)
+                near_robot = False
+                for j in range(i):
+                    length = math.sqrt((x-self.init_pos[i][0])**2+(y-self.init_pos[i][1])**2)
+                    if length < 1:
+                        near_robot = True
+                        break
+                if near_robot == False:
+                    break
+            self.init_pos[i][0], self.init_pos[i][1] = x, y
             self.agent_list[i].reset(self.init_pos[i])
         self.frames = 0
 
