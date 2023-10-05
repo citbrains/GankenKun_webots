@@ -189,11 +189,16 @@ class raw_env(AECEnv, EzPickle):
                     self.rewards[agent] += -1
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
                     print("reward(fall): "+str(agent)+" "+str(self.rewards[agent]))
+            for agent in self.agents:
+                self.total_rewards[agent] += self.rewards[agent]
 
         terminate = False
         truncate = self.frames >= self.max_cycles
         self.terminations = {a: terminate for a in self.agents}
         self.truncations = {a: truncate for a in self.agents}
+        if truncate:
+            for agent in self.agents:
+                self.infos[agent]["episode"] = {"r": self.total_rewards[agent], "l": self.max_cycles}
 
         if self._agent_selector.is_last():
             _live_agents = self.agents[:]
@@ -255,6 +260,7 @@ class raw_env(AECEnv, EzPickle):
         self._agent_selector.reinit(self.agents)
         self.agent_selection = self._agent_selector.next()
         self.rewards = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.total_rewards = dict(zip(self.agents, [0 for _ in self.agents]))
         self._cumulative_rewards = {a: 0 for a in self.agents}
         self.terminations = dict(zip(self.agents, [False for _ in self.agents]))
         self.truncations = dict(zip(self.agents, [False for _ in self.agents]))
