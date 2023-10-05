@@ -23,19 +23,17 @@ from stable_baselines3.common.logger import configure
 
 import soccer_v0
 
-class ActionRewardLogger(BaseCallback):
-    def __init__(self, check_freq: int):
-        super(ActionRewardLogger, self).__init__()
+class SaveModel(BaseCallback):
+    def __init__(self, save_path: str, check_freq: int):
+        super(SaveModel, self).__init__()
+        self.save_path = save_path
         self.check_freq = check_freq
+        self.save_num =300*6
 
     def _on_step(self) -> bool:
         if self.n_calls % self.check_freq == 0:
-            #action, _states = self.model.predict(self.training_env.last_obs, deterministic=True)
-            print(self.training_env)
-            last_obs = self.training_env.get_attr('last_obs')
-            last_rewards = self.training_env.get_attr('last_rewards')
-            #print(f"Step: {self.num_timesteps}, Action: {action}, Last Rewards: {last_rewards}")
-            print(f"Last Rewards: {last_rewards}, Last Obs: {last_obs}")
+            self.model.save(f"{self.save_path}_step{self.save_num}")
+            self.save_num += 300*6
         return True  # continue training
 
 if __name__ == "__main__":
@@ -50,9 +48,9 @@ if __name__ == "__main__":
     env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
     model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 1800, verbose = 1)
     model.set_logger(logger)
-    #callback = ActionRewardLogger(check_freq=10)
-    #model.learn(total_timesteps=10000, callback=callback)
-    model.learn(total_timesteps=1000000)
+    callback = SaveModel(f'./logs/log_{now}/model', check_freq=300)
+    model.learn(total_timesteps=1000000, callback=callback)
+    #model.learn(total_timesteps=1000000)
 
     #for agent in env.agent_iter():
     #    observation, reward, termination, truncation, info = env.last()
