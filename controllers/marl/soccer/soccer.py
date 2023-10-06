@@ -58,12 +58,14 @@ class raw_env(AECEnv, EzPickle):
         self.agent_dict = {}
         self.kill_list = []
         self.agent_list = []
-        self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
+        #self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
+        self.agents = ["blue1"]
         self.dead_agents = []
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
-        obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
+        #obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
+        obs_space = Box(low=-5, high=5, shape = ([5]), dtype=np.float16)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(6) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
@@ -98,7 +100,7 @@ class raw_env(AECEnv, EzPickle):
         obs += [bx, by, bthe]
         no_agent = len(self.possible_agents)
         base_index = list(range(no_agent))
-        if i >= no_agent/2:
+        if agent.startswith("red"):
             index = base_index[int(no_agent/2):] + base_index[:int(no_agent/2)]
         else:
             index = base_index
@@ -108,7 +110,7 @@ class raw_env(AECEnv, EzPickle):
             lx, ly = rx - bx, ry - by
             x, y = lx * c + ly * s, - lx * s + ly * c
             obs += [x, y]
-        if i >= no_agent/2:
+        if agent.startswith("red"):
             obs[2] = -obs[2]
             obs[3] = -obs[3]
             obs[4] = normalize_angle_rad(obs[4]+math.pi)
@@ -121,7 +123,8 @@ class raw_env(AECEnv, EzPickle):
         player = []
         for i in range(len(self.agent_list)):
             player.append(self.agent_list[i].pos)
-        state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
+        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
+        state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2]]
         return state
     
     def step(self, action):
@@ -168,7 +171,8 @@ class raw_env(AECEnv, EzPickle):
                 for agent in self.agents:
                     x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
                     length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-                    if length < 0.5:
+                    self.rewards[agent] += 0.2/length/40
+                    if length < 0.3:
                         if agent.startswith("blue"):
                             ball_dx, ball_dy = 3.5 - ball_x, 0 - ball_y
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
