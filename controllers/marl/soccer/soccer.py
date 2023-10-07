@@ -67,7 +67,7 @@ class raw_env(AECEnv, EzPickle):
         #obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
         obs_space = Box(low=-5, high=5, shape = ([5]), dtype=np.float16)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
-        self.action_spaces = dict(zip(self.agents, [Discrete(6) for _ in enumerate(self.agents)]))
+        self.action_spaces = dict(zip(self.agents, [Discrete(8) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
 
@@ -175,13 +175,13 @@ class raw_env(AECEnv, EzPickle):
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
                             reward = ball_vel_x * ball_dx + ball_vel_y * ball_dy
-                            self.rewards[agent] += max(reward, 0)
+                            self.rewards[agent] += max(reward, 0) * 10
                         elif agent.startswith("red"):
                             ball_dx, ball_dy = 4.5 - ( -ball_x), 0 - (-ball_y)
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
                             reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
-                            self.rewards[agent] += max(reward, 0)
+                            self.rewards[agent] += max(reward, 0) * 10
             for agent in self.agents:
                 self.rewards[agent] += -0.01
                 if self.rewards[agent] > 0.1:
