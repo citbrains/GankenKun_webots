@@ -50,7 +50,6 @@ if __name__ == "__main__":
     model.set_logger(logger)
     callback = SaveModel(f'./logs/log_{now}/model', check_freq=300)
     model.learn(total_timesteps=10000000, callback=callback)
-    #model.learn(total_timesteps=1000000)
 
     #for agent in env.agent_iter():
     #    observation, reward, termination, truncation, info = env.last()
