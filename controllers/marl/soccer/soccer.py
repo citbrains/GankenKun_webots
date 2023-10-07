@@ -141,7 +141,7 @@ class raw_env(AECEnv, EzPickle):
                     x, y = random.uniform(4.0, 0.5), random.uniform(-2.5, 2.5)
                 near_robot = False
                 for j in range(i):
-                    robot_x, robot_y, _ = self.agent_list[i].pos
+                    robot_x, robot_y, _ = self.agent_list[j].pos
                     length = math.sqrt((x-robot_x)**2+(y-robot_y)**2)
                     if length < 1:
                         near_robot = True
@@ -149,9 +149,6 @@ class raw_env(AECEnv, EzPickle):
                 if near_robot == False:
                     break
             self.init_pos[i][0], self.init_pos[i][1] = x, y
-                
-
-
             self.agent_list[i].move(self.init_pos[i])
             self.agent_list[i].is_replace = True
         else:
@@ -170,13 +167,13 @@ class raw_env(AECEnv, EzPickle):
                     length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
                     if length < 0.5:
                         if agent.startswith("blue"):
-                            ball_dx, ball_dy = 3.5 - ball_x, 0 - ball_y
+                            ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
                             reward = ball_vel_x * ball_dx + ball_vel_y * ball_dy
                             self.rewards[agent] += max(reward, 0)
                         elif agent.startswith("red"):
-                            ball_dx, ball_dy = 3.5 - ( -ball_x), 0 - (-ball_y)
+                            ball_dx, ball_dy = 4.5 - ( -ball_x), 0 - (-ball_y)
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
                             reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
@@ -243,7 +240,7 @@ class raw_env(AECEnv, EzPickle):
                     x, y = random.uniform(4.0, 0.5), random.uniform(-2.5, 2.5)
                 near_robot = False
                 for j in range(i):
-                    length = math.sqrt((x-self.init_pos[i][0])**2+(y-self.init_pos[i][1])**2)
+                    length = math.sqrt((x-self.init_pos[j][0])**2+(y-self.init_pos[j][1])**2)
                     if length < 1:
                         near_robot = True
                         break
