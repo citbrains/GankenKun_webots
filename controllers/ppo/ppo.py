@@ -2,22 +2,11 @@
 
 from __future__ import annotations
 
-import numpy as np
-import math
 import datetime
-
-from gymnasium.spaces import Box, Discrete, Sequence
-from gymnasium.utils import EzPickle, seeding
-
-from pettingzoo import AECEnv
-from pettingzoo.utils import wrappers
-from pettingzoo.utils.agent_selector import agent_selector
-from pettingzoo.utils.conversions import parallel_wrapper_fn
 
 import supersuit as ss
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
-from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.logger import configure
 

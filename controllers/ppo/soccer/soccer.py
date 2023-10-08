@@ -135,6 +135,8 @@ class raw_env(AECEnv, EzPickle):
         agent = self.agent_list[self.agent_name_mapping[self.agent_selection]]
         agent.score = 0
         
+        print("frames: "+str(self.frames))
+
         i = self.agent_name_mapping[self.agent_selection]
         if self.agent_list[i].is_fall:
             while True:
