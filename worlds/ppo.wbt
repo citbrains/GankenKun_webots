@@ -50,7 +50,7 @@ RobocupSoccerField {
 
 Robot {
   supervisor TRUE
-  controller "marl"
+  controller "ppo"
   children[
     Emitter  { name "blue1_emitter"  channel 1 }
     Receiver { name "blue1_receiver" channel 1 }

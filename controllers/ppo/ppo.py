@@ -2,22 +2,11 @@
 
 from __future__ import annotations
 
-import numpy as np
-import math
 import datetime
-
-from gymnasium.spaces import Box, Discrete, Sequence
-from gymnasium.utils import EzPickle, seeding
-
-from pettingzoo import AECEnv
-from pettingzoo.utils import wrappers
-from pettingzoo.utils.agent_selector import agent_selector
-from pettingzoo.utils.conversions import parallel_wrapper_fn
 
 import supersuit as ss
 from stable_baselines3 import PPO
 from stable_baselines3.ppo import MlpPolicy
-from stable_baselines3.common.callbacks import EvalCallback
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.logger import configure
 
@@ -46,7 +35,7 @@ if __name__ == "__main__":
     env.reset()
     env = ss.pettingzoo_env_to_vec_env_v1(env)
     env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
-    model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 1800, verbose = 1)
+    model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 300, verbose = 1)
     model.set_logger(logger)
     callback = SaveModel(f'./logs/log_{now}/model', check_freq=300)
     model.learn(total_timesteps=10000000, callback=callback)
