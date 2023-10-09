@@ -119,6 +119,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
 
     def step(self, action_no):
         # Execute the action
+        print(self.foot_step)
         action = self.actions_list[action_no]
         x_goal = self.foot_step[0][1] + action[0]
         y_goal = self.foot_step[0][2] - self.foot_step[0][5] + action[1]
