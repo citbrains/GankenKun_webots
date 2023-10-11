@@ -24,74 +24,24 @@ from ray.rllib.env.multi_agent_env import MultiAgentEnv
 from gym.spaces import Dict as GymDict, Discrete, Box
 import supersuit as ss
 from ray.rllib.env import PettingZooEnv, ParallelPettingZooEnv
-from pettingzoo.mpe import simple_adversary_v2, simple_crypto_v2, simple_v2, simple_push_v2, simple_tag_v2, \
-    simple_spread_v2, simple_reference_v2, simple_world_comm_v2, simple_speaker_listener_v3
+import soccer_v0
+from marllib import marl
+from marllib.envs.base_env import ENV_REGISTRY
 import time
 
-# pettingzoo 1.12.0
 REGISTRY = {}
-REGISTRY["simple_adversary"] = simple_adversary_v2.parallel_env
-REGISTRY["simple_crypto"] = simple_crypto_v2.parallel_env
-REGISTRY["simple_push"] = simple_push_v2.parallel_env
-REGISTRY["simple_tag"] = simple_tag_v2.parallel_env
-REGISTRY["simple_spread"] = simple_spread_v2.parallel_env
-REGISTRY["simple_reference"] = simple_reference_v2.parallel_env
-REGISTRY["simple_world_comm"] = simple_world_comm_v2.parallel_env
-REGISTRY["simple_speaker_listener"] = simple_speaker_listener_v3.parallel_env
+REGISTRY["soccer"] = soccer_v0.parallel_env
 
 policy_mapping_dict = {
-    "simple_adversary": {
+    "soccer": {
         "description": "one team attack, one team survive",
         "team_prefix": ("adversary_", "agent_"),
         "all_agents_one_policy": False,
-        "one_agent_one_policy": True,
-    },
-    "simple_crypto": {
-        "description": "two team cooperate, one team attack",
-        "team_prefix": ("eve_", "bob_", "alice_"),
-        "all_agents_one_policy": False,
-        "one_agent_one_policy": True,
-    },
-    "simple_push": {
-        "description": "one team target on landmark, one team attack",
-        "team_prefix": ("adversary_", "agent_",),
-        "all_agents_one_policy": False,
-        "one_agent_one_policy": True,
-    },
-    "simple_tag": {
-        "description": "one team attack, one team survive",
-        "team_prefix": ("adversary_", "agent_"),
-        "all_agents_one_policy": False,
-        "one_agent_one_policy": True,
-    },
-    "simple_spread": {
-        "description": "one team cooperate",
-        "team_prefix": ("agent_",),
-        "all_agents_one_policy": True,
-        "one_agent_one_policy": True,
-    },
-    "simple_reference": {
-        "description": "one team cooperate",
-        "team_prefix": ("agent_",),
-        "all_agents_one_policy": True,
-        "one_agent_one_policy": True,
-    },
-    "simple_world_comm": {
-        "description": "two team cooperate and attack, one team survive",
-        "team_prefix": ("adversary_", "leadadversary_", "agent_"),
-        "all_agents_one_policy": False,
-        "one_agent_one_policy": True,
-    },
-    "simple_speaker_listener": {
-        "description": "two team cooperate",
-        "team_prefix": ("speaker_", "listener_"),
-        "all_agents_one_policy": True,
         "one_agent_one_policy": True,
     },
 }
 
-
-class RLlibMPE(MultiAgentEnv):
+class RLlibSoccer(MultiAgentEnv):
 
     def __init__(self, env_config):
         map = env_config["map_name"]
