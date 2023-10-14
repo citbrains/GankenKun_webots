@@ -1,8 +1,4 @@
-import rllib
 from marllib import marl
-
-ENV_REGISTRY = {}
-ENV_REGISTRY["soccer"] = rllib.RLlibSoccer
 
 env = marl.make_env(environment_name="soccer", map_name="soccer")
 mappo = marl.algos.mappo(hyperparam_source="test")

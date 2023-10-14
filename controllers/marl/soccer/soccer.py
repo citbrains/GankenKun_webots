@@ -114,7 +114,7 @@ class raw_env(AECEnv, EzPickle):
             obs[2] = -obs[2]
             obs[3] = -obs[3]
             obs[4] = normalize_angle_rad(obs[4]+math.pi)
-        return obs
+        return np.array(obs)
     
     def state(self):
         ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
@@ -125,7 +125,7 @@ class raw_env(AECEnv, EzPickle):
             player.append(self.agent_list[i].pos)
         state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
         #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2]]
-        return state
+        return np.array(state)
     
     def step(self, action):
         if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
