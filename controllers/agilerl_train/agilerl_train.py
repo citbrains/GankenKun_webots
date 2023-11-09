@@ -43,7 +43,7 @@ if __name__ == "__main__":
     INIT_HP = {
         "ALGO": "MATD3",  # Algorithm
         # Swap image channels dimension from last to first [H, W, C] -> [C, H, W]
-        "BATCH_SIZE": 32,  # Batch size
+        "BATCH_SIZE": 512,  # Batch size
         "LR": 0.01,  # Learning rate
         "GAMMA": 0.95,  # Discount factor
         "MEMORY_SIZE": 100000,  # Max memory buffer size
