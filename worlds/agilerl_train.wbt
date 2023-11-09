@@ -1,0 +1,68 @@
+#VRML_SIM R2021b utf8
+WorldInfo {
+  info [
+    "GANKENKUN robot."
+    "The GANKENKUN robot simulation model"
+  ]
+  title "GANKENKUN"
+  basicTimeStep 8
+  optimalThreadCount 8
+  physicsDisableTime 0.1
+  physicsDisableLinearThreshold 0.1
+  physicsDisableAngularThreshold 0.1
+  contactProperties [
+    ContactProperties {
+      material1 "grass"
+      coulombFriction [
+        0.5
+      ]
+      softCFM 0.03
+    }
+    ContactProperties {
+      material1 "grass"
+      material2 "robocup soccer ball"
+      coulombFriction [
+        0.5
+      ]
+      bounce 0.76
+      softCFM 0.05
+    }
+    ContactProperties {
+      material2 "robocup soccer ball"
+      bounce 0.76
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.6719791180295076 -0.49317350564460494 -0.552470775935249 1.8510428047885563
+  position -2.5375047220358824 -0.9166711516828123 0.6010308394649483
+}
+TexturedBackground {
+  texture "stadium_dry"
+}
+TexturedBackgroundLight {
+  texture "stadium_dry"
+}
+
+RobocupSoccerField {
+  size "kid"
+}
+
+Robot {
+  supervisor TRUE
+  controller "agilerl_train"
+  children[
+    Emitter  { name "blue1_emitter"  channel 1 }
+    Receiver { name "blue1_receiver" channel 1 }
+    Emitter  { name "blue2_emitter"  channel 2 }
+    Receiver { name "blue2_receiver" channel 2 }
+    Emitter  { name "blue3_emitter"  channel 3 }
+    Receiver { name "blue3_receiver" channel 3 }
+    Emitter  { name "red1_emitter"   channel 4 }
+    Receiver { name "red1_receiver"  channel 4 }
+    Emitter  { name "red2_emitter"   channel 5 }
+    Receiver { name "red2_receiver"  channel 5 }
+    Emitter  { name "red3_emitter"   channel 6 }
+    Receiver { name "red3_receiver"  channel 6 }
+  ]
+}
