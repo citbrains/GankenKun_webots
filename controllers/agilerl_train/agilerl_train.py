@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import datetime
+import csv
 
 import numpy as np
 import torch
@@ -12,21 +14,6 @@ from tqdm import trange
 
 import soccer_v0
 from pettingzoo.mpe import simple_speaker_listener_v4
-
-
-#if __name__ == "__main__":
-#    now = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-#    log_dir = f'./logs/log_{now}/'
-#    logger = configure(log_dir, ["stdout", "csv", "tensorboard"])
-#    env = soccer_v0
-#    env = env.parallel_env()
-#    env = ss.black_death_v3(env)
-#    env.reset()
-#    env = ss.pettingzoo_env_to_vec_env_v1(env)
-#    env = ss.concat_vec_envs_v1(env, 1, num_cpus=0, base_class="stable_baselines3")
-#    model = PPO(MlpPolicy, env, n_steps = 300, batch_size = 1800, verbose = 1)
-#    model.set_logger(logger)
-#    model.learn(total_timesteps=10000000, callback=callback)
 
 
 if __name__ == "__main__":
@@ -74,8 +61,21 @@ if __name__ == "__main__":
         "MAX_BATCH_SIZE": 1024
     }
 
+    # Define training loop parameters
+    max_episodes = 10000  # Total episodes (default: 6000)
+    max_steps = 1000  # Maximum steps to take in each episode
+    epsilon = 1.0  # Starting epsilon value
+    eps_end = 0.1  # Final epsilon value
+    eps_decay = 0.995  # Epsilon decay
+    evo_epochs = 20  # Evolution frequency
+    evo_loop = 1  # Number of evaluation episodes
+    checkpoint=max_episodes/10
+    reward_freq = 1
+    path = "./models/MATD3/" + datetime.datetime.now().strftime('%y%m%d')
+    os.makedirs(path, exist_ok=True)
+
     # Define the simple speaker listener environment as a parallel environment
-    env = soccer_v0.parallel_env()
+    env = soccer_v0.parallel_env(max_cycles=max_steps)
     env.reset()
 
     # Configure the multi-agent algo input arguments
@@ -158,16 +158,17 @@ if __name__ == "__main__":
         device=device,
     )
 
-    # Define training loop parameters
-    max_episodes = 10000  # Total episodes (default: 6000)
-    max_steps = 1000  # Maximum steps to take in each episode
-    epsilon = 1.0  # Starting epsilon value
-    eps_end = 0.1  # Final epsilon value
-    eps_decay = 0.995  # Epsilon decay
-    evo_epochs = 20  # Evolution frequency
-    evo_loop = 1  # Number of evaluation episodes
     elite = pop[0]  # Assign a placeholder "elite" agent
-    checkpoint=max_episodes/10
+
+    filename = "reward.csv"
+    file_path = os.path.join(path, filename)
+    agent_name = [n for n in env.agents]
+    title_names = ["Episode","Step","Value"]
+    title_names.extend(agent_name)
+    with open(file_path, "w") as f:
+        writer = csv.DictWriter(f, fieldnames=title_names)
+        writer.writeheader()
+
 
     # Training loop
     for idx_epi in trange(max_episodes):
@@ -179,8 +180,10 @@ if __name__ == "__main__":
                     agent_id: np.moveaxis(np.expand_dims(s, 0), [3], [1])
                     for agent_id, s in state.items()
                 }
+            step_value = 0
 
-            for _ in range(max_steps):
+            #for _ in range(max_steps):
+            while True:
                 action = agent.getAction(state, epsilon)  # Get next action from agent
                 next_state, reward, termination, truncation, _ = env.step(
                     action
@@ -193,10 +196,6 @@ if __name__ == "__main__":
                         agent_id: np.moveaxis(ns, [2], [0])
                         for agent_id, ns in next_state.items()
                     }
-
-                # Stop episode if any agents have terminated
-                if any(truncation.values()) or any(termination.values()):
-                    break
 
                 # Save experiences to replay buffer
                 memory.save2memory(state, action, reward, next_state, termination)
@@ -213,6 +212,12 @@ if __name__ == "__main__":
                         agent.batch_size
                     )  # Sample replay buffer
                     agent.learn(experiences)  # Learn according to agent's RL algorithm
+
+                step_value += 1
+                
+                # Stop episode if any agents have terminated
+                if any(truncation.values()) or any(termination.values()):
+                    break
 
                 # Update the state
                 if INIT_HP["CHANNELS_LAST"]:
@@ -252,9 +257,20 @@ if __name__ == "__main__":
             elite, pop = tournament.select(pop)
             pop = mutations.mutation(pop)
 
+        if (idx_epi + 1) % reward_freq == 0:
+            filename = "reward.csv"
+            file_path = os.path.join(path, filename)
+            with open(file_path, "a") as f:
+                writer = csv.DictWriter(f, fieldnames=title_names)
+                writer.writerow(dict(**{"Episode": idx_epi+1, "Step": step_value, "Value": score}, **agent_reward))
+
+        # Save the trained algorithm for each checkpoint
+        if (idx_epi + 1) % checkpoint == 0 and (idx_epi + 1) > evo_epochs:
+            filename = "MATD3_trained_agent_" + str(idx_epi + 1) + ".pt"
+            save_path = os.path.join(path, filename)
+            elite.saveCheckpoint(save_path)
+
     # Save the trained algorithm
-    path = "./models/MATD3"
     filename = "MATD3_trained_agent.pt"
-    os.makedirs(path, exist_ok=True)
     save_path = os.path.join(path, filename)
     elite.saveCheckpoint(save_path)
