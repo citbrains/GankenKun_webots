@@ -69,6 +69,7 @@ class raw_env(AECEnv, EzPickle):
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(8) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
+        #self.action_mask = Box(low=0, high=1, shape = ([8,]), dtype=np.int8)
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
 
         self.possible_agents = copy.deepcopy(self.agents)
@@ -136,6 +137,10 @@ class raw_env(AECEnv, EzPickle):
         agent = self.agent_list[self.agent_name_mapping[self.agent_selection]]
         agent.score = 0
         
+        terminate = False
+        truncate = False
+        goal = False
+
         #print("frames: "+str(self.frames))
 
         i = self.agent_name_mapping[self.agent_selection]
@@ -171,33 +176,71 @@ class raw_env(AECEnv, EzPickle):
                 for agent in self.agents:
                     x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
                     length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-                    self.rewards[agent] += 0.2/length/40
+                    #self.rewards[agent] += 0.2/length/40
                     if length < 0.3:
                         if agent.startswith("blue"):
                             ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
-                            reward = ball_vel_x * ball_dx + ball_vel_y * ball_dy
+                            reward = round(ball_vel_x, 1) * ball_dx + round(ball_vel_y, 1) * ball_dy
                             self.rewards[agent] += max(reward, 0) * 10
                         elif agent.startswith("red"):
                             ball_dx, ball_dy = 4.5 - ( -ball_x), 0 - (-ball_y)
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
-                            reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
+                            reward = round(-ball_vel_x, 1) * ball_dx + round(-ball_vel_y, 1) * ball_dy
                             self.rewards[agent] += max(reward, 0) * 10
             for agent in self.agents:
-                self.rewards[agent] += -0.01
-                if self.rewards[agent] > 0.1:
-                    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
-                if self.agent_list[self.agent_name_mapping[agent]].is_replace:
+                # local rewards
+                x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
+                if abs(x) > 5.0 or abs(y) > 3.5:
                     self.rewards[agent] += -1
+                #if self.rewards[agent] > 0.1:
+                #    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
+                if self.agent_list[self.agent_name_mapping[agent]].is_replace:
+                    self.rewards[agent] += -10
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
-                    print("reward(fall): "+str(agent)+" "+str(self.rewards[agent]))
+                    print("reward(fall), reward: "+str(agent)+" "+str(self.rewards[agent]))
+
+                #global rewards
+                if ball_x > 4.5 and abs(ball_y) < 1.3:
+                    goal = True
+                    truncate = True 
+                    if agent.startswith("blue"):
+                        self.rewards[agent] += 1000
+                    elif agent.startswith("red"):
+                        self.rewards[agent] += -1000
+                    print("Team blue Goal, reward: "+str(agent)+" "+str(self.rewards[agent]))
+                elif ball_x < -4.5 and abs(ball_y) < 1.3:
+                    goal = True
+                    truncate = True 
+                    if agent.startswith("blue"):
+                        self.rewards[agent] += -1000
+                    elif agent.startswith("red"):
+                        self.rewards[agent] += 1000
+                    print("Team red Goal, reward: "+str(agent)+" "+str(self.rewards[agent]))
+                    
             for agent in self.agents:
                 self.total_rewards[agent] += self.rewards[agent]
 
-        terminate = False
-        truncate = self.frames >= self.max_cycles
+            if not goal:
+                if abs(ball_x) > 4.5 or abs(ball_y) > 3.0:
+                    print("The ball out of the field")
+                    y = random.uniform(-2.5, 2.5)
+                    self.ball.resetPhysics()
+                    self.ball_pos.setSFVec3f([0, y, 0])
+
+
+        # Actions Masking
+        #for agent in self.agents:
+        #    ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+        #    x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
+        #    length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
+        #    if length > 0.5:
+        #        self.infos["env_defined_actions"][agent] = []
+        
+        if self.frames >= self.max_cycles:
+            truncate = True
         self.terminations = {a: terminate for a in self.agents}
         self.truncations = {a: truncate for a in self.agents}
         if truncate:
