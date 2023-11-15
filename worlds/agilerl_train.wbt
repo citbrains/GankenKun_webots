@@ -44,7 +44,7 @@ TexturedBackgroundLight {
   texture "stadium_dry"
 }
 
-RobocupSoccerField {
+RobocupSoccerField2 {
   size "kid"
 }
 
