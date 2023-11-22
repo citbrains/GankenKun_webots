@@ -3,7 +3,8 @@ import os
 import imageio
 import numpy as np
 import torch
-from agilerl.algorithms.matd3 import MATD3
+#from agilerl.algorithms.matd3 import MATD3
+from soccer.matd3 import MATD3
 from PIL import Image, ImageDraw
 
 import soccer_v0
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     )
 
     # Load the saved algorithm into the MATD3 object
-    path = "../agilerl_train/models/MATD3/231112/MATD3_trained_agent.pt"
+    path = "../agilerl_train/models/MATD3/231113/MATD3_trained_agent.pt"
     matd3.loadCheckpoint(path)
 
     rewards = []  # List to collect total episodic reward
@@ -86,16 +87,17 @@ if __name__ == "__main__":
         state, _ = env.reset()
         agent_reward = {agent_id: 0 for agent_id in agent_ids}
         score = 0
+        info = None
         for _ in range(max_steps):
             # Get action
-            action = matd3.getAction(state, epsilon=0)
+            action = matd3.getAction(state, epsilon=0, action_mask=info)
 
             # Save the frame for this step and append to frames list
             #frame = env.render()
             #frames.append(_label_with_episode_number(frame, episode_num=ep))
 
             # Take action in environment
-            print(_, action)
+            #print(_, action)
             state, reward, termination, truncation, info = env.step(action)
 
             # Stop episode if any agents have terminated

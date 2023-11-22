@@ -69,7 +69,7 @@ class raw_env(AECEnv, EzPickle):
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(8) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
-        self.action_mask = Box(low=0, high=1, shape = ([8,]), dtype=np.int8)
+        self.action_mask = [0, 0, 0, 0, 0, 0, 1, 1]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
 
         self.possible_agents = copy.deepcopy(self.agents)
@@ -197,12 +197,14 @@ class raw_env(AECEnv, EzPickle):
             for agent in self.agents:
                 self.total_rewards[agent] += self.rewards[agent]
 
-        #for agent in self.agents:
-        #    ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
-        #    x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
-        #    length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-        #    if length > 0.5:
-        #        self.infos["env_defined_actions"][agent] = []
+            for agent in self.agents:
+                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+                x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
+                length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
+                if length > 0.5:
+                    self.infos[agent]["action_mask"] = self.action_mask
+                else:
+                    self.infos[agent]["action_mask"] = None
         
         terminate = False
         truncate = self.frames >= self.max_cycles
