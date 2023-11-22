@@ -3,13 +3,15 @@
 import os
 import datetime
 import csv
+import yaml
 
 import numpy as np
 import torch
 from agilerl.components.multi_agent_replay_buffer import MultiAgentReplayBuffer
 from agilerl.hpo.mutation import Mutations
 from agilerl.hpo.tournament import TournamentSelection
-from agilerl.utils.utils import initialPopulation
+#from agilerl.utils.utils import initialPopulation
+from soccer.utils import initialPopulation
 from tqdm import trange
 
 import soccer_v0
@@ -62,14 +64,12 @@ if __name__ == "__main__":
     }
 
     # Define training loop parameters
-    max_episodes = 10000  # Total episodes (default: 6000)
     max_steps = 1000  # Maximum steps to take in each episode
     epsilon = 1.0  # Starting epsilon value
     eps_end = 0.1  # Final epsilon value
-    eps_decay = 0.995  # Epsilon decay
+    eps_decay = 0.9997  # Epsilon decay
     evo_epochs = 20  # Evolution frequency
     evo_loop = 1  # Number of evaluation episodes
-    checkpoint=max_episodes/10
     reward_freq = 1
     path = "./models/MATD3/" + datetime.datetime.now().strftime('%y%m%d')
     os.makedirs(path, exist_ok=True)
@@ -163,112 +163,123 @@ if __name__ == "__main__":
     filename = "reward.csv"
     file_path = os.path.join(path, filename)
     agent_name = [n for n in env.agents]
-    title_names = ["Episode","Step","Value"]
+    title_names = ["Episode","Step","Epsilon","Value"]
     title_names.extend(agent_name)
     with open(file_path, "w") as f:
         writer = csv.DictWriter(f, fieldnames=title_names)
         writer.writeheader()
 
 
-    # Training loop
-    for idx_epi in trange(max_episodes):
-        for agent in pop:  # Loop through population
-            state, _ = env.reset()  # Reset environment at start of episode
-            agent_reward = {agent_id: 0 for agent_id in env.agents}
-            if INIT_HP["CHANNELS_LAST"]:
-                state = {
-                    agent_id: np.moveaxis(np.expand_dims(s, 0), [3], [1])
-                    for agent_id, s in state.items()
-                }
-            step_value = 0
+    for lesson_number in range(1, 4):    
+        with open(f"./soccer/config/lesson{lesson_number}.yaml") as file:
+            LESSON=yaml.safe_load(file)
 
-            #for _ in range(max_steps):
-            while True:
-                action = agent.getAction(state, epsilon)  # Get next action from agent
-                next_state, reward, termination, truncation, _ = env.step(
-                    action
-                )  # Act in environment
-
-                # Image processing if necessary for the environment
+        env.reset(options=LESSON)
+        
+        # Define training loop parameters
+        max_episodes = 10000  # Total episodes (default: 6000)
+        checkpoint=max_episodes/10
+        
+        # Training loop
+        for idx_epi in trange(max_episodes):
+            for agent in pop:  # Loop through population
+                state, _ = env.reset()  # Reset environment at start of episode
+                agent_reward = {agent_id: 0 for agent_id in env.agents}
                 if INIT_HP["CHANNELS_LAST"]:
-                    state = {agent_id: np.squeeze(s) for agent_id, s in state.items()}
-                    next_state = {
-                        agent_id: np.moveaxis(ns, [2], [0])
-                        for agent_id, ns in next_state.items()
+                    state = {
+                        agent_id: np.moveaxis(np.expand_dims(s, 0), [3], [1])
+                        for agent_id, s in state.items()
                     }
+                step_value = 0
+                info = None
 
-                # Save experiences to replay buffer
-                memory.save2memory(state, action, reward, next_state, termination)
+                #for _ in range(max_steps):
+                while True:
+                    action = agent.getAction(state, epsilon, action_mask=info)  # Get next action from agent
+                    next_state, reward, termination, truncation, info = env.step(
+                        action
+                    )  # Act in environment
 
-                # Collect the reward
-                for agent_id, r in reward.items():
-                    agent_reward[agent_id] += r
+                    # Image processing if necessary for the environment
+                    if INIT_HP["CHANNELS_LAST"]:
+                        state = {agent_id: np.squeeze(s) for agent_id, s in state.items()}
+                        next_state = {
+                            agent_id: np.moveaxis(ns, [2], [0])
+                            for agent_id, ns in next_state.items()
+                        }
 
-                # Learn according to learning frequency
-                if (memory.counter % agent.learn_step == 0) and (
-                    len(memory) >= agent.batch_size
-                ):
-                    experiences = memory.sample(
-                        agent.batch_size
-                    )  # Sample replay buffer
-                    agent.learn(experiences)  # Learn according to agent's RL algorithm
+                    # Save experiences to replay buffer
+                    memory.save2memory(state, action, reward, next_state, termination)
 
-                step_value += 1
-                
-                # Stop episode if any agents have terminated
-                if any(truncation.values()) or any(termination.values()):
-                    break
+                    # Collect the reward
+                    for agent_id, r in reward.items():
+                        agent_reward[agent_id] += r
 
-                # Update the state
-                if INIT_HP["CHANNELS_LAST"]:
-                    next_state = {
-                        agent_id: np.expand_dims(ns, 0)
-                        for agent_id, ns in next_state.items()
-                    }
-                state = next_state
+                    # Learn according to learning frequency
+                    if (memory.counter % agent.learn_step == 0) and (
+                        len(memory) >= agent.batch_size
+                    ):
+                        experiences = memory.sample(
+                            agent.batch_size
+                        )  # Sample replay buffer
+                        agent.learn(experiences)  # Learn according to agent's RL algorithm
 
-            # Save the total episode reward
-            score = sum(agent_reward.values())
-            agent.scores.append(score)
+                    step_value += 1
+                    
+                    # Stop episode if any agents have terminated
+                    if any(truncation.values()) or any(termination.values()):
+                        break
 
-        # Update epsilon for exploration
-        epsilon = max(eps_end, epsilon * eps_decay)
+                    # Update the state
+                    if INIT_HP["CHANNELS_LAST"]:
+                        next_state = {
+                            agent_id: np.expand_dims(ns, 0)
+                            for agent_id, ns in next_state.items()
+                        }
+                    state = next_state
 
-        # Now evolve population if necessary
-        if (idx_epi + 1) % evo_epochs == 0:
-            # Evaluate population
-            fitnesses = [
-                agent.test(
-                    env,
-                    swap_channels=INIT_HP["CHANNELS_LAST"],
-                    max_steps=max_steps,
-                    loop=evo_loop,
+                # Save the total episode reward
+                score = sum(agent_reward.values())
+                agent.scores.append(score)
+
+            # Now evolve population if necessary
+            if (idx_epi + 1) % evo_epochs == 0:
+                # Evaluate population
+                fitnesses = [
+                    agent.test(
+                        env,
+                        swap_channels=INIT_HP["CHANNELS_LAST"],
+                        max_steps=max_steps,
+                        loop=evo_loop,
+                    )
+                    for agent in pop
+                ]
+
+                print(f"Episode {idx_epi + 1}/{max_episodes}")
+                print(f'Fitnesses: {["%.2f" % fitness for fitness in fitnesses]}')
+                print(
+                    f'100 fitness avgs: {["%.2f" % np.mean(agent.fitness[-100:]) for agent in pop]}'
                 )
-                for agent in pop
-            ]
 
-            print(f"Episode {idx_epi + 1}/{max_episodes}")
-            print(f'Fitnesses: {["%.2f" % fitness for fitness in fitnesses]}')
-            print(
-                f'100 fitness avgs: {["%.2f" % np.mean(agent.fitness[-100:]) for agent in pop]}'
-            )
+                # Tournament selection and population mutation
+                elite, pop = tournament.select(pop)
+                pop = mutations.mutation(pop)
 
-            # Tournament selection and population mutation
-            elite, pop = tournament.select(pop)
-            pop = mutations.mutation(pop)
+            if (idx_epi + 1) % reward_freq == 0:
+                filename = "reward.csv"
+                file_path = os.path.join(path, filename)
+                with open(file_path, "a") as f:
+                    writer = csv.DictWriter(f, fieldnames=title_names)
+                    writer.writerow(dict(**{"Episode": idx_epi+1, "Step": step_value, "Epsilon": epsilon, "Value": score}, **agent_reward))
 
-        if (idx_epi + 1) % reward_freq == 0:
-            filename = "reward.csv"
-            file_path = os.path.join(path, filename)
-            with open(file_path, "a") as f:
-                writer = csv.DictWriter(f, fieldnames=title_names)
-                writer.writerow(dict(**{"Episode": idx_epi+1, "Step": step_value, "Value": score}, **agent_reward))
+            # Update epsilon for exploration
+            epsilon = max(eps_end, epsilon * eps_decay)
 
-        # Save the trained algorithm for each checkpoint
-        if (idx_epi + 1) % checkpoint == 0 and (idx_epi + 1) > evo_epochs:
-            filename = "MATD3_trained_agent_" + str(idx_epi + 1) + ".pt"
-            save_path = os.path.join(path, filename)
-            elite.saveCheckpoint(save_path)
+            # Save the trained algorithm for each checkpoint
+            if (idx_epi + 1) % checkpoint == 0 and (idx_epi + 1) > evo_epochs:
+                filename = "MATD3_trained_agent_" + str(idx_epi + 1) + ".pt"
+                save_path = os.path.join(path, filename)
+                elite.saveCheckpoint(save_path)
 
     # Save the trained algorithm
     filename = "MATD3_trained_agent.pt"

@@ -69,8 +69,9 @@ class raw_env(AECEnv, EzPickle):
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(8) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
-        #self.action_mask = Box(low=0, high=1, shape = ([8,]), dtype=np.int8)
+        self.action_mask = [0, 0, 0, 0, 0, 0, 1, 1]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float16)
+        self.lesson = {}
 
         self.possible_agents = copy.deepcopy(self.agents)
         self._agent_selector = agent_selector(self.agents)
@@ -134,6 +135,7 @@ class raw_env(AECEnv, EzPickle):
             self._was_dead_step(action)
             return
         self._cumulative_rewards[self.agent_selection] = 0
+        self._clear_rewards()
         agent = self.agent_list[self.agent_name_mapping[self.agent_selection]]
         agent.score = 0
         
@@ -168,7 +170,6 @@ class raw_env(AECEnv, EzPickle):
 
         if self._agent_selector.is_last():
             self.frames += 1
-            self._clear_rewards()
             for i in range(40):
                 self.supervisor.step(self.time_step)
                 ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
@@ -176,29 +177,29 @@ class raw_env(AECEnv, EzPickle):
                 for agent in self.agents:
                     x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
                     length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-                    #self.rewards[agent] += 0.2/length/40
+                    self.rewards[agent] += self.lesson["rewards"]["approach_ball"]/length/40
                     if length < 0.3:
                         if agent.startswith("blue"):
                             ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
                             reward = round(ball_vel_x, 1) * ball_dx + round(ball_vel_y, 1) * ball_dy
-                            self.rewards[agent] += max(reward, 0) * 10
+                            self.rewards[agent] += max(reward, 0) * self.lesson["rewards"]["dribble_or_kick"]
                         elif agent.startswith("red"):
                             ball_dx, ball_dy = 4.5 - ( -ball_x), 0 - (-ball_y)
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
                             ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
                             reward = round(-ball_vel_x, 1) * ball_dx + round(-ball_vel_y, 1) * ball_dy
-                            self.rewards[agent] += max(reward, 0) * 10
+                            self.rewards[agent] += max(reward, 0) * self.lesson["rewards"]["dribble_or_kick"]
             for agent in self.agents:
                 # local rewards
                 x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
-                if abs(x) > 5.0 or abs(y) > 3.5:
-                    self.rewards[agent] += -1
+                if abs(x) > 4.7 or abs(y) > 3.2:
+                    self.rewards[agent] += self.lesson["rewards"]["off_field"]
                 #if self.rewards[agent] > 0.1:
                 #    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
                 if self.agent_list[self.agent_name_mapping[agent]].is_replace:
-                    self.rewards[agent] += -10
+                    self.rewards[agent] += self.lesson["rewards"]["fall_down"]
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
                     print("reward(fall), reward: "+str(agent)+" "+str(self.rewards[agent]))
 
@@ -207,17 +208,17 @@ class raw_env(AECEnv, EzPickle):
                     goal = True
                     truncate = True 
                     if agent.startswith("blue"):
-                        self.rewards[agent] += 1000
+                        self.rewards[agent] += self.lesson["rewards"]["score_goal"]
                     elif agent.startswith("red"):
-                        self.rewards[agent] += -1000
+                        self.rewards[agent] += self.lesson["rewards"]["lose_point"]
                     print("Team blue Goal, reward: "+str(agent)+" "+str(self.rewards[agent]))
                 elif ball_x < -4.5 and abs(ball_y) < 1.3:
                     goal = True
                     truncate = True 
                     if agent.startswith("blue"):
-                        self.rewards[agent] += -1000
+                        self.rewards[agent] += self.lesson["rewards"]["lose_point"]
                     elif agent.startswith("red"):
-                        self.rewards[agent] += 1000
+                        self.rewards[agent] += self.lesson["rewards"]["score_goal"]
                     print("Team red Goal, reward: "+str(agent)+" "+str(self.rewards[agent]))
                     
             for agent in self.agents:
@@ -231,13 +232,15 @@ class raw_env(AECEnv, EzPickle):
                     self.ball_pos.setSFVec3f([0, y, 0])
 
 
-        # Actions Masking
-        #for agent in self.agents:
-        #    ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
-        #    x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
-        #    length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-        #    if length > 0.5:
-        #        self.infos["env_defined_actions"][agent] = []
+            # Actions Masking
+            for agent in self.agents:
+                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+                x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
+                length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
+                if length > 0.5:
+                    self.infos[agent]["action_mask"] = self.action_mask
+                else:
+                    self.infos[agent]["action_mask"] = None
         
         if self.frames >= self.max_cycles:
             truncate = True
@@ -303,6 +306,8 @@ class raw_env(AECEnv, EzPickle):
     def reset(self, seed = None, options = None):
         if seed is not None:
             self._seed(seed=seed)
+        if options is not None:
+            self.lesson = options
         self.agents = copy.deepcopy(self.possible_agents)
         self._agent_selector.reinit(self.agents)
         self.agent_selection = self._agent_selector.next()

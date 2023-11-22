@@ -1,0 +1,23 @@
+---
+# AgileRL Soccer Lesson 1
+
+opponent: self
+opponent_pool_size: 1  # Size of opponent pool for self-play
+opponent_upgrade: 6000  # Epoch frequency to update opponent pool
+#eval_opponent: strong  # 'random', 'weak' or 'strong'
+pretrained_path: models/DQN/lesson3_trained_agent.pt  # Path to pretrained model weights
+save_path: models/DQN/lesson4_trained_agent.pt  # Path to save trained model
+max_train_episodes: 1000  # Maximum number of training episodes in environment
+
+## Game specific:
+buffer_warm_up: false  # Fill replay buffer with random experiences
+warm_up_opponent:       # Difficulty level of warm up experiences
+agent_warm_up: 0  # Number of epochs to warm up agent by training on random experiences
+rewards:  # Rewards for different outcomes
+    score_goal: 1000
+    approach_ball: 0.2
+    dribble_or_kick: 10
+    off_field: -1.0
+    fall_down: -10
+    lose_point: -1000
+    play_continues: 0
