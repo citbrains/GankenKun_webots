@@ -90,7 +90,7 @@ class SoccerEnv(MultiAgentEnv):
         #infos = [infos[k] for k in sorted(infos)]
         info_n = []
         for i, agent in enumerate(self.agents):
-            info = {'individual_reward': rewrads[agent]}
+            info = {'individual_reward': rewards[i][0]}
             info_n.append(info)
         #return obs, state, rewards, dones, infos, ava
         return obs, rewards, dones, info_n

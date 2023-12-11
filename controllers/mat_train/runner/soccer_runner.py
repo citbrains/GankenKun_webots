@@ -22,8 +22,11 @@ class SoccerRunner(Runner):
         train_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
         done_episodes_rewards = []
 
-        train_episode_scores = [0 for _ in range(self.n_rollout_threads)]
+        #train_episode_scores = [0 for _ in range(self.n_rollout_threads)]
         #done_episodes_scores = []
+
+        train_individual_rewards = [0 for _ in range(self.num_agents)]
+        done_individual_rewards = []
 
         for episode in range(episodes):
             if self.use_linear_lr_decay:
@@ -42,6 +45,12 @@ class SoccerRunner(Runner):
                 reward_env = np.mean(rewards, axis=1).flatten()
                 train_episode_rewards += reward_env
 
+                for agent_id in range(self.num_agents):
+                    for info in infos:
+                        if 'individual_reward' in info[agent_id].keys():
+                            train_individual_rewards[agent_id] += info[agent_id]['individual_reward']
+
+
                 #score_env = [t_info[0]["score_reward"] for t_info in infos]
                 #train_episode_scores += np.array(score_env)
                 for t in range(self.n_rollout_threads):
@@ -49,7 +58,9 @@ class SoccerRunner(Runner):
                         done_episodes_rewards.append(train_episode_rewards[t])
                         train_episode_rewards[t] = 0
                         #done_episodes_scores.append(train_episode_scores[t])
-                        train_episode_scores[t] = 0
+                        #train_episode_scores[t] = 0
+                        done_individual_rewards.append(train_individual_rewards)
+                        train_individual_rewards = [0 for _ in range(self.num_agents)]
 
                 #data = obs, rewards, dones, infos, available_actions, \
                 data = obs, rewards, dones, infos, \
@@ -96,6 +107,13 @@ class SoccerRunner(Runner):
                     #      .format(aver_episode_rewards, aver_episode_scores))
                     print("some episodes done, average rewards: {}".format(aver_episode_rewards))
 
+                env_infos = {}
+                last_individual_rewards = done_individual_rewards[-1]
+                done_individual_rewards = []
+                for agent_id in range(self.num_agents):
+                    agent_k = 'agent%i/individual_rewards' % (agent_id+1)
+                    env_infos[agent_k] = [last_individual_rewards[agent_id]]
+                self.log_env(env_infos, total_num_steps)
 
 
             # eval
