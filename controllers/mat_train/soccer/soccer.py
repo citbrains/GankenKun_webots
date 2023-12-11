@@ -273,9 +273,9 @@ class raw_env(AECEnv, EzPickle):
         for i in range(len(self.agent_list)):
             while True:
                 if self.agents[i].startswith("blue"):
-                    x, y = random.uniform(-4.0, -0.5), random.uniform(-2.5, 2.5)
+                    x, y = random.uniform(-4.0, -1.0), random.uniform(-2.5, 2.5)
                 elif self.agents[i].startswith("red"):
-                    x, y = random.uniform(4.0, 0.5), random.uniform(-2.5, 2.5)
+                    x, y = random.uniform(4.0, 1.0), random.uniform(-2.5, 2.5)
                 near_robot = False
                 for j in range(i):
                     length = math.sqrt((x-self.init_pos[j][0])**2+(y-self.init_pos[j][1])**2)
