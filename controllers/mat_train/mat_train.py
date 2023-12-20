@@ -64,6 +64,8 @@ def parse_args(args, parser):
     #parser.add_argument("--num_landmarks", type=int, default=3)
     parser.add_argument('--num_agents', type=int,
                         default=3, help="number of players")
+    parser.add_argument('--self_play_interval', type=int,
+                        default=200, help="number of switching episodes for self-play")
 
     all_args = parser.parse_known_args(args)[0]
 
@@ -172,4 +174,4 @@ def main(args):
 
 if __name__ == "__main__":
     #main(sys.argv[1:])
-    main(['--seed', '1', '--env_name', 'soccer', '--algorithm_name', 'mat', '--experiment_name', 'single', '--scenario_name', 'soccer', '--num_agents', '3', '--lr', '5e-4', '--entropy_coef', '0.01', '--max_grad_norm', '0.5', '--n_training_threads', '16', '--n_rollout_threads', '1', '--num_mini_batch', '1', '--episode_length', '1000', '--num_env_steps', '10000000', '--ppo_epoch', '10', '--clip_param', '0.05', '--use_value_active_masks', '--use_policy_active_masks'])
+    main(['--seed', '1', '--env_name', 'soccer', '--algorithm_name', 'mat_dec', '--experiment_name', 'single', '--scenario_name', 'soccer', '--num_agents', '3', '--lr', '5e-4', '--entropy_coef', '0.01', '--max_grad_norm', '0.5', '--n_training_threads', '16', '--n_rollout_threads', '1', '--num_mini_batch', '1', '--episode_length', '1000', '--num_env_steps', '10000000', '--ppo_epoch', '10', '--clip_param', '0.05', '--use_value_active_masks', '--use_policy_active_masks'])

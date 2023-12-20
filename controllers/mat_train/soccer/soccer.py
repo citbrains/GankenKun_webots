@@ -58,17 +58,17 @@ class raw_env(AECEnv, EzPickle):
         self.agent_dict = {}
         self.kill_list = []
         self.agent_list = []
-        #self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
-        self.agents = ["blue1", "blue2", "blue3"]
+        self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
+        #self.agents = ["blue1", "blue2", "blue3"]
         self.dead_agents = []
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
-        #obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
-        obs_space = Box(low=-5, high=5, shape = ([9]), dtype=np.float32)
+        obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
+        #obs_space = Box(low=float('-inf'), high=float('inf'), shape = ([9]), dtype=np.float32)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
-        self.action_spaces = dict(zip(self.agents, [Discrete(8) for _ in enumerate(self.agents)]))
-        self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
+        self.action_spaces = dict(zip(self.agents, [Discrete(9) for _ in enumerate(self.agents)]))
+        self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick", "walk,0,0,0"]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float32)
 
         self.possible_agents = copy.deepcopy(self.agents)
@@ -96,7 +96,10 @@ class raw_env(AECEnv, EzPickle):
         s, c = math.sin(bthe), math.cos(bthe)
         blx, bly = ball_x - bx, ball_y - by
         x, y = blx * c + bly * s, - blx * s + bly * c
-        obs = [x, y]
+        if abs(math.degrees(math.atan2(y, x))) > 60:
+            obs = [-100, -100]
+        else:
+            obs = [x, y]
         obs += [bx, by, bthe]
         no_agent = len(self.possible_agents)
         base_index = list(range(no_agent))
@@ -123,8 +126,8 @@ class raw_env(AECEnv, EzPickle):
         player = []
         for i in range(len(self.agent_list)):
             player.append(self.agent_list[i].pos)
-        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
-        state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2],  player[2][0], player[2][1], player[2][2]]
+        state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
+        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2],  player[2][0], player[2][1], player[2][2]]
         return state
     
     def step(self, action):
@@ -149,7 +152,9 @@ class raw_env(AECEnv, EzPickle):
                 elif self.agents[i].startswith("red"):
                     x, y = random.uniform(4.0, 3.0), random.uniform(-2.5, 2.5)
                 near_robot = False
-                for j in range(i):
+                for j in range(len(self.agents)):
+                    if j == i:
+                        continue
                     robot_x, robot_y, _ = self.agent_list[j].pos
                     length = math.sqrt((x-robot_x)**2+(y-robot_y)**2)
                     if length < 1:
@@ -191,13 +196,20 @@ class raw_env(AECEnv, EzPickle):
             for agent in self.agents:
                 # local rewards
                 x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
+                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+                s, c = math.sin(the), math.cos(the)
+                dbx, dby = ball_x - x, ball_y - y
+                blx, bly = dbx * c + dby * s, - dbx * s + dby * c
+
                 self.rewards[agent] += -0.01
                 #if self.rewards[agent] > 0.1:
                 #    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
                 if self.agent_list[self.agent_name_mapping[agent]].is_replace:
-                    self.rewards[agent] += -1
+                    self.rewards[agent] += -10
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
                     print("reward(fall): "+str(agent)+" "+str(self.rewards[agent]))
+                if abs(math.degrees(math.atan2(bly, blx))) <= 60:
+                    self.rewards[agent] += 0.1
 
                 # global rewards
                 if ball_x > 4.5 and abs(ball_y) < 1.3:
@@ -277,7 +289,9 @@ class raw_env(AECEnv, EzPickle):
                 elif self.agents[i].startswith("red"):
                     x, y = random.uniform(4.0, 1.0), random.uniform(-2.5, 2.5)
                 near_robot = False
-                for j in range(i):
+                for j in range(len(self.agents)):
+                    if j == i:
+                        continue
                     length = math.sqrt((x-self.init_pos[j][0])**2+(y-self.init_pos[j][1])**2)
                     if length < 1:
                         near_robot = True

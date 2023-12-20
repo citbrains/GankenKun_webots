@@ -18,6 +18,8 @@ class SoccerRunner(Runner):
 
         start = time.time()
         episodes = int(self.num_env_steps) // self.episode_length // self.n_rollout_threads
+        save_episode = None
+        self.self_play_interval = self.all_args.self_play_interval
 
         train_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
         done_episodes_rewards = []
@@ -35,11 +37,13 @@ class SoccerRunner(Runner):
             for step in range(self.episode_length):
                 # Sample actions
                 values, actions, action_log_probs, rnn_states, rnn_states_critic = self.collect(step)
+                c_values, c_actions, c_action_log_probs, c_rnn_states, c_rnn_states_critic = self.c_collect(step)
+                concat_actions = [np.concatenate([actions, c_actions])]
 
                 # Obser reward and next obs
 
                 #obs, rewards, dones, infos, available_actions = self.envs.step(actions)
-                obs, rewards, dones, infos = self.envs.step(actions)
+                obs, rewards, dones, infos, c_obs, c_rewards, c_dones, c_infos = self.envs.step(concat_actions)
 
                 dones_env = np.all(dones, axis=1)
                 reward_env = np.mean(rewards, axis=1).flatten()
@@ -66,9 +70,13 @@ class SoccerRunner(Runner):
                 data = obs, rewards, dones, infos, \
                        values, actions, action_log_probs, \
                        rnn_states, rnn_states_critic
+                c_data = c_obs, c_rewards, c_dones, c_infos, \
+                       c_values, c_actions, c_action_log_probs, \
+                       c_rnn_states, c_rnn_states_critic
 
                 # insert data into buffer
                 self.insert(data)
+                self.c_insert(c_data)
 
             # compute return and update network
             self.compute()
@@ -78,7 +86,14 @@ class SoccerRunner(Runner):
             total_num_steps = (episode + 1) * self.episode_length * self.n_rollout_threads
             # save model
             if (episode % self.save_interval == 0 or episode == episodes - 1):
-                self.save(episode)
+                save_episode = episode
+                self.save(save_episode)
+            
+            # copy team update network
+            if (episode % self.self_play_interval == 0 and episode > self.save_interval):
+                print("copy team update network")
+                self.c_restore(str(self.save_dir) + "/transformer_" + str(save_episode) + ".pt")
+            self.c_buffer.after_update()
 
             # log information
             if episode % self.log_interval == 0:
@@ -122,17 +137,23 @@ class SoccerRunner(Runner):
 
     def warmup(self):
         # reset env
-        obs = self.envs.reset()
+        o = self.envs.reset()[0]
+        obs, c_obs = o[0], o[1]
 
         # replay buffer
         if self.use_centralized_V:
             share_obs = obs.reshape(self.n_rollout_threads, -1)
             share_obs = np.expand_dims(share_obs, 1).repeat(self.num_agents, axis=1)
+            c_share_obs = c_obs.reshape(self.n_rollout_threads, -1)
+            c_share_obs = np.expand_dims(c_share_obs, 1).repeat(self.num_agents, axis=1)
         else:
             share_obs = obs
+            c_share_obs = c_obs
 
         self.buffer.share_obs[0] = share_obs.copy()
         self.buffer.obs[0] = obs.copy()
+        self.c_buffer.share_obs[0] = c_share_obs.copy()
+        self.c_buffer.obs[0] = c_obs.copy()
 
     @torch.no_grad()
     def collect(self, step):
@@ -159,6 +180,33 @@ class SoccerRunner(Runner):
         rnn_states_critic = np.array(np.split(_t2n(rnn_state_critic), self.n_rollout_threads))
 
         return values, actions, action_log_probs, rnn_states, rnn_states_critic
+
+    def c_collect(self, step):
+        self.c_trainer.prep_rollout()
+        #value, action, action_log_prob, rnn_state, rnn_state_critic \
+        #    = self.c_trainer.policy.get_actions(np.concatenate(self.c_buffer.share_obs[step]),
+        #                                      np.concatenate(self.c_buffer.obs[step]),
+        #                                      np.concatenate(self.c_buffer.rnn_states[step]),
+        #                                      np.concatenate(self.c_buffer.rnn_states_critic[step]),
+        #                                      np.concatenate(self.c_buffer.masks[step]),
+        #                                      np.concatenate(self.c_buffer.available_actions[step]))
+        value, action, action_log_prob, rnn_state, rnn_state_critic \
+            = self.c_trainer.policy.get_actions(np.concatenate(self.c_buffer.share_obs[step]),
+                                              np.concatenate(self.c_buffer.obs[step]),
+                                              np.concatenate(self.c_buffer.rnn_states[step]),
+                                              np.concatenate(self.c_buffer.rnn_states_critic[step]),
+                                              np.concatenate(self.c_buffer.masks[step]))
+ 
+        # [self.envs, agents, dim]
+        values = np.array(np.split(_t2n(value), self.n_rollout_threads))
+        actions = np.array(np.split(_t2n(action), self.n_rollout_threads))
+        action_log_probs = np.array(np.split(_t2n(action_log_prob), self.n_rollout_threads))
+        rnn_states = np.array(np.split(_t2n(rnn_state), self.n_rollout_threads))
+        rnn_states_critic = np.array(np.split(_t2n(rnn_state_critic), self.n_rollout_threads))
+
+        return values, actions, action_log_probs, rnn_states, rnn_states_critic
+
+
 
     def insert(self, data):
         #obs, rewards, dones, infos, available_actions, \
@@ -191,7 +239,36 @@ class SoccerRunner(Runner):
         self.buffer.insert(share_obs, obs, rnn_states, rnn_states_critic,
                            actions, action_log_probs, values, rewards, masks, None, active_masks)
 
+    def c_insert(self, data):
+        #obs, rewards, dones, infos, available_actions, \
+        obs, rewards, dones, infos, \
+        values, actions, action_log_probs, rnn_states, rnn_states_critic = data
 
+        dones_env = np.all(dones, axis=1)
+
+        rnn_states[dones_env == True] = np.zeros(((dones_env == True).sum(), self.num_agents, self.recurrent_N, self.hidden_size), dtype=np.float32)
+        rnn_states_critic[dones_env == True] = np.zeros(((dones_env == True).sum(), self.num_agents, *self.c_buffer.rnn_states_critic.shape[3:]), dtype=np.float32)
+
+        masks = np.ones((self.n_rollout_threads, self.num_agents, 1), dtype=np.float32)
+        masks[dones_env == True] = np.zeros(((dones_env == True).sum(), self.num_agents, 1), dtype=np.float32)
+
+        active_masks = np.ones((self.n_rollout_threads, self.num_agents, 1), dtype=np.float32)
+        active_masks[dones == True] = np.zeros(((dones == True).sum(), 1), dtype=np.float32)
+        active_masks[dones_env == True] = np.ones(((dones_env == True).sum(), self.num_agents, 1), dtype=np.float32)
+
+        # bad_masks = np.array([[[0.0] if info[agent_id]['bad_transition'] else [1.0] for agent_id in range(self.num_agents)] for info in infos])
+
+        if self.use_centralized_V:
+            share_obs = obs.reshape(self.n_rollout_threads, -1)
+            share_obs = np.expand_dims(share_obs, 1).repeat(self.num_agents, axis=1)
+        else:
+            share_obs = obs
+
+        #self.c_buffer.insert(share_obs, obs, rnn_states, rnn_states_critic,
+        #                   actions, action_log_probs, values, rewards, masks, None, active_masks,
+        #                   available_actions)
+        self.c_buffer.insert(share_obs, obs, rnn_states, rnn_states_critic,
+                           actions, action_log_probs, values, rewards, masks, None, active_masks)
 
     def log_train(self, train_infos, total_num_steps):
         train_infos["average_step_rewards"] = np.mean(self.buffer.rewards)
