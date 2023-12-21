@@ -91,3 +91,6 @@ websocket-client==1.3.2
 whichcraft==0.6.1
 yarg==0.1.9
 yaspin==2.1.0
+gymnasium==0.28.1
+control==0.9.4
+pettingzoo==1.23.1
