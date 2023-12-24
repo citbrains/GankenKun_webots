@@ -64,7 +64,7 @@ class raw_env(AECEnv, EzPickle):
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
-        obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
+        obs_space = Box(low=-100, high=100, shape = ([15]), dtype=np.float16)
         #obs_space = Box(low=float('-inf'), high=float('inf'), shape = ([9]), dtype=np.float32)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(9) for _ in enumerate(self.agents)]))

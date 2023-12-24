@@ -107,7 +107,7 @@ class Runner(object):
             self.c_restore(self.model_dir)
 
         # algorithm
-        self.c_trainer = TrainAlgo(self.all_args, self.policy, self.num_agents, device=self.device)
+        self.c_trainer = TrainAlgo(self.all_args, self.c_policy, self.num_agents, device=self.device)
         
         # buffer
         self.c_buffer = SharedReplayBuffer(self.all_args,
