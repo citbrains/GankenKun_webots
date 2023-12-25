@@ -67,8 +67,8 @@ class raw_env(AECEnv, EzPickle):
         #obs_space = Box(low=-5, high=5, shape = ([15]), dtype=np.float16)
         obs_space = Box(low=-5, high=5, shape = ([9]), dtype=np.float32)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
-        self.action_spaces = dict(zip(self.agents, [Discrete(8) for _ in enumerate(self.agents)]))
-        self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick"]
+        self.action_spaces = dict(zip(self.agents, [Discrete(9) for _ in enumerate(self.agents)]))
+        self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick", "walk,0,0,0"]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float32)
 
         self.possible_agents = copy.deepcopy(self.agents)
