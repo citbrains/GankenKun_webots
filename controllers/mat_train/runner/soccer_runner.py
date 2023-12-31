@@ -149,7 +149,9 @@ class SoccerRunner(Runner):
                                               np.concatenate(self.buffer.obs[step]),
                                               np.concatenate(self.buffer.rnn_states[step]),
                                               np.concatenate(self.buffer.rnn_states_critic[step]),
-                                              np.concatenate(self.buffer.masks[step]))
+#                                              np.concatenate(self.buffer.masks[step]))
+                                              np.concatenate(self.buffer.masks[step]),
+                                              deterministic=True)   # no random behavior
  
         # [self.envs, agents, dim]
         values = np.array(np.split(_t2n(value), self.n_rollout_threads))
