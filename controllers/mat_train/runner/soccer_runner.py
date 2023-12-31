@@ -22,9 +22,6 @@ class SoccerRunner(Runner):
         train_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
         done_episodes_rewards = []
 
-        #train_episode_scores = [0 for _ in range(self.n_rollout_threads)]
-        #done_episodes_scores = []
-
         train_individual_rewards = [0 for _ in range(self.num_agents)]
         done_individual_rewards = []
 
@@ -38,7 +35,6 @@ class SoccerRunner(Runner):
 
                 # Obser reward and next obs
 
-                #obs, rewards, dones, infos, available_actions = self.envs.step(actions)
                 obs, rewards, dones, infos = self.envs.step(actions)
 
                 dones_env = np.all(dones, axis=1)
@@ -51,18 +47,13 @@ class SoccerRunner(Runner):
                             train_individual_rewards[agent_id] += info[agent_id]['individual_reward']
 
 
-                #score_env = [t_info[0]["score_reward"] for t_info in infos]
-                #train_episode_scores += np.array(score_env)
                 for t in range(self.n_rollout_threads):
                     if dones_env[t]:
                         done_episodes_rewards.append(train_episode_rewards[t])
                         train_episode_rewards[t] = 0
-                        #done_episodes_scores.append(train_episode_scores[t])
-                        #train_episode_scores[t] = 0
                         done_individual_rewards.append(train_individual_rewards)
                         train_individual_rewards = [0 for _ in range(self.num_agents)]
 
-                #data = obs, rewards, dones, infos, available_actions, \
                 data = obs, rewards, dones, infos, \
                        values, actions, action_log_probs, \
                        rnn_states, rnn_states_critic
@@ -100,11 +91,6 @@ class SoccerRunner(Runner):
                     self.writter.add_scalars("train_episode_rewards", {"aver_rewards": aver_episode_rewards}, total_num_steps)
                     done_episodes_rewards = []
 
-                    #aver_episode_scores = np.mean(done_episodes_scores)
-                    #self.writter.add_scalars("train_episode_scores", {"aver_scores": aver_episode_scores}, total_num_steps)
-                    #done_episodes_scores = []
-                    #print("some episodes done, average rewards: {}, scores: {}"
-                    #      .format(aver_episode_rewards, aver_episode_scores))
                     print("some episodes done, average rewards: {}".format(aver_episode_rewards))
 
                 env_infos = {}
@@ -114,11 +100,6 @@ class SoccerRunner(Runner):
                     agent_k = 'agent%i/individual_rewards' % (agent_id+1)
                     env_infos[agent_k] = [last_individual_rewards[agent_id]]
                 self.log_env(env_infos, total_num_steps)
-
-
-            # eval
-            if episode % self.eval_interval == 0 and self.use_eval:
-                self.eval(total_num_steps)
 
     def warmup(self):
         # reset env
@@ -137,19 +118,11 @@ class SoccerRunner(Runner):
     @torch.no_grad()
     def collect(self, step):
         self.trainer.prep_rollout()
-        #value, action, action_log_prob, rnn_state, rnn_state_critic \
-        #    = self.trainer.policy.get_actions(np.concatenate(self.buffer.share_obs[step]),
-        #                                      np.concatenate(self.buffer.obs[step]),
-        #                                      np.concatenate(self.buffer.rnn_states[step]),
-        #                                      np.concatenate(self.buffer.rnn_states_critic[step]),
-        #                                      np.concatenate(self.buffer.masks[step]),
-        #                                      np.concatenate(self.buffer.available_actions[step]))
         value, action, action_log_prob, rnn_state, rnn_state_critic \
             = self.trainer.policy.get_actions(np.concatenate(self.buffer.share_obs[step]),
                                               np.concatenate(self.buffer.obs[step]),
                                               np.concatenate(self.buffer.rnn_states[step]),
                                               np.concatenate(self.buffer.rnn_states_critic[step]),
-#                                              np.concatenate(self.buffer.masks[step]))
                                               np.concatenate(self.buffer.masks[step]),
                                               deterministic=True)   # no random behavior
  
@@ -163,7 +136,6 @@ class SoccerRunner(Runner):
         return values, actions, action_log_probs, rnn_states, rnn_states_critic
 
     def insert(self, data):
-        #obs, rewards, dones, infos, available_actions, \
         obs, rewards, dones, infos, \
         values, actions, action_log_probs, rnn_states, rnn_states_critic = data
 
@@ -179,17 +151,12 @@ class SoccerRunner(Runner):
         active_masks[dones == True] = np.zeros(((dones == True).sum(), 1), dtype=np.float32)
         active_masks[dones_env == True] = np.ones(((dones_env == True).sum(), self.num_agents, 1), dtype=np.float32)
 
-        # bad_masks = np.array([[[0.0] if info[agent_id]['bad_transition'] else [1.0] for agent_id in range(self.num_agents)] for info in infos])
-
         if self.use_centralized_V:
             share_obs = obs.reshape(self.n_rollout_threads, -1)
             share_obs = np.expand_dims(share_obs, 1).repeat(self.num_agents, axis=1)
         else:
             share_obs = obs
 
-        #self.buffer.insert(share_obs, obs, rnn_states, rnn_states_critic,
-        #                   actions, action_log_probs, values, rewards, masks, None, active_masks,
-        #                   available_actions)
         self.buffer.insert(share_obs, obs, rnn_states, rnn_states_critic,
                            actions, action_log_probs, values, rewards, masks, None, active_masks)
 
@@ -204,64 +171,3 @@ class SoccerRunner(Runner):
             else:
                 self.writter.add_scalars(k, {k: v}, total_num_steps)
 
-    @torch.no_grad()
-    def eval(self, total_num_steps):
-        eval_episode = 0
-        eval_episode_rewards = []
-        one_episode_rewards = [0 for _ in range(self.all_args.eval_episodes)]
-        eval_episode_scores = []
-        one_episode_scores = [0 for _ in range(self.all_args.eval_episodes)]
-
-        eval_obs, eval_share_obs, ava = self.eval_envs.reset()
-        eval_rnn_states = np.zeros((self.all_args.eval_episodes, self.num_agents, self.recurrent_N,
-                                    self.hidden_size), dtype=np.float32)
-        eval_masks = np.ones((self.all_args.eval_episodes, self.num_agents, 1), dtype=np.float32)
-
-        while True:
-            self.trainer.prep_rollout()
-            eval_actions, eval_rnn_states = \
-                self.trainer.policy.act(np.concatenate(eval_share_obs),
-                                        np.concatenate(eval_obs),
-                                        np.concatenate(eval_rnn_states),
-                                        np.concatenate(eval_masks),
-                                        np.concatenate(ava),
-                                        deterministic=True)
-            eval_actions = np.array(np.split(_t2n(eval_actions), self.all_args.eval_episodes))
-            eval_rnn_states = np.array(np.split(_t2n(eval_rnn_states), self.all_args.eval_episodes))
-
-            # Obser reward and next obs
-            eval_obs, eval_share_obs, eval_rewards, eval_dones, eval_infos, ava = self.eval_envs.step(eval_actions)
-            eval_rewards = np.mean(eval_rewards, axis=1).flatten()
-            one_episode_rewards += eval_rewards
-
-            eval_scores = [t_info[0]["score_reward"] for t_info in eval_infos]
-            one_episode_scores += np.array(eval_scores)
-
-            eval_dones_env = np.all(eval_dones, axis=1)
-            eval_rnn_states[eval_dones_env == True] = np.zeros(((eval_dones_env == True).sum(), self.num_agents,
-                                                                self.recurrent_N, self.hidden_size), dtype=np.float32)
-            eval_masks = np.ones((self.all_args.eval_episodes, self.num_agents, 1), dtype=np.float32)
-            eval_masks[eval_dones_env == True] = np.zeros(((eval_dones_env == True).sum(), self.num_agents, 1),
-                                                          dtype=np.float32)
-
-            for eval_i in range(self.all_args.eval_episodes):
-                if eval_dones_env[eval_i]:
-                    eval_episode += 1
-                    eval_episode_rewards.append(one_episode_rewards[eval_i])
-                    one_episode_rewards[eval_i] = 0
-
-                    eval_episode_scores.append(one_episode_scores[eval_i])
-                    one_episode_scores[eval_i] = 0
-
-            if eval_episode >= self.all_args.eval_episodes:
-                key_average = '/eval_average_episode_rewards'
-                key_max = '/eval_max_episode_rewards'
-                key_scores = '/eval_average_episode_scores'
-                eval_env_infos = {key_average: eval_episode_rewards,
-                                  key_max: [np.max(eval_episode_rewards)],
-                                  key_scores: eval_episode_scores}
-                self.log_env(eval_env_infos, total_num_steps)
-
-                print("eval average episode rewards: {}, scores: {}."
-                      .format(np.mean(eval_episode_rewards), np.mean(eval_episode_scores)))
-                break
