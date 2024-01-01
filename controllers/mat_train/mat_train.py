@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import sys
 import os
 import wandb
 import socket
@@ -7,9 +6,7 @@ import setproctitle
 import numpy as np
 from pathlib import Path
 import torch
-#sys.path.append("../../")
 from config import get_config
-#from mat.envs.mpe.MPE_env import MPEEnv
 from soccer.soccer_env import SoccerEnv
 from runner.soccer_runner import SoccerRunner as Runner
 from soccer.env_wrappers import SubprocVecEnv, DummyVecEnv
@@ -19,11 +16,7 @@ from soccer.env_wrappers import SubprocVecEnv, DummyVecEnv
 def make_train_env(all_args):
     def get_env_fn(rank):
         def init_env():
-            if all_args.env_name == "soccer":
-                #env_args = {"scenario": all_args.scenario,
-                #            "n_agent": all_args.n_agent}
-                #env = FootballEnv(env_args=env_args)
-                
+            if all_args.env_name == "soccer":                
                 env_args = {"scenario": all_args.scenario_name,
                             "episode_length": all_args.episode_length}
                 env = SoccerEnv(env_args=env_args)
@@ -39,29 +32,9 @@ def make_train_env(all_args):
     else:
         return SubprocVecEnv([get_env_fn(i) for i in range(all_args.n_rollout_threads)])
 
-
-def make_eval_env(all_args):
-    def get_env_fn(rank):
-        def init_env():
-            if all_args.env_name == "soccer":
-                env = SoccerEnv()
-            else:
-                print("Can not support the " +
-                      all_args.env_name + "environment.")
-                raise NotImplementedError
-            env.seed(all_args.seed * 50000 + rank * 10000)
-            return env
-        return init_env
-    if all_args.n_eval_rollout_threads == 1:
-        return DummyVecEnv([get_env_fn(0)])
-    else:
-        return SubprocVecEnv([get_env_fn(i) for i in range(all_args.n_eval_rollout_threads)])
-
-
 def parse_args(args, parser):
     parser.add_argument('--scenario_name', type=str,
                         default='soccer', help="Which scenario to run on")
-    #parser.add_argument("--num_landmarks", type=int, default=3)
     parser.add_argument('--num_agents', type=int,
                         default=3, help="number of players")
 
@@ -102,7 +75,6 @@ def main(args):
 
     # run dir
     print( Path(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0] + "/mat_train" +"/results") / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name)
-    #run_dir = Path(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0] + "/results") / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name
     run_dir = Path(os.path.split(os.path.dirname(os.path.abspath(__file__)))[0] + "/mat_train" + "/results") / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name
     if not run_dir.exists():
         os.makedirs(str(run_dir))
@@ -143,13 +115,11 @@ def main(args):
 
     # env init
     envs = make_train_env(all_args)
-    eval_envs = make_eval_env(all_args) if all_args.use_eval else None
     num_agents = all_args.num_agents
 
     config = {
         "all_args": all_args,
         "envs": envs,
-        "eval_envs": eval_envs,
         "num_agents": num_agents,
         "device": device,
         "run_dir": run_dir
@@ -160,8 +130,6 @@ def main(args):
     
     # post process
     envs.close()
-    if all_args.use_eval and eval_envs is not envs:
-        eval_envs.close()
 
     if all_args.use_wandb:
         run.finish()
@@ -171,5 +139,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    #main(sys.argv[1:])
-    main(['--seed', '1', '--env_name', 'soccer', '--algorithm_name', 'mat_dec', '--experiment_name', 'single', '--scenario_name', 'soccer', '--num_agents', '3', '--lr', '5e-4', '--entropy_coef', '0.01', '--max_grad_norm', '0.5', '--n_training_threads', '16', '--n_rollout_threads', '1', '--num_mini_batch', '1', '--episode_length', '1000', '--num_env_steps', '10000000', '--ppo_epoch', '10', '--clip_param', '0.05', '--use_value_active_masks', '--use_policy_active_masks'])
+    main(['--seed', '1', '--env_name', 'soccer', '--algorithm_name', 'mat_dec', '--experiment_name', 'single', '--scenario_name', 'soccer', '--num_agents', '3', '--lr', '5e-4', '--entropy_coef', '0.01', '--max_grad_norm', '0.5', '--n_training_threads', '16', '--n_rollout_threads', '1', '--num_mini_batch', '1', '--episode_length', '1000', '--num_env_steps', '10000000', '--ppo_epoch', '10', '--clip_param', '0.05', '--use_value_active_masks', '--use_policy_active_masks', '--model_dir', './transformer_1000.pt'])

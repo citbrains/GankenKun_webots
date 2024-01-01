@@ -52,8 +52,6 @@ def continuous_autoregreesive_act(decoder, obs_rep, obs, batch_size, n_agent, ac
         act_mean = decoder(shifted_action, obs_rep, obs)[:, i, :]
         action_std = torch.sigmoid(decoder.log_std) * 0.5
 
-        # log_std = torch.zeros_like(act_mean).to(**tpdv) + decoder.log_std
-        # distri = Normal(act_mean, log_std.exp())
         distri = Normal(act_mean, action_std)
         action = act_mean if deterministic else distri.sample()
         action_log = distri.log_prob(action)
@@ -62,9 +60,6 @@ def continuous_autoregreesive_act(decoder, obs_rep, obs, batch_size, n_agent, ac
         output_action_log[:, i, :] = action_log
         if i + 1 < n_agent:
             shifted_action[:, i + 1, :] = action
-
-        # print("act_mean: ", act_mean)
-        # print("action: ", action)
 
     return output_action, output_action_log
 
@@ -76,9 +71,6 @@ def continuous_parallel_act(decoder, obs_rep, obs, action, batch_size, n_agent, 
     act_mean = decoder(shifted_action, obs_rep, obs)
     action_std = torch.sigmoid(decoder.log_std) * 0.5
     distri = Normal(act_mean, action_std)
-
-    # log_std = torch.zeros_like(act_mean).to(**tpdv) + decoder.log_std
-    # distri = Normal(act_mean, log_std.exp())
 
     action_log = distri.log_prob(action)
     entropy = distri.entropy()
