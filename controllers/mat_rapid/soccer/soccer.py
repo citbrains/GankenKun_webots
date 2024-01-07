@@ -167,7 +167,7 @@ class raw_env(AECEnv, EzPickle):
         if self._agent_selector.is_last():
             self.frames += 1
             self._clear_rewards()
-            for i in range(20):
+            for i in range(4):
                 self.supervisor.step(self.time_step)
                 ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
                 ball_vel_x, ball_vel_y = self.ball.getVelocity()[:2]

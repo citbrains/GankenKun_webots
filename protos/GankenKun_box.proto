@@ -1,0 +1,108 @@
+#VRML_SIM R2021a utf8
+# license: Apache License 2.0
+# license url: http://www.apache.org/licenses/LICENSE-2.0
+# This is a proto file for Webots for the GankenKun
+# Extracted from: gankenkun_simple.urdf
+
+PROTO GankenKun_box [
+  field  SFVec3f     translation     0 0 0
+  field  SFRotation  rotation        0 1 0 0
+  field  SFString    name            "GankenKun"  # Is `Robot.name`.
+  field  SFString    controller      "void"       # Is `Robot.controller`.
+  field  MFString    controllerArgs  []           # Is `Robot.controllerArgs`.
+  field  SFString    customData      ""           # Is `Robot.customData`.
+  field  SFBool      supervisor      FALSE        # Is `Robot.supervisor`.
+  field  SFBool      synchronization TRUE         # Is `Robot.synchronization`.
+  field  SFBool      selfCollision   TRUE         # Is `Robot.selfCollision`.
+#  field  SFInt32     cameraWidth     640          # Is `Camera.width`.
+#  field  SFInt32     cameraHeight    480          # Is `Camera.height`.
+  field  MFString    jerseyTexture   "textures/GankenKun_red1.png"
+  field  SFColor     jerseyColor     1 0 0
+#  field  SFBool      enable_backlash FALSE         # Enables backlash on all joints.
+  field  SFInt32     channel         1             # communication channel
+]
+{
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Transform {
+        translation 0.000 0.000 0.000
+        rotation 0.0 0.0 1 1.57
+        children [
+          Shape {
+            appearance DEF teamcolor PBRAppearance {
+              baseColor IS jerseyColor
+              transparency 0.000000
+              roughness 1.000000
+              metalness 0
+              emissiveColor 0.000000 0.000000 0.000000
+            }
+            geometry DEF body Box {
+              size 0.200 0.200 0.600
+            }
+          }
+        ]
+      }
+      Transform {
+        translation -0.005 0.000 0.000
+        rotation -0.577350 -0.577350 0.577350 2.094395
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColorMap ImageTexture {
+                url IS jerseyTexture
+              }
+              metalness 0
+              roughness 1
+            }
+            geometry DEF body_number IndexedFaceSet {
+              coord Coordinate {
+                point [
+                  -0.03300 -0.08825 -0.03400, 0.03300 -0.08825 -0.03400, 0.03300 0.01500 -0.03400, -0.03300 0.01500 -0.03400, 0.03300 -0.07500 0.09700, -0.03300 -0.07500 0.09700, -0.03300 0.01500 0.09700, 0.03300 0.01500 0.09700,
+                ]
+              }
+              texCoord TextureCoordinate {
+                point [
+                  0.0 0.0, 1.0 0.0, 1.0 1.0, 0.0 1.0
+                ]
+              }
+              coordIndex [
+                3 2 1 0 -1 7 6 5 4 -1
+              ]
+              texCoordIndex [
+                0 1 2 3 -1 0 1 2 3 -1
+              ]
+              creaseAngle 1
+            }
+          }
+        ]
+      }
+    ]
+    name IS name 
+    boundingObject Transform {
+      translation 0.000 0.000 0.000
+      rotation 0.0 0.0 1 1.57
+      children [
+        Box {
+           size 0.200 0.200 0.600
+        }
+      ]
+    }
+    physics Physics {
+      density -1
+      mass 1.289633
+      centerOfMass [ 0.000 0.000000 0.300 ]
+      inertiaMatrix [
+        7.000000e-03 7.000000e-03 7.000000e-03
+        0.000000e+00 0.000000e+00 0.000000e+00
+      ]
+    }
+    controller IS controller
+    controllerArgs IS controllerArgs
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+    selfCollision IS selfCollision
+  }
+}

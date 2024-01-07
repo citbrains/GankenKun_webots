@@ -20,10 +20,10 @@ class Player():
             self.player.remove()
         if "blue" in self.name:
             ch = int(self.name[-1])
-            children.importMFNodeFromString(-1, f'DEF {self.name} GankenKun_simple {{translation {pos[0]} {pos[1]} 0.450 rotation 0 0 1 {pos[2]} jerseyTexture "textures/GankenKun_{self.name}.png" jerseyColor 0, 0, 1 channel {ch} controller "void"}}')
+            children.importMFNodeFromString(-1, f'DEF {self.name} GankenKun_box {{translation {pos[0]} {pos[1]} 0.300 rotation 0 0 1 {pos[2]} jerseyTexture "textures/GankenKun_{self.name}.png" jerseyColor 0, 0, 1 channel {ch} controller "void"}}')
         else:
             ch = int(self.name[-1])+3
-            children.importMFNodeFromString(-1, f'DEF {self.name} GankenKun_simple {{translation {pos[0]} {pos[1]} 0.450 rotation 0 0 1 {pos[2]} jerseyTexture "textures/GankenKun_{self.name}.png" jerseyColor 1, 0, 0 channel {ch} controller "void"}}')
+            children.importMFNodeFromString(-1, f'DEF {self.name} GankenKun_box {{translation {pos[0]} {pos[1]} 0.300 rotation 0 0 1 {pos[2]} jerseyTexture "textures/GankenKun_{self.name}.png" jerseyColor 1, 0, 0 channel {ch} controller "void"}}')
         self.pos = pos
         self.emitter = self.supervisor.getDevice(f'{self.name}_emitter')
         self.player = self.supervisor.getFromDef(f'{self.name}')

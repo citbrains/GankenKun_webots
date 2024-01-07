@@ -5,7 +5,7 @@ WorldInfo {
     "The GANKENKUN robot simulation model"
   ]
   title "GANKENKUN"
-  basicTimeStep 8
+  basicTimeStep 80
   optimalThreadCount 8
   physicsDisableTime 0.1
   physicsDisableLinearThreshold 0.1
@@ -50,7 +50,7 @@ RobocupSoccerField2 {
 
 Robot {
   supervisor TRUE
-  controller "mat_train"
+  controller "<extern>"
   children[
     Emitter  { name "blue1_emitter"  channel 1 }
     Receiver { name "blue1_receiver" channel 1 }
