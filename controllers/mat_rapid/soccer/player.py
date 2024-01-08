@@ -3,6 +3,8 @@ from controller import Supervisor
 import math
 
 class Player():
+    kick_vel = 0.0
+
     def __init__(self, name = None, supervisor = None):
         super().__init__()
         self.name = name
@@ -48,16 +50,13 @@ class Player():
             return
         if "kick" in message.decode('utf-8'):
             self.waiting_time = 4
-#        x, y, the = self.player_pos.getSFVec3f()
         message_parts = message.decode('utf-8').split(',')
         if message_parts[0] == "walk":
             self.dx, self.dy, self.dthe = float(message_parts[1])*0.01, float(message_parts[2])*0.01, float(message_parts[3])*0.01
-        if message_parts[0] == "kick":
+            self.kick_vel = 0.0
+        if "kick" in message.decode('utf-8'):
             self.dx, self.dy, self.dthe = 0.0, 0.0, 0.0
-#        print("dx: "+str(self.dx)+", dy: "+str(self.dy)+", dthe: "+str(self.dthe))
-
-#        if self.emitter != None:
-#            self.emitter.send(message)
+            self.kick_vel = 2.0
 
     def update(self):
         #self.action = action

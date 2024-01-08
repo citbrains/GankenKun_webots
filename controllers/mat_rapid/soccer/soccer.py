@@ -92,11 +92,12 @@ class raw_env(AECEnv, EzPickle):
         i = self.agent_name_mapping[agent]
         state = self.state()
         ball_x, ball_y = [state[0], state[1]]
-        bx, by, bthe = state[i*3+3], state[i*3+4],state[i*3+5]
+        bx, by, bthe = state[i*3+3], state[i*3+4], state[i*3+5]
         s, c = math.sin(bthe), math.cos(bthe)
         blx, bly = ball_x - bx, ball_y - by
         x, y = blx * c + bly * s, - blx * s + bly * c
-        obs = [x, y]
+        angle = math.degrees(math.atan2(y, x))
+        obs = [x, y] if (abs(angle) < 30) else [-100, -100]
         obs += [bx, by, bthe]
         no_agent = len(self.possible_agents)
         base_index = list(range(no_agent))
@@ -163,6 +164,16 @@ class raw_env(AECEnv, EzPickle):
         else:
             message = self.actions[action].encode('utf-8')
             agent.send(message)
+            if "kick" in message.decode('utf-8'):
+                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+                bx, by, bthe = agent.pos
+                s, c = math.sin(bthe), math.cos(bthe)
+                blx, bly = ball_x - bx, ball_y - by
+                x, y = blx * c + bly * s, - blx * s + bly * c
+                if 0.1 < x < 0.25:
+                    if ("left" in message.decode('utf-8') and 0.0 < y < 0.1) or ("right" in message.decode('utf-8') and -0.1 < y < 0.0):
+                        vel = agent.kick_vel
+                        self.ball.setVelocity([vel*c, vel*s, 0, 0, 0, 0])
 
         if self._agent_selector.is_last():
             self.frames += 1
@@ -174,7 +185,7 @@ class raw_env(AECEnv, EzPickle):
                 for agent in self.agents:
                     x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
                     length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-                    self.rewards[agent] += 0.2/length/40
+                    #self.rewards[agent] += 0.2/length/40
                     if length < 0.3:
                         if agent.startswith("blue"):
                             ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
