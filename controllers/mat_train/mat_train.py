@@ -174,4 +174,5 @@ def main(args):
 
 if __name__ == "__main__":
     #main(sys.argv[1:])
-    main(['--seed', '1', '--env_name', 'soccer', '--algorithm_name', 'mat_dec', '--experiment_name', 'single', '--scenario_name', 'soccer', '--num_agents', '3', '--lr', '5e-4', '--entropy_coef', '0.01', '--max_grad_norm', '0.5', '--n_training_threads', '16', '--n_rollout_threads', '1', '--num_mini_batch', '1', '--episode_length', '1000', '--num_env_steps', '10000000', '--ppo_epoch', '10', '--clip_param', '0.05', '--use_value_active_masks', '--use_policy_active_masks'])
+    arg_list = ['--seed', '1', '--env_name', 'soccer', '--algorithm_name', 'mat_dec', '--experiment_name', 'single', '--scenario_name', 'self-play', '--num_agents', '2', '--lr', '5e-4', '--entropy_coef', '0.01', '--max_grad_norm', '0.5', '--n_training_threads', '16', '--n_rollout_threads', '1', '--num_mini_batch', '1', '--episode_length', '1000', '--num_env_steps', '10000000', '--ppo_epoch', '10', '--clip_param', '0.05', '--use_value_active_masks', '--use_policy_active_masks']
+    main(arg_list)
