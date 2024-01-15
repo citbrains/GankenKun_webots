@@ -44,3 +44,4 @@ build/
 .idea/
 __pycache__/
 venv/
+/controllers/mat_train/results/
