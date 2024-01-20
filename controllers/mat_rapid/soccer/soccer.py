@@ -97,7 +97,7 @@ class raw_env(AECEnv, EzPickle):
         blx, bly = ball_x - bx, ball_y - by
         x, y = blx * c + bly * s, - blx * s + bly * c
         angle = math.degrees(math.atan2(y, x))
-        obs = [x, y] if (abs(angle) < 30) else [-100, -100]
+        obs = [x, y] if (abs(angle) < 60) else [-100, -100]
         obs += [bx, by, bthe]
         no_agent = len(self.possible_agents)
         base_index = list(range(no_agent))
@@ -119,8 +119,8 @@ class raw_env(AECEnv, EzPickle):
     
     def state(self):
         ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
-        for agent in self.agent_list:
-            agent.update()
+        #for agent in self.agent_list:
+        #    agent.update()
         player = []
         for i in range(len(self.agent_list)):
             player.append(self.agent_list[i].pos)
@@ -177,16 +177,18 @@ class raw_env(AECEnv, EzPickle):
 
         if self._agent_selector.is_last():
             self.frames += 1
+            # status update and calculate reward
             self._clear_rewards()
             for i in range(4):
                 self.supervisor.step(self.time_step)
                 ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
                 ball_vel_x, ball_vel_y = self.ball.getVelocity()[:2]
                 for agent in self.agents:
+                    self.agent_list[self.agent_name_mapping[agent]].update()
                     x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
                     length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
                     #self.rewards[agent] += 0.2/length/40
-                    if length < 0.3:
+                    if length < 1.0:
                         if agent.startswith("blue"):
                             ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
                             ball_len = math.sqrt(ball_dx**2+ball_dy**2)
@@ -200,11 +202,18 @@ class raw_env(AECEnv, EzPickle):
                             reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
                             self.rewards[agent] += max(reward, 0) * 10
             for agent in self.agents:
-                # local rewards
+                # out of field penalty
                 x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
-                self.rewards[agent] += -0.01
-                #if self.rewards[agent] > 0.1:
-                #    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
+                if abs(x) > 5.0 or abs(y) > 3.5:
+                    self.rewards[agent] += -0.4
+                # hit other robot penalty
+                for other_agent in self.agents:
+                    if other_agent == agent:
+                        continue
+                    xo, yo, _ = self.agent_list[self.agent_name_mapping[other_agent]].pos
+                    if math.sqrt((x-xo)**2+(y-yo)**2) < 0.3:
+                        self.rewards[agent] = -1.0
+                # fall penalty
                 if self.agent_list[self.agent_name_mapping[agent]].is_replace:
                     self.rewards[agent] += -1
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False

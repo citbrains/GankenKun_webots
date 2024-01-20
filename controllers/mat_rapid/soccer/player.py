@@ -63,7 +63,7 @@ class Player():
         x, y, z = self.player_pos.getSFVec3f()
         yaw, pitch, roll = self.rotation_to_euler(self.player_rot.getSFRotation())
         self.pos = [x, y, yaw]
-        if abs(pitch) > 1.0 or abs(roll) > 1.0 or abs(x) > 5.0 or abs(y) > 3.5:
+        if abs(pitch) > 1.0 or abs(roll) > 1.0:
             self.is_fall = True
         else:
             self.is_fall = False
