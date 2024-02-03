@@ -11,7 +11,6 @@ import sys
 import os
 import numpy as np
 import gym
-import time
 from stable_baselines import SAC
 from stable_baselines.sac.policies import MlpPolicy
 
@@ -87,12 +86,12 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 # left_ankle_pitch, 
                 # right_waist_roll, 
                 # left_waist_roll
-                0, 
-                0, 
-                0, 
-                0, 
-                0,                
-                0, 
+                10, 
+                10, 
+                10, 
+                10, 
+                10,                
+                10, 
             ], dtype=np.float32)
         
         observation_space_high = np.array(
@@ -177,14 +176,9 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.tm = 0.0
         self.motion_frame_num = 0
         self.motion_total_time = 0.0
-        self.angles = [0.0] * len(MOTOR_NAMES)                  #モータの目標角度
+        self.angles = [np.random.uniform(low=-5.0, high=5.0) for _ in range(len(MOTOR_NAMES))] # ロボットの初期姿勢(各関節軸の角度)をランダムにする
         self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
-        self.data = OpenAIGymEnvironment.read_motion_file(self)
-        
-        for motor in self.__motors:
-            initial_position = np.random.uniform(low=-np.pi, high=np.pi)
-            motor.setPosition(initial_position)
-        
+        self.data = OpenAIGymEnvironment.read_motion_file(self)        
         # learning_parameter
         self.reward = 0
         
@@ -239,8 +233,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                         if LEARNING_TARGET_JOINT[i] == 1:
                             motor_angle_sensor_data.append(math.degrees(self.__motor_angle_sensors[i].getValue() * DIRECTION[i] ))
                             observe_angle_data.append(motor_target_angle_data[i])
-                    print("motor sensor angle data = ")
-                    print(motor_angle_sensor_data)
                     self.state = [acc_x, acc_y, acc_z, gyro_x,gyro_y, gyro_z, rot_x, rot_y, rot_z, rot_deg]
                     self.state += observe_angle_data
                     self.state += motor_angle_sensor_data
@@ -250,9 +242,7 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                     else:
                         self.reward += 1
                     # # done 
-                    done = bool(
-                        self.t >= self.motion_total_time
-                    )
+                    done = bool(self.t >= self.motion_total_time)
 
                     break
                 
@@ -269,9 +259,8 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                         self.angles[i] += self.delta_angles[i] * 0.01
                     [motor.setPosition(math.radians(DIRECTION[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]
                     
-            info = {} #使用しない        
+            info = {} #使用しない
             return np.array(self.state, dtype=np.float32), self.reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
-                    # return  done  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
                     
 
 def main():
