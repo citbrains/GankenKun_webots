@@ -1,3 +1,7 @@
+"""
+このコードは、転倒するキック動作に対して、修正する方策を学習するためのものになります。
+右キックのモーションのみに対応し、初期姿勢のランダム化を行うことで複数の転倒パターンを学習します
+"""
 import warnings
 warnings.filterwarnings('ignore')
 from controller import Supervisor, Node
@@ -7,6 +11,7 @@ import sys
 import os
 import numpy as np
 import gym
+import time
 from stable_baselines import SAC
 from stable_baselines.sac.policies import MlpPolicy
 
@@ -69,7 +74,7 @@ LEARNING_TARGET_MOTION_FRAME_NUM = 8
 LEARNING_ACTION_ANGLE_RANGE = 30
 
 class OpenAIGymEnvironment(Supervisor, gym.Env):
-    
+    # max_episode_steps = エピソードの最大長
     def __init__(self, max_episode_steps=1000) :
         super().__init__()
         
@@ -82,12 +87,12 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 # left_ankle_pitch, 
                 # right_waist_roll, 
                 # left_waist_roll
-                10, 
-                10, 
-                10, 
-                10, 
-                10,                
-                10, 
+                0, 
+                0, 
+                0, 
+                0, 
+                0,                
+                0, 
             ], dtype=np.float32)
         
         observation_space_high = np.array(
@@ -143,7 +148,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.__timestep = int(self.getBasicTimeStep()) #シミュレータ内部の仮想時間 10mm sec = 0.01sec
         self.__motors = []
         self.__motor_angle_sensors = []
-        self.__robot_body_solids = []        
         
                 
     def reset(self):
@@ -151,25 +155,24 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.simulationReset()
         self.player = self.getFromDef('PLAYER')
         self.player_rotation = self.getFromDef('PLAYER').getField('rotation')
-        OpenAIGymEnvironment.append_solid(self.player, self.__robot_body_solids )
         
-        #motor 
+        #motor reset
         self.__motors = []
         for name in MOTOR_NAMES:
             self.__motors.append(self.getDevice(name))
-        #motor sensor
+        #motor sensor reset
         self.__motor_angle_sensors = []
         for name in MOTOR_SENSOR_NAMES:
             self.__motor_angle_sensors.append(self.getDevice(name)) 
         for name in range (len(MOTOR_SENSOR_NAMES)):
             self.__motor_angle_sensors[name].enable(self.__timestep)
-        #accelerometer
+        #accelerometer reset
         self.accelerometer = self.getDevice('accelerometer')
         self.accelerometer.enable(self.__timestep)
-        #gyro
+        #gyro sensor reset
         self.gyro = self.getDevice('gyro')
         self.gyro.enable(self.__timestep)
-        # motion parameter
+        # motion parameter reset
         self.t = 0.0
         self.tm = 0.0
         self.motion_frame_num = 0
@@ -177,27 +180,15 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         self.angles = [0.0] * len(MOTOR_NAMES)                  #モータの目標角度
         self.delta_angles = [0.0] * len(MOTOR_NAMES)     #モーション再生中の補間角度
         self.data = OpenAIGymEnvironment.read_motion_file(self)
+        
+        for motor in self.__motors:
+            initial_position = np.random.uniform(low=-np.pi, high=np.pi)
+            motor.setPosition(initial_position)
+        
         # learning_parameter
         self.reward = 0
         
         return np.array(self.state, dtype=np.float32) # return 初期状態
-        
-    
-    def append_solid(solid, solids):  # we list only the hands and feet
-        if solid.getField('name'):
-            solids.append(solid)
-        children = solid.getProtoField('children') if solid.isProto() else solid.getField('children')
-        for i in range(children.getCount()):
-            child = children.getMFNode(i)
-            if child.getType() in [Node.ROBOT, Node.SOLID, Node.GROUP, Node.TRANSFORM, Node.ACCELEROMETER, Node.CAMERA, Node.GYRO, Node.TOUCH_SENSOR]:
-                OpenAIGymEnvironment.append_solid(child, solids)
-                continue
-            if child.getType() in [Node.HINGE_JOINT, Node.HINGE_2_JOINT, Node.SLIDER_JOINT, Node.BALL_JOINT]:
-                endPoint = child.getProtoField('endPoint') if child.isProto() else child.getField('endPoint')
-                solid = endPoint.getSFNode()
-                if solid.getType() == Node.NO_NODE or solid.getType() == Node.SOLID_REFERENCE:
-                    continue
-                OpenAIGymEnvironment.append_solid(solid, solids)  # active tag is reset after a joint
 
     def read_motion_file(self):
         # file_name = "./leg_up_motion.csv"  #正常のキック動作を再生する場合は有効化する
@@ -216,7 +207,6 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
         return (sensor_data - SENSOR_DATA_MIN) / (SENSOR_DATA_MAX - SENSOR_DATA_MIN) * (SC_MAX - SC_MIN) + SC_MIN
     
     def step(self, action):
-        count = 0
         motion_frame_data = self.data[self.motion_frame_num][0] #motion fileのdata(フレーム間の時間)の中身を1フレームずつに分解
         motor_target_angle_data = self.data[self.motion_frame_num][1:20]#motion fileのdata(フレーム間の各関節角度)の中身を1フレームずつに分解
         action_space_target_num = 0 #action_spaceの
@@ -226,62 +216,58 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
                 action_space_target_num += 1
                 
         self.tm += float(self.data[self.motion_frame_num][0]) * 0.01 # tm = モーションファイルの書くフレームごとの時間 ÷ webotsのtime step[sec]
-        motor_angle_sensor_data = []
-        observe_angle_data = []
+        motor_angle_sensor_data = [] # motor内部のセンサにより取得した現在の角度情報
+        observe_angle_data = [] # motorの目標関節角度
         frame_end_flag = False
         
         while True:
-            
             if frame_end_flag == True:
                 break
             
             while super().step(self.__timestep) != -1:
-                count += 1
                 
-                if count < 500:
-                    if self.t >= self.tm:
-                        pass
-                    
-                    else:
-                        self.t += self.__timestep / 1000.0
-                        try:
-                            for i in range(len(MOTOR_NAMES)):
-                                self.delta_angles[i] = (float(motor_target_angle_data[i]) - self.angles[i]) / (float(motion_frame_data) * 0.01)
-                        except ZeroDivisionError:
-                            print("ZeroDivisionError")
-                            print("The frame of the motion file contains 0.")
-                            break
-                        for i in range(len(MOTOR_NAMES)):
-                            self.angles[i] += self.delta_angles[i] * 0.01
-                        [motor.setPosition(math.radians(DIRECTION[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]
-                
-                if count > 500:
-                        frame_end_flag = True #1フレーム終了のフラグ
-                        self.motion_frame_num += 1
-                        # Observation
-                        acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
-                        acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data))
-                        gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
-                        gyro_x, gyro_y, gyro_z = list(map(OpenAIGymEnvironment.Normalization, gyro_data))
-                        rot_x, rot_y, rot_z, rot_deg = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 x, y, z, deg 軸角度表現で表せる  単位は[] 
-                        for i in range(len(MOTOR_NAMES)):
-                            if LEARNING_TARGET_JOINT[i] == 1:
-                                motor_angle_sensor_data.append(math.degrees(self.__motor_angle_sensors[i].getValue() * DIRECTION[i] ))
-                                observe_angle_data.append(motor_target_angle_data[i])
-                        self.state = [acc_x, acc_y, acc_z, gyro_x,gyro_y, gyro_z, rot_x, rot_y, rot_z, rot_deg]
-                        self.state += observe_angle_data
-                        self.state += motor_angle_sensor_data
+                if self.t >= self.tm:
+                    frame_end_flag = True #1フレーム終了のフラグ
+                    self.motion_frame_num += 1
+                    # Observation
+                    acc_data = self.accelerometer.getValues()    #取得情報は対象のx, y, zの加速度 単位は[]
+                    acc_x, acc_y, acc_z= list(map(OpenAIGymEnvironment.Normalization, acc_data)) # 加速度を正規化
+                    gyro_data = self.gyro.getValues()                    #取得情報は対象のx, y, zのジャイロ 単位は[] 
+                    gyro_x, gyro_y, gyro_z = list(map(OpenAIGymEnvironment.Normalization, gyro_data)) # ジャイロを正規化
+                    rot_x, rot_y, rot_z, rot_deg = self.player_rotation.getSFRotation()     #取得情報は対象の姿勢 x, y, z, deg 軸角度表現で表せる  単位は[] 
+                    for i in range(len(MOTOR_NAMES)):
+                        if LEARNING_TARGET_JOINT[i] == 1:
+                            motor_angle_sensor_data.append(math.degrees(self.__motor_angle_sensors[i].getValue() * DIRECTION[i] ))
+                            observe_angle_data.append(motor_target_angle_data[i])
+                    print("motor sensor angle data = ")
+                    print(motor_angle_sensor_data)
+                    self.state = [acc_x, acc_y, acc_z, gyro_x,gyro_y, gyro_z, rot_x, rot_y, rot_z, rot_deg]
+                    self.state += observe_angle_data
+                    self.state += motor_angle_sensor_data
 
-                        if abs(rot_deg) >= 1.0: #各軸度表現の角度を利用して転倒判定を行う
-                            self.reward -= 1
-                        else:
-                            self.reward += 1
-                        # # done 
-                        done = bool(
-                            self.t >= self.motion_total_time
-                        )
+                    if abs(rot_deg) >= 1.0: #各軸度表現の角度を利用して転倒判定を行う
+                        self.reward -= 1
+                    else:
+                        self.reward += 1
+                    # # done 
+                    done = bool(
+                        self.t >= self.motion_total_time
+                    )
+
+                    break
+                
+                else:
+                    self.t += self.__timestep / 1000.0
+                    try:
+                        for i in range(len(MOTOR_NAMES)):
+                            self.delta_angles[i] = (float(motor_target_angle_data[i]) - self.angles[i]) / (float(motion_frame_data) * 0.01)
+                    except ZeroDivisionError:
+                        print("ZeroDivisionError")
+                        print("The frame of the motion file contains 0.")
                         break
-                    
+                    for i in range(len(MOTOR_NAMES)):
+                        self.angles[i] += self.delta_angles[i] * 0.01
+                    [motor.setPosition(math.radians(DIRECTION[i] * float(self.angles[i]))) for motor, i in zip(self.__motors, range(len(MOTOR_NAMES)))]
                     
             info = {} #使用しない        
             return np.array(self.state, dtype=np.float32), self.reward, done, info  # return  1step後の状態，即時報酬，正常終了したかどうかの判定，情報
@@ -291,21 +277,14 @@ class OpenAIGymEnvironment(Supervisor, gym.Env):
 def main():
     env = OpenAIGymEnvironment()
     print("environment comp")
-    
-    # モデルの学習時に必要
     model = SAC(MlpPolicy, env, verbose=1, tensorboard_log=log_dir)
     print("model comp")
     model.learn(total_timesteps=1000000, log_interval=10)
     print("learn comp")
-    model.save("sac_motion_fix_model_slow_version")
+    model.save("sac_motion_fix_model")
     print("model save")
-    #-------------------------------
-    
-    # モデルの読み込み時に必要
-    # model = SAC.load('./models/221225/sac_motion_fix_model')
-    
     state = env.reset()
-        
+            
     while True:
         action, _ = model.predict(state)
         state, reward, done, info = env.step(action)
@@ -318,6 +297,5 @@ def main():
             state = env.reset()
             break
     env.close()
-    
 if __name__ == "__main__":
     main()
