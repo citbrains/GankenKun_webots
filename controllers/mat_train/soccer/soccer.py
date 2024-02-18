@@ -58,21 +58,23 @@ class raw_env(AECEnv, EzPickle):
         self.agent_dict = {}
         self.kill_list = []
         self.agent_list = []
-        #self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
-        self.agents = ["blue1", "blue2", "red1", "red2"]
+        self.agents = ["blue1", "blue2", "blue3", "red1", "red2", "red3"]
+        #self.agents = ["blue1", "blue2", "red1", "red2"]
         #self.agents = ["blue1", "blue2", "blue3"]
         self.train_agent_num = len([agent for agent in self.agents if agent.startswith("blue")])
         self.dead_agents = []
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
+        obs_space = Box(low=-100, high=100, shape = ([17]), dtype=np.float16) #ball 2 + robot 4 + previous action 1 + other robot 2 * 5
         #obs_space = Box(low=-100, high=100, shape = ([15]), dtype=np.float16)
-        obs_space = Box(low=-100, high=100, shape = ([11]), dtype=np.float16)
+        #obs_space = Box(low=-100, high=100, shape = ([11]), dtype=np.float16)
         #obs_space = Box(low=float('-inf'), high=float('inf'), shape = ([9]), dtype=np.float32)
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(9) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick", "walk,0,0,0"]
         self.state_space = Box(low=-5, high=5, shape = ([21]), dtype=np.float32)
+        self.selected_action = [0]*len(self.agents)
 
         self.possible_agents = copy.deepcopy(self.agents)
         self._agent_selector = agent_selector(self.agents)
@@ -99,11 +101,13 @@ class raw_env(AECEnv, EzPickle):
         s, c = math.sin(bthe), math.cos(bthe)
         blx, bly = ball_x - bx, ball_y - by
         x, y = blx * c + bly * s, - blx * s + bly * c
-        if abs(math.degrees(math.atan2(y, x))) > 60:
-            obs = [-100, -100]
-        else:
-            obs = [x, y]
-        obs += [bx, by, bthe]
+        #if abs(math.degrees(math.atan2(y, x))) > 60:
+        #    obs = [-100, -100]
+        #else:
+        #    obs = [x, y]
+        obs = [x, y]
+        obs += [bx, by, math.sin(bthe), math.cos(bthe)]
+        obs += [self.selected_action[i]]
         no_agent = len(self.possible_agents)
         base_index = list(range(no_agent))
         if agent.startswith("red"):
@@ -117,19 +121,23 @@ class raw_env(AECEnv, EzPickle):
             lx, ly = rx - bx, ry - by
             x, y = lx * c + ly * s, - lx * s + ly * c
             if agent.startswith("red"):
-                if j < self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 60:
-                    obs += [-100, -100]
-                else:
-                    obs += [x, y]
+                #if j < self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 60:
+                #    obs += [-100, -100]
+                #else:
+                #    obs += [x, y]
+                obs += [x, y]
             else:
-                if j >= self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 60:
-                    obs += [-100, -100]
-                else:
-                    obs += [x, y]
+                #if j >= self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 60:
+                #    obs += [-100, -100]
+                #else:
+                #    obs += [x, y]
+                obs += [x, y]
         if agent.startswith("red"):
             obs[2] = -obs[2]
             obs[3] = -obs[3]
-            obs[4] = normalize_angle_rad(obs[4]+math.pi)
+            obs[4] = -obs[4]
+            obs[5] = -obs[5]
+            #obs[4] = normalize_angle_rad(obs[4]+math.pi)
         return obs
     
     def state(self):
@@ -139,12 +147,13 @@ class raw_env(AECEnv, EzPickle):
         player = []
         for i in range(len(self.agent_list)):
             player.append(self.agent_list[i].pos)
-        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
-        state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2]]
+        state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
+        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2]]
         #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2],  player[2][0], player[2][1], player[2][2]]
         return state
     
     def step(self, action):
+        self.selected_action[self.agent_name_mapping[self.agent_selection]] = action
         if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
             self._was_dead_step(action)
             return
@@ -306,8 +315,8 @@ class raw_env(AECEnv, EzPickle):
         children.importMFNodeFromString(-1, f'DEF BALL RobocupSoccerBall {{ translation 0 {y} 0.1 size 1 }}')
         self.ball = self.supervisor.getFromDef('BALL')
         self.ball_pos = self.ball.getField('translation')
-        #self.init_pos = [[-0.3, 0, 0], [-2, -1, 0], [-2, 1, 0], [1, 0, 3.14], [2, -1, 3.14], [2, 1, 3.14]]
-        self.init_pos = [[-0.3, 0, 0], [-2, -1, 0], [1, 0, 3.14], [2, -1, 3.14]]
+        self.init_pos = [[-0.3, 0, 0], [-2, -1, 0], [-2, 1, 0], [1, 0, 3.14], [2, -1, 3.14], [2, 1, 3.14]]
+        #self.init_pos = [[-0.3, 0, 0], [-2, -1, 0], [1, 0, 3.14], [2, -1, 3.14]]
         for i in range(len(self.agent_list)):
             while True:
                 if self.agents[i].startswith("blue"):
