@@ -153,10 +153,10 @@ class raw_env(AECEnv, EzPickle):
         return state
     
     def step(self, action):
-        self.selected_action[self.agent_name_mapping[self.agent_selection]] = action
         if self.terminations[self.agent_selection] or self.truncations[self.agent_selection]:
             self._was_dead_step(action)
             return
+        self.selected_action[self.agent_name_mapping[self.agent_selection]] = action
         self._cumulative_rewards[self.agent_selection] = 0
         agent = self.agent_list[self.agent_name_mapping[self.agent_selection]]
         agent.score = 0
