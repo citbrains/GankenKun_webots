@@ -115,9 +115,17 @@ class SoccerEnv(MultiAgentEnv):
             #info = {'individual_reward': rewards[self.n_agents+i][0]}
             info = {'individual_reward': c_rews[i][0]}
             c_info_n.append(info)
+        
+        available = []
+        for arr in obs:
+            distance = np.sqrt((arr[0] - arr[1])**2)
+            available.append([1,1,1,1,1,1,1,1,1] if distance <= 0.5 else [1,1,1,1,1,1,0,0,1])
+        c_available = []
+        for arr in c_obs:
+            distance = np.sqrt((arr[0] - arr[1])**2)
+            c_available.append([1,1,1,1,1,1,1,1,1] if distance <= 0.5 else [1,1,1,1,1,1,0,0,1])
 
-        #return obs, state, rewards, dones, infos, ava
-        return obs, rews, dones, info_n, c_obs, c_rews, c_dones, c_info_n
+        return obs, rews, dones, info_n, available, c_obs, c_rews, c_dones, c_info_n, c_available
 
     def render(self, **kwargs):
         # self.env.render(**kwargs)
