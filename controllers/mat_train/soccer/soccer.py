@@ -66,10 +66,7 @@ class raw_env(AECEnv, EzPickle):
         for i in range(len(self.agents)):
             self.agent_name_mapping[self.agents[i]] = i
             self.agent_list.append(Player(self.agents[i], self.supervisor))
-        obs_space = Box(low=-100, high=100, shape = ([17]), dtype=np.float16) #ball 2 + robot 4 + previous action 1 + other robot 2 * 5
-        #obs_space = Box(low=-100, high=100, shape = ([15]), dtype=np.float16)
-        #obs_space = Box(low=-100, high=100, shape = ([11]), dtype=np.float16)
-        #obs_space = Box(low=float('-inf'), high=float('inf'), shape = ([9]), dtype=np.float32)
+        obs_space = Box(low=-10, high=10, shape = ([17]), dtype=np.float16) #ball 2 + robot 4 + previous action 1 + other robot 2 * 5
         self.observation_spaces = dict(zip(self.agents, [obs_space for _ in enumerate(self.agents)]))
         self.action_spaces = dict(zip(self.agents, [Discrete(9) for _ in enumerate(self.agents)]))
         self.actions = ["walk,1,0,0", "walk,-1,0,0", "walk,0,1,0", "walk,0,-1,0", "walk,0,0,1", "walk,0,0,-1", "motion,left_kick", "motion,right_kick", "walk,0,0,0"]
@@ -101,11 +98,10 @@ class raw_env(AECEnv, EzPickle):
         s, c = math.sin(bthe), math.cos(bthe)
         blx, bly = ball_x - bx, ball_y - by
         x, y = blx * c + bly * s, - blx * s + bly * c
-        #if abs(math.degrees(math.atan2(y, x))) > 60:
-        #    obs = [-100, -100]
-        #else:
-        #    obs = [x, y]
-        obs = [x, y]
+        if abs(math.degrees(math.atan2(y, x))) > 80:
+            obs = [-10, -10]
+        else:
+            obs = [x, y]
         obs += [bx, by, math.sin(bthe), math.cos(bthe)]
         obs += [self.selected_action[i]]
         no_agent = len(self.possible_agents)
@@ -121,17 +117,15 @@ class raw_env(AECEnv, EzPickle):
             lx, ly = rx - bx, ry - by
             x, y = lx * c + ly * s, - lx * s + ly * c
             if agent.startswith("red"):
-                #if j < self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 60:
-                #    obs += [-100, -100]
-                #else:
-                #    obs += [x, y]
-                obs += [x, y]
+                if j < self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 80:
+                    obs += [-10, -10]
+                else:
+                    obs += [x, y]
             else:
-                #if j >= self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 60:
-                #    obs += [-100, -100]
-                #else:
-                #    obs += [x, y]
-                obs += [x, y]
+                if j >= self.train_agent_num and abs(math.degrees(math.atan2(y, x))) > 80:
+                    obs += [-10, -10]
+                else:
+                    obs += [x, y]
         if agent.startswith("red"):
             obs[2] = -obs[2]
             obs[3] = -obs[3]
@@ -231,7 +225,7 @@ class raw_env(AECEnv, EzPickle):
                     self.rewards[agent] += -10
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
                     print("reward(fall): "+str(agent)+" "+str(self.rewards[agent]))
-                if abs(math.degrees(math.atan2(bly, blx))) <= 60:
+                if abs(math.degrees(math.atan2(bly, blx))) <= 80:
                     self.rewards[agent] += 0.1
                 near_robot = False
                 for j, name in enumerate(self.agents):
