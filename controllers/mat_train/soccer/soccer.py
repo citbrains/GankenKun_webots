@@ -165,9 +165,9 @@ class raw_env(AECEnv, EzPickle):
         if self.agent_list[i].is_fall:
             while True:
                 if self.agents[i].startswith("blue"):
-                    x, y = random.uniform(-4.0, -3.0), random.uniform(-2.5, 2.5)
+                    x, y, the = random.uniform(-4.0, 1.0), random.uniform(-2.5, 2.5), random.uniform(-math.pi, math.pi)
                 elif self.agents[i].startswith("red"):
-                    x, y = random.uniform(4.0, 3.0), random.uniform(-2.5, 2.5)
+                    x, y, the = random.uniform(-4.0, -1.0), random.uniform(-2.5, 2.5), random.uniform(-math.pi, math.pi)
                 near_robot = False
                 for j in range(len(self.agents)):
                     if j == i:
@@ -179,7 +179,7 @@ class raw_env(AECEnv, EzPickle):
                         break
                 if near_robot == False:
                     break
-            self.init_pos[i][0], self.init_pos[i][1] = x, y
+            self.init_pos[i][0], self.init_pos[i][1], self.init_pos[i][2] = x, y, the
             self.agent_list[i].move(self.init_pos[i])
             self.agent_list[i].is_replace = True
         else:
@@ -187,46 +187,76 @@ class raw_env(AECEnv, EzPickle):
             agent.send(message)
 
         if self._agent_selector.is_last():
+            ball_distance_reward = 1.0
+            rew_ball_distance = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            goal_reward = 1000.0
+            rew_goal = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            velocity_reward = 100.0
+            rew_ball_vel = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            out_of_field_reward = -100.0
+            rew_out_of_field = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            collision_reward = -1.0
+            rew_collision = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            ball_position_reward = 10.0
+            rew_ball_position = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            ball_tracking_reward = 0.1
+            rew_ball_tracking = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            
             self.frames += 1
             self._clear_rewards()
             for i in range(40):
                 self.supervisor.step(self.time_step)
-                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
-                ball_vel_x, ball_vel_y = self.ball.getVelocity()[:2]
-                for agent in self.agents:
-                    x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
-                    length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
-                    self.rewards[agent] += 0.2/length/40
-                    if length < 0.3:
-                        if agent.startswith("blue"):
-                            ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
-                            ball_len = math.sqrt(ball_dx**2+ball_dy**2)
-                            ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
-                            reward = ball_vel_x * ball_dx + ball_vel_y * ball_dy
-                            self.rewards[agent] += max(reward, 0) * 10
-                        elif agent.startswith("red"):
-                            ball_dx, ball_dy = 4.5 - ( -ball_x), 0 - (-ball_y)
-                            ball_len = math.sqrt(ball_dx**2+ball_dy**2)
-                            ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
-                            reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
-                            self.rewards[agent] += max(reward, 0) * 10
+            
+            ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+            ball_vel_x, ball_vel_y = self.ball.getVelocity()[:2]
             for agent in self.agents:
-                # local rewards
                 x, y, the = self.agent_list[self.agent_name_mapping[agent]].pos
-                ball_x, ball_y, _ = self.ball_pos.getSFVec3f()
+                length = math.sqrt((x-ball_x)**2+(y-ball_y)**2)
+
+                # ball distance rewards
+                rew_ball_distance[agent] += math.exp(-length) * ball_distance_reward
+
+                # out of field rewards
+                if abs(x) > 4.9 or abs(y) > 3.4:
+                    rew_out_of_field[agent] += out_of_field_reward
+
+                # ball position rewards
+                rew_ball_position[agent] = 1.0 if ball_x > 1.5 else 0.0
+                rew_ball_position[agent] = 2.0 if (ball_x > 2.5 and abs(ball_y) < 2.5) else rew_ball_position[agent]
+                rew_ball_position[agent] = -1.0 if ball_x < -1.5 else rew_ball_position[agent]
+                rew_ball_position[agent] = -2.0 if (ball_x < -2.5 and abs(ball_y) < 2.5) else rew_ball_position[agent]
+                rew_ball_position[agent] *= ball_position_reward if agent.startswith("blue") else -ball_position_reward
+
+                # ball velocity rewards
+                if length < 1.0:
+                    if agent.startswith("blue"):
+                        ball_dx, ball_dy = 4.5 - ball_x, 0 - ball_y
+                        ball_len = math.sqrt(ball_dx**2+ball_dy**2)
+                        ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
+                        reward = ball_vel_x * ball_dx + ball_vel_y * ball_dy
+                        rew_ball_vel[agent] += max(reward, 0) * velocity_reward
+                    elif agent.startswith("red"):
+                        ball_dx, ball_dy = 4.5 - ( -ball_x), 0 - (-ball_y)
+                        ball_len = math.sqrt(ball_dx**2+ball_dy**2)
+                        ball_dx, ball_dy = ball_dx / ball_len, ball_dy / ball_len
+                        reward = (-ball_vel_x) * ball_dx + (-ball_vel_y) * ball_dy
+                        rew_ball_vel[agent] += max(reward, 0) * velocity_reward
+
+                # local rewards
                 s, c = math.sin(the), math.cos(the)
                 dbx, dby = ball_x - x, ball_y - y
                 blx, bly = dbx * c + dby * s, - dbx * s + dby * c
 
-                self.rewards[agent] += -0.02
-                #if self.rewards[agent] > 0.1:
-                #    print("reward: "+str(agent)+" "+str(self.rewards[agent]))
+                # collision rewards
                 if self.agent_list[self.agent_name_mapping[agent]].is_replace:
-                    self.rewards[agent] += -10
+                    rew_collision[agent] += collision_reward * 10
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
-                    print("reward(fall): "+str(agent)+" "+str(self.rewards[agent]))
+                    breakpoint()
+                
+                # ball tracking rewards
                 if abs(math.degrees(math.atan2(bly, blx))) <= 80:
-                    self.rewards[agent] += 0.1
+                    rew_ball_tracking[agent] += ball_tracking_reward
+
                 near_robot = False
                 for j, name in enumerate(self.agents):
                     if name==agent:
@@ -239,26 +269,40 @@ class raw_env(AECEnv, EzPickle):
                 if near_robot:
                     self.rewards[agent] += -1
 
-                # global rewards
+                # goal rewards
                 if ball_x > 4.5 and abs(ball_y) < 1.3:
                     goal = True
                     truncate = True
                     if agent.startswith("blue"):
-                        self.rewards[agent] += 1000
+                        rew_goal[agent] += goal_reward
                     elif agent.startswith("red"):
-                        self.rewards[agent] += -1000
-                    print("Team blue Goal, reward: "+str(agent)+" "+str(self.rewards[agent]))
+                        rew_goal[agent] += -goal_reward
                 elif ball_x < -4.5 and abs(ball_y) < 1.3:
                     goal = True
                     truncate = True
                     if agent.startswith("blue"):
-                        self.rewards[agent] += -1000
+                        rew_goal[agent] += -goal_reward
                     elif agent.startswith("red"):
-                        self.rewards[agent] += 1000
-                    print("Team red Goal, reward: "+str(agent)+" "+str(self.rewards[agent]))
+                        rew_goal[agent] += goal_reward
+            
+            max_blue = max(list(rew_ball_distance)[:3], key = rew_ball_distance.get)
+            max_red = max(list(rew_ball_distance)[3:], key = rew_ball_distance.get)
+            for key in rew_ball_distance:
+                if key not in [max_blue, max_red]:
+                    rew_ball_distance[key] = 0.0
 
             for agent in self.agents:
+                self.rewards[agent] = rew_ball_distance[agent] + rew_goal[agent] + rew_ball_vel[agent] + rew_out_of_field[agent] + rew_collision[agent] + rew_ball_position[agent] + rew_ball_tracking[agent]
                 self.total_rewards[agent] += self.rewards[agent]
+
+            print("rewards: "+str(self.rewards))
+            print("rew_ball_distance: "+str(rew_ball_distance))
+            print("rew_goal: "+str(rew_goal))
+            print("rew_ball_vel: "+str(rew_ball_vel))
+            print("rew_out_of_field: "+str(rew_out_of_field))
+            print("rew_collision: "+str(rew_collision))
+            print("rew_ball_position: "+str(rew_ball_position))
+            print("rew_ball_tracking: "+str(rew_ball_tracking))
 
             if not goal:
                 if abs(ball_x) > 4.5 or abs(ball_y) > 3.0:
@@ -289,7 +333,7 @@ class raw_env(AECEnv, EzPickle):
         
         self._accumulate_rewards()
         self._deads_step_first()
-    
+
     def render():
         pass
 
@@ -314,9 +358,9 @@ class raw_env(AECEnv, EzPickle):
         for i in range(len(self.agent_list)):
             while True:
                 if self.agents[i].startswith("blue"):
-                    x, y = random.uniform(-4.0, -1.0), random.uniform(-2.5, 2.5)
+                    x, y, the = random.uniform(-4.0, 1.0), random.uniform(-2.5, 2.5), random.uniform(-math.pi, math.pi)
                 elif self.agents[i].startswith("red"):
-                    x, y = random.uniform(4.0, 1.0), random.uniform(-2.5, 2.5)
+                    x, y, the = random.uniform(4.0, -1.0), random.uniform(-2.5, 2.5), random.uniform(-math.pi, math.pi)
                 near_robot = False
                 for j in range(len(self.agents)):
                     if j == i:
@@ -327,7 +371,7 @@ class raw_env(AECEnv, EzPickle):
                         break
                 if near_robot == False:
                     break
-            self.init_pos[i][0], self.init_pos[i][1] = x, y
+            self.init_pos[i][0], self.init_pos[i][1], self.init_pos[i][2] = x, y, the
             self.agent_list[i].reset(self.init_pos[i])
         self.frames = 0
 
