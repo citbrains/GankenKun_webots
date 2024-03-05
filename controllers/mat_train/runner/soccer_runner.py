@@ -39,9 +39,10 @@ class SoccerRunner(Runner):
         done_individual_rewards = []
 
         for episode in range(episodes):
-            if self.use_linear_lr_decay:
-                self.trainer.policy.lr_decay(episode, episodes)
+            #if self.use_linear_lr_decay:
+            #    self.trainer.policy.lr_decay(episode, episodes)
 
+            count = 0
             for step in range(self.episode_length):
                 # Sample actions
                 values, actions, action_log_probs, rnn_states, rnn_states_critic = self.collect(step)
@@ -82,6 +83,13 @@ class SoccerRunner(Runner):
                 # insert data into buffer
                 self.insert(data)
                 self.c_insert(c_data)
+
+                if np.any(dones) or count >= 300:
+                    self.envs.reset()
+                    print("\r\n")
+                    count = 0
+                count += 1
+                print(count, end=' ', flush=True)
 
             # compute return and update network
             self.compute()
