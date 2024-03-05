@@ -3,7 +3,8 @@ import wandb
 import numpy as np
 import torch
 from runner.base_runner import Runner
-
+from pathlib import Path
+import os
 
 def _t2n(x):
     return x.detach().cpu().numpy()
@@ -12,6 +13,13 @@ class SoccerRunner(Runner):
     """Runner class to perform training, evaluation. and data collection for SMAC. See parent class for details."""
     def __init__(self, config):
         super(SoccerRunner, self).__init__(config)
+
+    def setEpisode(self, episode1, episode2):
+        model_dir = Path(os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)) + "/results/test/models")
+        self.restore(str(model_dir) + "/transformer_" + str(episode1) + ".pt")
+        self.buffer.after_update()
+        self.c_restore(str(model_dir) + "/transformer_" + str(episode2) + ".pt")
+        self.c_buffer.after_update()
 
     def run(self):
         self.warmup()
@@ -82,15 +90,15 @@ class SoccerRunner(Runner):
             # post process
             total_num_steps = (episode + 1) * self.episode_length * self.n_rollout_threads
             # save model
-            if (episode % self.save_interval == 0 or episode == episodes - 1):
-                save_episode = episode
-                self.save(save_episode)
+            #if (episode % self.save_interval == 0 or episode == episodes - 1):
+            #    save_episode = episode
+            #    self.save(save_episode)
             
             # copy team update network
-            if (episode % self.self_play_interval == 0 and episode > self.save_interval):
-                print("copy team update network")
-                self.c_restore(str(self.save_dir) + "/transformer_" + str(save_episode) + ".pt")
-            self.c_buffer.after_update()
+            #if (episode % self.self_play_interval == 0 and episode > self.save_interval):
+            #    print("copy team update network")
+            #    self.c_restore(str(self.save_dir) + "/transformer_" + str(save_episode) + ".pt")
+            #self.c_buffer.after_update()
 
             # log information
             if episode % self.log_interval == 0:

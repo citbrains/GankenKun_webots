@@ -297,4 +297,7 @@ def get_config():
     parser.add_argument("--train_maps", type=str, nargs='+', default=None)
     parser.add_argument("--eval_maps", type=str, nargs='+', default=None)
 
+    parser.add_argument("--test_model1", type=int, default=200)
+    parser.add_argument("--test_model2", type=int, default=0)
+
     return parser

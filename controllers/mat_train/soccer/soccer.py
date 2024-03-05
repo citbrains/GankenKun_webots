@@ -251,7 +251,6 @@ class raw_env(AECEnv, EzPickle):
                 if self.agent_list[self.agent_name_mapping[agent]].is_replace:
                     rew_collision[agent] += collision_reward * 10
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
-                    breakpoint()
                 
                 # ball tracking rewards
                 if abs(math.degrees(math.atan2(bly, blx))) <= 80:
@@ -295,18 +294,18 @@ class raw_env(AECEnv, EzPickle):
                 self.rewards[agent] = rew_ball_distance[agent] + rew_goal[agent] + rew_ball_vel[agent] + rew_out_of_field[agent] + rew_collision[agent] + rew_ball_position[agent] + rew_ball_tracking[agent]
                 self.total_rewards[agent] += self.rewards[agent]
 
-            print("rewards: "+str(self.rewards))
-            print("rew_ball_distance: "+str(rew_ball_distance))
-            print("rew_goal: "+str(rew_goal))
-            print("rew_ball_vel: "+str(rew_ball_vel))
-            print("rew_out_of_field: "+str(rew_out_of_field))
-            print("rew_collision: "+str(rew_collision))
-            print("rew_ball_position: "+str(rew_ball_position))
-            print("rew_ball_tracking: "+str(rew_ball_tracking))
+            # print("rewards: "+str(self.rewards))
+            # print("rew_ball_distance: "+str(rew_ball_distance))
+            # print("rew_goal: "+str(rew_goal))
+            # print("rew_ball_vel: "+str(rew_ball_vel))
+            # print("rew_out_of_field: "+str(rew_out_of_field))
+            # print("rew_collision: "+str(rew_collision))
+            # print("rew_ball_position: "+str(rew_ball_position))
+            # print("rew_ball_tracking: "+str(rew_ball_tracking))
 
             if not goal:
                 if abs(ball_x) > 4.5 or abs(ball_y) > 3.0:
-                    print("The ball out of the field")
+                    # print("The ball out of the field")
                     y = random.uniform(-2.5, 2.5)
                     self.ball.resetPhysics()
                     self.ball_pos.setSFVec3f([0, y, 0])
