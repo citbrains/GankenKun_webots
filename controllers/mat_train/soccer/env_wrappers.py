@@ -682,17 +682,17 @@ class DummyVecEnv(ShareVecEnv):
         for (i, done) in enumerate(dones):
             if 'bool' in done.__class__.__name__:
                 if done:
-                    obs[i], c_obs[i] = self.envs[i].reset()
+                    obs[i], c_obs[i], _, _ = self.envs[i].reset()
             else:
                 if np.all(done):
-                    obs[i], c_obs[i] = self.envs[i].reset()
+                    obs[i], c_obs[i], _, _ = self.envs[i].reset()
 
         self.actions = None
         return obs, rews, dones, infos, available, c_obs, c_rews, c_dones, c_infos, c_available
 
     def reset(self):
         obs = [env.reset() for env in self.envs]
-        return np.array(obs)
+        return obs
 
     def close(self):
         for env in self.envs:

@@ -21,20 +21,22 @@ class SoccerRunner(Runner):
         save_episode = None
         self.self_play_interval = self.all_args.self_play_interval
 
-        train_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
-        done_episodes_rewards = []
-
-        #train_episode_scores = [0 for _ in range(self.n_rollout_threads)]
-        #done_episodes_scores = []
-
-        train_individual_rewards = [0 for _ in range(self.num_agents)]
-        done_individual_rewards = []
+        agents = list(self.infos.keys())
+        sum_episode_rewards = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_ball_distance_reward = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_goal_reward = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_ball_vel_reward = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_out_of_field_reward = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_collision_reward = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_ball_position_reward = [0.0 for _ in range(self.n_rollout_threads)]
+        sum_ball_tracking_reward = [0.0 for _ in range(self.n_rollout_threads)]
 
         for episode in range(episodes):
             if self.use_linear_lr_decay:
                 self.trainer.policy.lr_decay(episode, episodes)
 
             for step in range(self.episode_length):
+                print(step, endl=" ", flush=True)
                 # Sample actions
                 values, actions, action_log_probs, rnn_states, rnn_states_critic = self.collect(step)
                 c_values, c_actions, c_action_log_probs, c_rnn_states, c_rnn_states_critic = self.c_collect(step)
@@ -45,24 +47,15 @@ class SoccerRunner(Runner):
 
                 dones_env = np.all(dones, axis=1)
                 reward_env = np.mean(rewards, axis=1).flatten()
-                train_episode_rewards += reward_env
-
-                for agent_id in range(self.num_agents):
-                    for info in infos:
-                        if 'individual_reward' in info[agent_id].keys():
-                            train_individual_rewards[agent_id] += info[agent_id]['individual_reward']
-
-
-                #score_env = [t_info[0]["score_reward"] for t_info in infos]
-                #train_episode_scores += np.array(score_env)
-                for t in range(self.n_rollout_threads):
-                    if dones_env[t]:
-                        done_episodes_rewards.append(train_episode_rewards[t])
-                        train_episode_rewards[t] = 0
-                        #done_episodes_scores.append(train_episode_scores[t])
-                        #train_episode_scores[t] = 0
-                        done_individual_rewards.append(train_individual_rewards)
-                        train_individual_rewards = [0 for _ in range(self.num_agents)]
+                sum_episode_rewards += reward_env
+                for agent in agents:
+                    sum_ball_distance_reward += np.array([infos[0][agent]["ball_distance_reward"]])
+                    sum_goal_reward += np.array([infos[0][agent]["goal_reward"]])
+                    sum_ball_vel_reward += np.array([infos[0][agent]["ball_vel_reward"]])
+                    sum_out_of_field_reward += np.array([infos[0][agent]["out_of_field_reward"]])
+                    sum_collision_reward += np.array([infos[0][agent]["collision_reward"]])
+                    sum_ball_position_reward += np.array([infos[0][agent]["ball_position_reward"]])
+                    sum_ball_tracking_reward += np.array([infos[0][agent]["ball_tracking_reward"]])
 
                 data = obs, rewards, dones, infos, available_actions, \
                        values, actions, action_log_probs, \
@@ -106,27 +99,25 @@ class SoccerRunner(Runner):
                                 int(total_num_steps / (end - start))))
 
                 self.log_train(train_infos, total_num_steps)
+                print("rewards: {}".format(sum_episode_rewards[0]/num))
 
-                if len(done_episodes_rewards) > 0:
-                    aver_episode_rewards = np.mean(done_episodes_rewards)
-                    self.writter.add_scalars("train_episode_rewards", {"aver_rewards": aver_episode_rewards}, total_num_steps)
-                    done_episodes_rewards = []
-
-                    #aver_episode_scores = np.mean(done_episodes_scores)
-                    #self.writter.add_scalars("train_episode_scores", {"aver_scores": aver_episode_scores}, total_num_steps)
-                    #done_episodes_scores = []
-                    #print("some episodes done, average rewards: {}, scores: {}"
-                    #      .format(aver_episode_rewards, aver_episode_scores))
-                    print("some episodes done, average rewards: {}".format(aver_episode_rewards))
-
-                env_infos = {}
-                last_individual_rewards = done_individual_rewards[-1]
-                done_individual_rewards = []
-                for agent_id in range(self.num_agents):
-                    agent_k = 'agent%i/individual_rewards' % (agent_id+1)
-                    env_infos[agent_k] = [last_individual_rewards[agent_id]]
-                self.log_env(env_infos, total_num_steps)
-
+                num = self.episode_length * self.log_interval
+                self.writter.add_scalars("train_episode_rewards", {"total_rewards": sum_episode_rewards[0]/num}, total_num_steps)
+                sum_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"ball_distance_reward": sum_ball_distance_reward[0]/num}, total_num_steps)
+                sum_ball_distance_reward = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"goal_reward": sum_goal_reward[0]/num}, total_num_steps)
+                sum_goal_reward = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"ball_vel_reward": sum_ball_vel_reward[0]/num}, total_num_steps)
+                sum_ball_vel_reward = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"out_of_field_reward": sum_out_of_field_reward[0]/num}, total_num_steps)
+                sum_out_of_field_reward = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"collision_reward": sum_collision_reward[0]/num}, total_num_steps)
+                sum_collision_reward = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"ball_position_reward": sum_ball_position_reward[0]/num}, total_num_steps)
+                sum_ball_position_reward = [0 for _ in range(self.n_rollout_threads)]
+                self.writter.add_scalars("train_episode_rewards", {"ball_tracking_reward": sum_ball_tracking_reward[0]/num}, total_num_steps)
+                sum_ball_tracking_reward = [0 for _ in range(self.n_rollout_threads)]
 
             # eval
             if episode % self.eval_interval == 0 and self.use_eval:
@@ -135,7 +126,7 @@ class SoccerRunner(Runner):
     def warmup(self):
         # reset env
         o = self.envs.reset()[0]
-        obs, c_obs = o[0], o[1]
+        obs, c_obs, infos, c_infos = np.array(o[0]), np.array(o[1]), o[2], o[3]
 
         # replay buffer
         if self.use_centralized_V:
@@ -151,6 +142,8 @@ class SoccerRunner(Runner):
         self.buffer.obs[0] = obs.copy()
         self.c_buffer.share_obs[0] = c_share_obs.copy()
         self.c_buffer.obs[0] = c_obs.copy()
+        self.infos = infos
+        self.c_infos = c_infos
 
     @torch.no_grad()
     def collect(self, step):

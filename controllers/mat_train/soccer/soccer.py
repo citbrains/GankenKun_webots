@@ -251,7 +251,6 @@ class raw_env(AECEnv, EzPickle):
                 if self.agent_list[self.agent_name_mapping[agent]].is_replace:
                     rew_collision[agent] += collision_reward * 10
                     self.agent_list[self.agent_name_mapping[agent]].is_replace = False
-                    breakpoint()
                 
                 # ball tracking rewards
                 if abs(math.degrees(math.atan2(bly, blx))) <= 80:
@@ -294,30 +293,34 @@ class raw_env(AECEnv, EzPickle):
             for agent in self.agents:
                 self.rewards[agent] = rew_ball_distance[agent] + rew_goal[agent] + rew_ball_vel[agent] + rew_out_of_field[agent] + rew_collision[agent] + rew_ball_position[agent] + rew_ball_tracking[agent]
                 self.total_rewards[agent] += self.rewards[agent]
-
-            print("rewards: "+str(self.rewards))
-            print("rew_ball_distance: "+str(rew_ball_distance))
-            print("rew_goal: "+str(rew_goal))
-            print("rew_ball_vel: "+str(rew_ball_vel))
-            print("rew_out_of_field: "+str(rew_out_of_field))
-            print("rew_collision: "+str(rew_collision))
-            print("rew_ball_position: "+str(rew_ball_position))
-            print("rew_ball_tracking: "+str(rew_ball_tracking))
+                self.ball_distance_reward[agent] += rew_ball_distance[agent]
+                self.goal_reward[agent] += rew_goal[agent]
+                self.ball_vel_reward[agent] += rew_ball_vel[agent]
+                self.out_of_field_reward[agent] += rew_out_of_field[agent]
+                self.collision_reward[agent] += rew_collision[agent]
+                self.ball_position_reward[agent] += rew_ball_position[agent]
+                self.ball_tracking_reward[agent] += rew_ball_tracking[agent]
 
             if not goal:
                 if abs(ball_x) > 4.5 or abs(ball_y) > 3.0:
-                    print("The ball out of the field")
                     y = random.uniform(-2.5, 2.5)
                     self.ball.resetPhysics()
                     self.ball_pos.setSFVec3f([0, y, 0])
         
+            for agent in self.agents:
+                self.infos[agent] = {"individual_reward": self.rewards[agent],
+                                     "ball_distance_reward": rew_ball_distance[agent],
+                                     "goal_reward": rew_goal[agent],
+                                     "ball_vel_reward": rew_ball_vel[agent],
+                                     "out_of_field_reward": rew_out_of_field[agent],
+                                     "collision_reward": rew_collision[agent],
+                                     "ball_position_reward": rew_ball_position[agent],
+                                     "ball_tracking_reward": rew_ball_tracking[agent]}
+    
         if self.frames >= self.max_cycles:
             truncate = True
         self.terminations = {a: terminate for a in self.agents}
         self.truncations = {a: truncate for a in self.agents}
-        if truncate:
-            for agent in self.agents:
-                self.infos[agent]["episode"] = {"r": self.total_rewards[agent], "l": self.max_cycles}
 
         if self._agent_selector.is_last():
             _live_agents = self.agents[:]
@@ -383,6 +386,13 @@ class raw_env(AECEnv, EzPickle):
         self.agent_selection = self._agent_selector.next()
         self.rewards = dict(zip(self.agents, [0 for _ in self.agents]))
         self.total_rewards = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.ball_distance_reward = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.goal_reward = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.ball_vel_reward = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.out_of_field_reward = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.collision_reward = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.ball_position_reward = dict(zip(self.agents, [0 for _ in self.agents]))
+        self.ball_tracking_reward = dict(zip(self.agents, [0 for _ in self.agents]))
         self._cumulative_rewards = {a: 0 for a in self.agents}
         self.terminations = dict(zip(self.agents, [False for _ in self.agents]))
         self.truncations = dict(zip(self.agents, [False for _ in self.agents]))

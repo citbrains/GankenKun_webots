@@ -49,51 +49,31 @@ class SoccerEnv(MultiAgentEnv):
             [np.array(obs[k], dtype=np.float32).flatten() for k in sorted(obs)]
         )
         return obs_cat
-        #ava = obs["avail"]
-        #return obs_cat, ava
 
     def reset(self, **kwargs):
         """ Returns initial observations and states"""
-        obs_dicts, _ = self.env.reset()
-        #self.pre_obs = obs_dicts
-        #obs = []
-        #ava = []
+        obs_dicts, info_dicts = self.env.reset()
         obs = [np.array(obs_dicts[k], dtype=np.float32) for k in sorted(obs_dicts) if k.startswith(self.train_team_name)]
         c_obs = [np.array(obs_dicts[k], dtype=np.float32) for k in sorted(obs_dicts) if k.startswith(self.copy_team_name)]
-        #for obs_dict in obs_dicts:
-        #    obs_i, ava_i = self._encode_obs(obs_dict)
-        #    obs.append(obs_i)
-        #    ava.append(ava_i)
-        return obs, c_obs
-        #state = obs.copy()
-        #return obs, state, ava
+        infos = {key: value for key, value in info_dicts.items() if key.startswith(self.train_team_name)}
+        c_infos = {key: value for key, value in info_dicts.items() if key.startswith(self.copy_team_name)}
+        return obs, c_obs, infos, c_infos
 
     def step(self, actions):
-        #actions_int = [int(a) for a in actions]
-        #o, r, d, i = self.env.step(actions_int)
         actions_dict = {}
         for i, agent in enumerate(self.agents):
             actions_dict[agent] = int(actions[0][i])
         for i, agent in enumerate(self.copy_agents):
             actions_dict[agent] = int(actions[1][i])
         observations, rewards, terminations, truncations, infos = self.env.step(actions_dict)
-        #obs = []
         obs = [np.array(observations[k], dtype=np.float32) for k in sorted(observations) if k.startswith(self.train_team_name)]
         c_obs = [np.array(observations[k], dtype=np.float32) for k in sorted(observations) if k.startswith(self.copy_team_name)]
-        #ava = []
-        #for obs_dict in observations:
-        #    obs_i, ava_i = self._encode_obs(obs_dict)
-        #    obs.append(obs_i)
-        #    ava.append(ava_i)
-        #state = obs.copy()
         
         d = [truncations[k] for k in sorted(truncations) if k.startswith(self.train_team_name)]
         dones = np.ones((self.n_agents), dtype=bool) * d
         c_d = [truncations[k] for k in sorted(truncations) if k.startswith(self.copy_team_name)]
         c_dones = np.ones((self.n_agents), dtype=bool) * c_d
 
-        #rewards = [[self.reward_encoder.calc_reward(_r, _prev_obs, _obs)]
-        #           for _r, _prev_obs, _obs in zip(r, self.pre_obs, o)]
         if all(d):
             rews = [[rewards[k]] for k in sorted(rewards) if k.startswith(self.train_team_name)]
             c_rews = [[rewards[k]] for k in sorted(rewards) if k.startswith(self.copy_team_name)]
@@ -101,21 +81,9 @@ class SoccerEnv(MultiAgentEnv):
             rews = [[rewards[k]/(self.n_agents+self.n_copy_agents)] for k in sorted(rewards) if k.startswith(self.train_team_name)]
             c_rews = [[rewards[k]/(self.n_agents+self.n_copy_agents)] for k in sorted(rewards) if k.startswith(self.copy_team_name)]
 
-        #self.pre_obs = observations
+        infos_n = {key: value for key, value in infos.items() if key.startswith("blue")}
+        c_infos_n = {key: value for key, value in infos.items() if key.startswith("red")}
 
-        #infos = [i for n in range(self.n_agents)]
-        #infos = [infos[k] for k in sorted(infos)]
-        info_n = []
-        for i, agent in enumerate(self.agents):
-            #info = {'individual_reward': rewards[i][0]}
-            info = {'individual_reward': rews[i][0]}
-            info_n.append(info)
-        c_info_n = []
-        for i, agent in enumerate(self.copy_agents):
-            #info = {'individual_reward': rewards[self.n_agents+i][0]}
-            info = {'individual_reward': c_rews[i][0]}
-            c_info_n.append(info)
-        
         available = []
         for arr in obs:
             distance = np.sqrt(arr[0]**2 + arr[1]**2)
@@ -125,7 +93,7 @@ class SoccerEnv(MultiAgentEnv):
             distance = np.sqrt(arr[0]**2 + arr[1]**2)
             c_available.append([1,1,1,1,1,1,1,1,1] if distance <= 0.5 else [1,1,1,1,1,1,0,0,1])
 
-        return obs, rews, dones, info_n, available, c_obs, c_rews, c_dones, c_info_n, c_available
+        return obs, rews, dones, infos_n, available, c_obs, c_rews, c_dones, c_infos_n, c_available
 
     def render(self, **kwargs):
         # self.env.render(**kwargs)
