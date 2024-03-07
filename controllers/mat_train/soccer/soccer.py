@@ -188,7 +188,7 @@ class raw_env(AECEnv, EzPickle):
             velocity_reward = 10.0
             out_of_field_reward = -100.0
             collision_reward = -1.0
-            ball_position_reward = 2.0
+            ball_position_reward = 4.0
             ball_tracking_reward = 0.1
 
             rew_ball_distance = dict(zip(self.agents, [0.0 for _ in self.agents]))

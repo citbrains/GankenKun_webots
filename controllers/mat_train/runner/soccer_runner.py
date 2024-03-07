@@ -101,7 +101,6 @@ class SoccerRunner(Runner):
                 self.log_train(train_infos, total_num_steps)
 
                 num = self.episode_length * self.log_interval
-                print("rewards: {}".format(sum_episode_rewards[0]/num))
                 self.writter.add_scalars("train_episode_rewards", {"total_rewards": sum_episode_rewards[0]/num}, total_num_steps)
                 sum_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
                 self.writter.add_scalars("train_episode_rewards", {"ball_distance_reward": sum_ball_distance_reward[0]/self.num_agents/num}, total_num_steps)
