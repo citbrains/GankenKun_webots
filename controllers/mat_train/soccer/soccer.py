@@ -131,7 +131,6 @@ class raw_env(AECEnv, EzPickle):
             obs[3] = -obs[3]
             obs[4] = -obs[4]
             obs[5] = -obs[5]
-            #obs[4] = normalize_angle_rad(obs[4]+math.pi)
         return obs
     
     def state(self):
@@ -142,8 +141,6 @@ class raw_env(AECEnv, EzPickle):
         for i in range(len(self.agent_list)):
             player.append(self.agent_list[i].pos)
         state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2], player[4][0], player[4][1], player[4][2], player[5][0], player[5][1], player[5][2]]
-        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2], player[2][0], player[2][1], player[2][2], player[3][0], player[3][1], player[3][2]]
-        #state = [ball_x, ball_y, 0, player[0][0], player[0][1], player[0][2], player[1][0], player[1][1], player[1][2],  player[2][0], player[2][1], player[2][2]]
         return state
     
     def step(self, action):
@@ -159,8 +156,6 @@ class raw_env(AECEnv, EzPickle):
         truncate = False
         goal = False
         
-        #print("frames: "+str(self.frames))
-
         i = self.agent_name_mapping[self.agent_selection]
         if self.agent_list[i].is_fall:
             while True:
@@ -187,19 +182,21 @@ class raw_env(AECEnv, EzPickle):
             agent.send(message)
 
         if self._agent_selector.is_last():
+            # rewards
             ball_distance_reward = 1.0
-            rew_ball_distance = dict(zip(self.agents, [0.0 for _ in self.agents]))
             goal_reward = 1000.0
-            rew_goal = dict(zip(self.agents, [0.0 for _ in self.agents]))
-            velocity_reward = 100.0
-            rew_ball_vel = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            velocity_reward = 10.0
             out_of_field_reward = -100.0
-            rew_out_of_field = dict(zip(self.agents, [0.0 for _ in self.agents]))
             collision_reward = -1.0
-            rew_collision = dict(zip(self.agents, [0.0 for _ in self.agents]))
-            ball_position_reward = 10.0
-            rew_ball_position = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            ball_position_reward = 2.0
             ball_tracking_reward = 0.1
+
+            rew_ball_distance = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            rew_goal = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            rew_ball_vel = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            rew_out_of_field = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            rew_collision = dict(zip(self.agents, [0.0 for _ in self.agents]))
+            rew_ball_position = dict(zip(self.agents, [0.0 for _ in self.agents]))
             rew_ball_tracking = dict(zip(self.agents, [0.0 for _ in self.agents]))
             
             self.frames += 1

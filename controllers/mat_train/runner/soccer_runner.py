@@ -36,7 +36,7 @@ class SoccerRunner(Runner):
                 self.trainer.policy.lr_decay(episode, episodes)
 
             for step in range(self.episode_length):
-                print(step, endl=" ", flush=True)
+                print(step, end='\r', flush=True)
                 # Sample actions
                 values, actions, action_log_probs, rnn_states, rnn_states_critic = self.collect(step)
                 c_values, c_actions, c_action_log_probs, c_rnn_states, c_rnn_states_critic = self.c_collect(step)
@@ -80,10 +80,10 @@ class SoccerRunner(Runner):
                 self.save(save_episode)
             
             # copy team update network
-            if (episode % self.self_play_interval == 0 and episode > self.save_interval):
-                print("copy team update network")
-                self.c_restore(str(self.save_dir) + "/transformer_" + str(save_episode) + ".pt")
-            self.c_buffer.after_update()
+            #if (episode % self.self_play_interval == 0 and episode > self.save_interval):
+            #    print("copy team update network")
+            #    self.c_restore(str(self.save_dir) + "/transformer_" + str(save_episode) + ".pt")
+            #self.c_buffer.after_update()
 
             # log information
             if episode % self.log_interval == 0:
@@ -99,24 +99,24 @@ class SoccerRunner(Runner):
                                 int(total_num_steps / (end - start))))
 
                 self.log_train(train_infos, total_num_steps)
-                print("rewards: {}".format(sum_episode_rewards[0]/num))
 
                 num = self.episode_length * self.log_interval
+                print("rewards: {}".format(sum_episode_rewards[0]/num))
                 self.writter.add_scalars("train_episode_rewards", {"total_rewards": sum_episode_rewards[0]/num}, total_num_steps)
                 sum_episode_rewards = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"ball_distance_reward": sum_ball_distance_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"ball_distance_reward": sum_ball_distance_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_ball_distance_reward = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"goal_reward": sum_goal_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"goal_reward": sum_goal_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_goal_reward = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"ball_vel_reward": sum_ball_vel_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"ball_vel_reward": sum_ball_vel_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_ball_vel_reward = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"out_of_field_reward": sum_out_of_field_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"out_of_field_reward": sum_out_of_field_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_out_of_field_reward = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"collision_reward": sum_collision_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"collision_reward": sum_collision_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_collision_reward = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"ball_position_reward": sum_ball_position_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"ball_position_reward": sum_ball_position_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_ball_position_reward = [0 for _ in range(self.n_rollout_threads)]
-                self.writter.add_scalars("train_episode_rewards", {"ball_tracking_reward": sum_ball_tracking_reward[0]/num}, total_num_steps)
+                self.writter.add_scalars("train_episode_rewards", {"ball_tracking_reward": sum_ball_tracking_reward[0]/self.num_agents/num}, total_num_steps)
                 sum_ball_tracking_reward = [0 for _ in range(self.n_rollout_threads)]
 
             # eval

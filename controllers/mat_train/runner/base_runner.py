@@ -104,7 +104,7 @@ class Runner(object):
                              device=self.device)
 
         if self.model_dir is not None:
-            self.c_restore(self.model_dir)
+            self.c_restore("./transformer_0.pt")
 
         # algorithm
         self.c_trainer = TrainAlgo(self.all_args, self.c_policy, self.num_agents, device=self.device)
