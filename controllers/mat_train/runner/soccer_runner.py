@@ -43,6 +43,7 @@ class SoccerRunner(Runner):
             #    self.trainer.policy.lr_decay(episode, episodes)
 
             count = 0
+            num = 0
             for step in range(self.episode_length):
                 # Sample actions
                 values, actions, action_log_probs, rnn_states, rnn_states_critic = self.collect(step)
@@ -88,8 +89,9 @@ class SoccerRunner(Runner):
                     self.envs.reset()
                     print("\r\n")
                     count = 0
+                    num += 1
                 count += 1
-                print(count, end=' ', flush=True)
+                print(str(num)+": "+str(count), end='\r', flush=True)
 
             # compute return and update network
             self.compute()
