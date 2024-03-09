@@ -87,7 +87,7 @@ class SoccerRunner(Runner):
 
                 if np.any(dones) or count >= 300:
                     self.envs.reset()
-                    print("\r\n")
+                    print()
                     count = 0
                     num += 1
                 count += 1

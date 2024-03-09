@@ -310,9 +310,9 @@ class raw_env(AECEnv, EzPickle):
                     self.ball.resetPhysics()
                     self.ball_pos.setSFVec3f([0, y, 0])
             if ball_x > 4.5 and abs(ball_y) < 1.3:
-                print("blue goal")
+                print("\nblue goal", end="")
             if ball_x < -4.5 and abs(ball_y) < 1.3:
-                print("red goal")
+                print("\nred goal", end="")
         
         if self.frames >= self.max_cycles:
             truncate = True
