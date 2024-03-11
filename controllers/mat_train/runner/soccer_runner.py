@@ -5,6 +5,7 @@ import torch
 from runner.base_runner import Runner
 from pathlib import Path
 import os
+import sys
 
 def _t2n(x):
     return x.detach().cpu().numpy()
@@ -90,6 +91,8 @@ class SoccerRunner(Runner):
                     print()
                     count = 0
                     num += 1
+                    if num >= 20:
+                        sys.exit()
                 count += 1
                 print(str(num)+": "+str(count), end='\r', flush=True)
 
